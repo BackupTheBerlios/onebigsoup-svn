@@ -98,8 +98,6 @@ class LocalNamesSink:
     """
     def __init__(self, namespace):
         self.namespace = namespace
-    def comment(self, s):
-        pass
 
     def meta(self, key, value):
         pass
@@ -107,13 +105,13 @@ class LocalNamesSink:
     def map(self, name, uri):
         self.namespace.names[ name ] = uri
 
-    def connection(self, name, uri):
+    def otherNameSpace( self, name, uri ):
         self.namespace.connections[ name ] = uri
 
-    def defaultConnection(self, name):
+    def defaultNameSpaces(self, name):
         self.namespace.defaults.append( name )
 
-    def defaultPagePattern(self, pattern):
+    def lastResortNamePattern(self, pattern):
         self.namespace.pattern = pattern
 
 
@@ -183,11 +181,6 @@ class Resolver:
         # go to our default space, and return our default pattern match
         return space.default_for_name( final_name )
 
-def test():
-    store = NameSpaceStore(24*60*60) # one day timeout
-    space = store.get( "http://taoriver.net/tmp/nstest.txt" )
-    print space.lookup( "FirstName" )
-
 def test_resolver():
 ##     resolver = Resolver( "http://onebigsoup.wiki.taoriver.net/moin.cgi/LocalNamesDescription?action=raw",
 ##                          "localnames_cache" )
@@ -198,18 +191,19 @@ def test_resolver():
 ##     print resolver.lookup_tuple( ["IntComm", "CommunityWiki", "OneBigSoup"] )
 ##     print resolver.lookup_tuple( ["CommunityWiki", "OneBigSoup"] )
 ##     print resolver.lookup_tuple( ["ThePublicWeb"] )
+    print "READING:"
+    print urllib.urlopen("http://lion.taoriver.net/localnames.txt").read()
+    print "------"
     resolver = Resolver( "http://lion.taoriver.net/localnames.txt",
                          "localnames_cache" )
     print resolver.lookup_tuple( ["WeirdFile"] )
     print resolver.lookup_tuple( ["Kitty"] )
     print resolver.lookup_tuple( ["MarshallBrain"] )
     print resolver.lookup_tuple( ["/."] )
-    print resolver.lookup_tuple( ["OneBigSoup","FrontPage"] )
-    print resolver.lookup_tuple( ["OneBigSoup","DingDing"] )
-    print resolver.lookup_tuple( ["LocalNames"] )
+    #print resolver.lookup_tuple( ["OneBigSoup","FrontPage"] )
+    #print resolver.lookup_tuple( ["OneBigSoup","DingDing"] )
+    #print resolver.lookup_tuple( ["LocalNames"] )
     
     
 if __name__=="__main__": 
-    test()
-    print "---------"
     test_resolver()
