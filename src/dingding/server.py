@@ -36,7 +36,8 @@ class Server:
 
     * notify( load, Spw )                     - report an event
     * subscribe( pattern, client_info, Cpw )   - ask for notice of events
-    * unsubscribe( pattern, client_info, Cpw ) - ask for no more notices
+    * unsubscribe( pattern, client_info, Cpw ) - cut off a subscription
+    * unsubscribe_all( client_info, Cpw )      - ask for no more notices
 
     load:    A dictionary of NLSD data summarizing the event.
              (NLSD: Numbers, Lists, Strings, Dictionaries)
@@ -256,6 +257,28 @@ class Server:
 
         return found_one
 
+    def unsubscribe_all( s, client_info, Cpw ):
+        """
+        Un-subscribe a client *completely*.
+
+        client_info: Info about client (dictionary)
+        Cpw:         Client notification password
+        """
+        indexes = range( len(s.registry) )
+        indexes.reverse()
+        found_one = False
+        
+        for i in indexes:
+            (p,r,c) = s.registry[i]
+            if Cpw==c and r==client_info:
+                del s.registry[i]
+                found_one = True
+
+        if found_one == True:
+            s._save()
+        
+        return found_one
+    
     def get_logs( s, ptrn ):
         """
         The server is not obligated to keep logs
@@ -291,6 +314,7 @@ class Server:
         server.register_function( s.notify )
         server.register_function( s.subscribe )
         server.register_function( s.unsubscribe )
+        server.register_function( s.unsubscribe_all )
         server.register_function( s.get_logs )
         print time.asctime(), "Event Server Starts - %s:%s" % (s.host_name,
                                                                s.port_number)
