@@ -20,6 +20,42 @@ loose_flags = sets.ImmutableSet(["no-case", "no-punctuation",
                                   "no-space", "forgive-spelling"])
 
 
+def dump_cache(url):
+    """Dump cache entry for a particular url."""
+    try:
+        del store[url]
+    except KeyError:
+        pass
+
+
+def preferred_names():
+    """
+    Dictionary linking cached namespace preferred name to url.
+
+    Old cache entries discarded, then
+    names assigned first come first serve.
+
+    """
+    decorated = [(ns["TIME"], ns) for ns in store.values()]
+    decorated.sort()
+    spaces = [ns for ns_time, ns in decorated]
+    
+    now = time.time()
+    for space in spaces:
+        if now > space["TIME"] + time_to_live:
+            dump_cache(space["URL"])
+        else:
+            break
+
+    bindings = {}
+    for space in spaces:
+        for name in space["X"].get("PREFERRED-NAME", []):
+            if not bindings.has_key(name):
+                bindings[name] = space["URL"]
+                break
+    return bindings
+
+
 def get_namespace(url):
     """
     Returns a namespace dictionary.
@@ -30,6 +66,7 @@ def get_namespace(url):
     The namespace dictionary is structured so:
 
     "TIME": (INTERNAL) cache timestamp
+    "URL": url used to fetch namespace
     "TEXT": raw UTF-8 text cached
     "ERRORS": list of parse errors;
               each error is a tuple:
@@ -53,6 +90,7 @@ def get_namespace(url):
     
     namespace = {}
     namespace["TIME"] = now
+    namespace["URL"] = url
     namespace["TEXT"] = urllib.urlopen( url ).read().decode("utf-8","replace")
     lines = namespace["TEXT"].splitlines()
 
@@ -77,9 +115,10 @@ def get_namespace(url):
             else:
                 msg = "redefinition of %s" % second
                 namespace["ERRORS"].append((line_number, msg))
+    for line_number, second, third in namespace["X-raw"]:
+        namespace["X"].setdefault(second, []).append(third)
 
     store[url] = namespace
-
     return namespace
 
 
@@ -214,6 +253,7 @@ def _prepare_key(name, flags):
     name: string,  flags: list of strings
     Recognized flags: "no-case", "no-punctuation",
                       "no-space", "forgive-spelling".
+
     """
     if "no-case" in flags:
         name = name.lower()
@@ -266,3 +306,7 @@ if __name__ == '__main__':
     flags.add("loose")
     flags.discard("reverse")
     print lookup(["wiki-wrappers"], url, flags)
+    get_namespace("http://taoriver.net/tmp/gmail.txt")
+    print "Preferred Names:",
+    print preferred_names()
+
