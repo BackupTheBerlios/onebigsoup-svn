@@ -17,7 +17,7 @@ server.subscribe( ["VAL","Action","post"],
 
 from DocXMLRPCServer import DocXMLRPCServer
 
-import localnames,time
+import localnames,time,socket
 
 
 
@@ -28,6 +28,8 @@ PASSWORD    = "password" # client password for receiving ding-ding events
 
 CACHE_TTL_IN_SECONDS = 7*24*60*60 # one week!
 
+ULI_ALLOW_DUMP = True # allow people to dump cache by ULI? (EASILY ATTACKED)
+
 
 
 class Server:
@@ -37,6 +39,84 @@ class Server:
         s.password = password
 
         s.store = localnames.NameSpaceStore( CACHE_TTL_IN_SECONDS )
+
+        s.uli_ns = ""
+
+    def uli(s, message ):
+        """
+        ULI port:
+        * commands are case insensitive
+        * one session for all users- hopefully not a big problem..!
+
+        HELP
+
+          Tell how to use the system
+        """
+        if type(message) != type("string"):
+            return "ULI requires string arguments."
+
+        while message[-1] in ["\r","\n"]:
+            message = message[:-1]
+
+        message = message.split()
+        if len(message)>0:
+            cmd = message[0].upper()
+            rest = message[1:]
+        else:
+            cmd = None
+
+        if cmd == "HELP":
+            return "\n".join( ["Valid commands are:",
+                               "* HELP",
+                               "* SET-NAMESPACE (url)",
+                               "* LOOKUP (space) (space) ... (name)  --abbreviation: just 'L'",
+                               "* DUMP-CACHE (url)",
+                               "* LIST-CACHE",
+                               "* LIST-NAMES",
+                               "* LIST-SPACES",
+                               "* LIST-DEFAULTS",
+                               "",
+                               "Presently set to namespace:",
+                               s.uli_ns] )
+
+        if cmd == "SET-NAMESPACE":
+            s.uli_ns = rest[0]
+            return "Set namespace to: %s\n" % s.uli_ns
+
+        if cmd in ["L","LOOKUP"]:
+            return s.lookup( s.uli_ns, rest, 1 ) + "\n"
+
+        if cmd == "DUMP-CACHE":
+            url = rest[0]
+            if not ULI_ALLOW_DUMP:
+                return "Dumping cache by ULI has been turned off."
+            if not s.store.namespaces.has_key( url ):
+                return "%s wasn't cached." % url
+            del s.store.namespaces[ url ]
+            return "Cache dumped for namespace by URL %s" % url
+
+        if cmd == "LIST-CACHE":
+            return " ".join( s.store.namespaces.keys() ) + "\n"
+
+        if cmd == "LIST-NAMES":
+            space = s.store.namespaces.get( s.uli_ns )
+            if space == None:
+                return "Invalid namespace: %s." % s.uli_ns
+            return " ".join( space.names.keys() ) + "\n"
+
+        if cmd == "LIST-SPACES":
+            space = s.store.namespaces.get( s.uli_ns )
+            if space == None:
+                return "Invalid namespace: %s." % s.uli_ns
+            return " ".join( space.spaces.keys() ) + "\n"
+
+        if cmd == "LIST-DEFAULTS":
+            space = s.store.namespaces.get( s.uli_ns )
+            if space == None:
+                return "Invalid namespace: %s." % s.uli_ns
+            return " ".join( space.defaults ) + "\n"
+
+        return "LocalNames XML-RPC server ULI interface does not understand the request.\n Received: %s\n" % message
 
     def notify( s, load, client_password ):
         """
@@ -169,13 +249,25 @@ class Server:
         pass
 
     def run( s ):
-        server = DocXMLRPCServer( (s.host_name, s.port_number),
-                                  logRequests=0 )
+        server = None
+        while server == None:
+            try:
+                server = DocXMLRPCServer( (s.host_name, s.port_number),
+                                      logRequests=0 )
+            except socket.error, (code,name):
+                server = None
+                if code != 98 and name != "Address already in use":
+                    raise socket.error(code,name)
+                print "couldn't get socket, retrying in 15 seconds..."
+                print "   %s %s" % (code,name)
+                time.sleep(15)
+
         server.register_function( s.lookup )
         server.register_function( s.lookup_many )
         server.register_function( s.locate_list )
         server.register_function( s.list_names )
         server.register_function( s.notify )
+        server.register_function( s.uli )
 
         print time.asctime(), "LocalNames Server Starts - %s:%s" % (s.host_name,
                                                                     s.port_number)
