@@ -1,0 +1,77 @@
+      <h4>Add a Name:</h4>
+      <form method="get" action="index.cgi">
+        <input type="hidden" name="$PAGE_KEY" value="$PAGE_EDITNAMES"/>
+	<input type="hidden" name="$SPACE_KEY" value="$SPACE"/>
+        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <td style="text-align: right;" valign="undefined">Name:</td>
+              <td align="undefined" valign="undefined">
+                <input size="40" name="name">
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: right;" valign="undefined">URL:</td>
+              <td align="undefined" valign="undefined">
+                <input size="60" value="http://" name="url">
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <td style="white-space: nowrap;" align="undefined" valign="undefined">Alternate Name:</td>
+              <td align="undefined" valign="undefined">
+                <input size="40" name="alt">
+              </td>
+            </tr>
+            <tr>
+              <td style="white-space: nowrap;" align="undefined" valign="undefined">Alternate Name:</td>
+              <td align="undefined" valign="undefined">
+                <input size="40" name="alt">
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+	  <tbody>
+	    <tr>
+	      <td>
+	      <input type="submit" value="Add Name"></input>
+	      </td>
+	    </tr>
+	  </tbody>
+	</table>
+      </form>
+
+      <h4>Names:</h4>
+      <form method="post" action="index.cgi">
+        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <th style="text-align: center;">delete<br>
+              </th>
+              <th style="text-align: center;">order<br>
+              </th>
+              <th>name<br>
+              </th>
+              <th>URL<br>
+              </th>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><input name="del0" value="del0" type="checkbox"> </td>
+              <td align="undefined" valign="undefined"><input size="6" name="order0" value="0"><br>
+              </td>
+              <td align="undefined" valign="undefined"><input size="25" name="name0"> </td>
+              <td align="undefined" valign="undefined"><input size="50" value="http://" name="url0"> </td>
+            </tr>
+            <tr>
+              <td style="text-align: center;" valign="undefined"><input name="del1" value="del1" type="checkbox"> </td>
+              <td align="undefined" valign="undefined"><input size="6" name="order1" value="1"> </td>
+              <td align="undefined" valign="undefined"><input size="25" name="name1"> </td>
+              <td align="undefined" valign="undefined"><input size="50" value="http://" name="url1"> </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>

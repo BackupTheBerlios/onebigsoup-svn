@@ -1,0 +1,41 @@
+
+
+TO INSTALL:
+
+  1) create directory
+
+     Create a directory to serve from, somewhere.
+     Maybe:  mkdir /var/www/localnames
+
+  2) adjust httpd.conf
+
+     * enable .htaccess in the directory you're
+       going to be serving from
+
+
+     Maybe:  Alias /localnames/ "/var/www/localnames/"
+             <Directory "/var/www/testing">
+               AllowOverride All
+             </Directory>
+
+  3) edit conf.sh
+
+     Basically, just telling system where various
+     things are found.
+
+     In particular, you give the location of the
+     directory you prepared in step 1.
+
+  2) run "sh_install.sh"
+
+     It's a bash script, and it installs the program.
+
+
+OTHER NOTES:
+
+ * don't know if data.p and data/ dirs will be problems-
+   may have to change ownership to apache.apache
+
+ * talk to me, Mother Goose! just let me know what
+   you're having problems with
+

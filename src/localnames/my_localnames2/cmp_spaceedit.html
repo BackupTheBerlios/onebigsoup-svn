@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Local Names Space Editor</title>
+  <meta content="Lion Kimbro" name="author">
+  <link rel="stylesheet" href="mylocalnames.css" type="text/css">
+</head>
+<body>
+<table style="width: 100%;" border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td>
+      <table style="width: 100%;" border="0" cellpadding="2"
+ cellspacing="2">
+        <tbody>
+          <tr>
+            <td>(ln)</td>
+            <td style="text-align: right;">space:<br>
+            </td>
+            <td
+ style="text-align: left; width: 50%; white-space: nowrap;">
+            <h2>LIONS</h2>
+            </td>
+            <td style="vertical-align: middle;">
+            <table style="width: 100px; text-align: left;" border="0"
+ cellpadding="2" cellspacing="2">
+              <tbody>
+                <tr>
+                  <td
+ style="text-align: center; vertical-align: middle;"><img
+ style="width: 80px; height: 15px;" alt="Local Names v1.0"
+ src="names-v1-0.png"><br>
+                  </td>
+                </tr>
+                <tr>
+                  <td
+ style="text-align: center; vertical-align: middle;"><img
+ style="width: 80px; height: 15px;" alt="nLSD namespace description"
+ src="nlsd-names.png"><br>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </td>
+            <td align="undefined" valign="undefined">(recent activity)<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 650px;" align="undefined" valign="undefined">
+      <table style="text-align: left; width: 155px; height: 29px;"
+ border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr class="darker">
+            <td
+ style="width: 100px; text-align: center; vertical-align: middle; white-space: nowrap;"><span
+ style="font-weight: bold;">names</span><br>
+            </td>
+            <td
+ style="width: 100px; text-align: center; vertical-align: middle; white-space: nowrap;">spaces<br>
+            </td>
+            <td
+ style="width: 100px; text-align: center; vertical-align: middle; white-space: nowrap;">other<br>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="width: 650px;" class="darker">
+      <h4>Add a Name:</h4>
+      <form method="post" action="addname" name="addname">
+        <table style="width: 100px; text-align: left;" border="0"
+ cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <td style="text-align: right;" valign="undefined">Name:<br>
+              </td>
+              <td align="undefined" valign="undefined"><input size="40"
+ name="name"><br>
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: right;" valign="undefined">URL:<br>
+              </td>
+              <td align="undefined" valign="undefined"><input size="60"
+ value="http://" name="url"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table style="width: 100px; text-align: left;" border="0"
+ cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <td style="white-space: nowrap;" align="undefined"
+ valign="undefined">Alternate Name:<br>
+              </td>
+              <td align="undefined" valign="undefined"><input size="40"
+ name="alternate1"></td>
+            </tr>
+            <tr>
+              <td style="white-space: nowrap;" align="undefined"
+ valign="undefined">Alternate Name:<br>
+              </td>
+              <td align="undefined" valign="undefined"><input size="40"
+ name="alternate2"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table style="width: 100px; text-align: left;" border="0"
+ cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <td style="white-space: nowrap;">Insert at:<br>
+              </td>
+              <td style="white-space: nowrap;">
+              <table>
+                <tbody>
+                  <tr>
+                    <td style="white-space: nowrap;"><input
+ name="insertloc" value="beginning" type="radio"> beginning </td>
+                  </tr>
+                  <tr>
+                    <td style="white-space: nowrap;"> <input
+ name="insertloc" value="end" type="radio">end </td>
+                  </tr>
+                </tbody>
+              </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+      <h4>Names:</h4>
+      <form method="post" action="changenames" name="changenames">
+        <table style="width: 100px; text-align: left;" border="0"
+ cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <th style="text-align: center;">delete<br>
+              </th>
+              <th style="text-align: center;">order<br>
+              </th>
+              <th>name<br>
+              </th>
+              <th>URL<br>
+              </th>
+            </tr>
+            <tr>
+              <td style="text-align: center;"><input name="del0"
+ value="del0" type="checkbox"> </td>
+              <td align="undefined" valign="undefined"><input size="6"
+ name="order0" value="0"><br>
+              </td>
+              <td align="undefined" valign="undefined"><input size="25"
+ name="name0"> </td>
+              <td align="undefined" valign="undefined"><input size="50"
+ value="http://" name="url0"> </td>
+            </tr>
+            <tr>
+              <td style="text-align: center;" valign="undefined"><input
+ name="del1" value="del1" type="checkbox"> </td>
+              <td align="undefined" valign="undefined"><input size="6"
+ name="order1" value="1"> </td>
+              <td align="undefined" valign="undefined"><input size="25"
+ name="name1"> </td>
+              <td align="undefined" valign="undefined"><input size="50"
+ value="http://" name="url1"> </td>
+            </tr>
+          </tbody>
+        </table>
+      </form>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

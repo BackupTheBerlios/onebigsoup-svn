@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>My Local Names</title>
+  <link rel="stylesheet" href="css_myln.css" type="text/css">
+</head>
+<body>
+<table
+ style="margin-left: auto; margin-right: auto; width: 100%; text-align: left;"
+ cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;" align="undefined">
+      <h1>Welcome to Local Names!</h1>
+      <h4>What is Local Names?</h4>
+      <p>Local Names is an open data format for naming <a
+ href="http://en.wikipedia.org/wiki/Url">URL</a>s.</p>
+      <p>It also allows you to network <a href="#What_are_name_spaces">name
+spaces.</a></p>
+      <h4>Where can I use Local Names?</h4>
+      <p>Right now, you can use Local Names in:</p>
+      <ul>
+        <li><a
+ href="About_Local_Names.html#Using_Local_Names_in_Firefox"> the
+Firefox web browser</a></li>
+        <li><a
+ href="About_Local_Names.html#Using_Local_Names_in_WordPress">WordPress
+blogs</a></li>
+        <li><a href="About_Local_Names.html#Using_Local_Names_in_Wiki">most
+wiki</a></li>
+        <li><a href="About_Local_Names.html#Using_Local_Names_in_IRC">IRC</a></li>
+      </ul>
+      <p>We'd like to be able to use Local Names in e-mail, instant
+messengers, on community web sites, even in software code!</p>
+      <h4><a name="What_are_name_spaces"></a>What are name spaces?</h4>
+      <p>A "name space" is a collection of named URLs.</p>
+      <p>You can think of it as a "bag" of Local Names.</p>
+      <h4>What are name spaces for?</h4>
+      <p>If you talk about a lot of things, you eventually want to use
+names differently in different contexts.</p>
+      <p>Your friend may <a
+ href="http://developer.gnome.org/arch/gnome/componentmodel/bonobo.html">link
+Bonobo to one URL,</a> you may <a
+ href="http://en.wikipedia.org/wiki/Bonobo">link Bonobo to quite
+another.</a><br>
+      </p>
+      <p>With Local Names, not only can you name URLs, but you can also
+name and link name spaces.</p>
+      <p>In practical terms, this means that you can share your Local
+Names with everybody.</p>
+      <p>Shared lists for common resources saves typing, and builds
+Link Language.<br>
+      </p>
+      </td>
+      <td style="vertical-align: top;" align="undefined">
+      <table style="width: 350px; text-align: left;" border="0"
+ cellpadding="10" cellspacing="15">
+        <tbody>
+          <tr>
+            <td class="darker"
+ style="vertical-align: middle; background-color: rgb(190, 204, 146);">
+            <table style="width: 100%; text-align: left;" border="0"
+ cellpadding="0" cellspacing="0">
+              <tbody>
+                <tr>
+                  <td style="width: 33%; text-align: center;"
+ valign="undefined">(localnames)<br>
+                  </td>
+                  <td style="width: 33%; text-align: center;"
+ valign="undefined">(nlsd)<br>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="darker"
+ style="vertical-align: middle; background-color: rgb(190, 204, 146);">
+            <h3>Create/Edit Space</h3>
+            <form method="get" action="index.cgi">
+	      <input type="hidden" name="$PAGE_KEY" value="$PAGE_EDITNAMES"/>
+              <p>Name of Space: <input size="20" name="space"></p>
+            </form>
+            </td>
+          </tr>
+          <tr>
+            <td class="darker"
+ style="vertical-align: middle; background-color: rgb(190, 204, 146);">
+
+
+
+            <table style="width: 100%; text-align: left;" border="0" cellpadding="0" cellspacing="0">
+              <tbody>
+                <tr>
+                  <td>
+                  <h3>Recent Activity</h3>
+                  </td>
+                  <td>(rss)</td>
+                </tr>
+              </tbody>
+            </table>
+            <table style="width: 100%; text-align: left;" border="0" cellpadding="0" cellspacing="1">
+              <tbody>
+#for $note in $html_notes
+                <tr>
+                  <td>$note</td>
+                </tr>
+#end for
+              </tbody>
+            </table>
+
+
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<br>
+<br>
+</body>
+</html>
