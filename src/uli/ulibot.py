@@ -49,15 +49,15 @@ def suwbot(host, port, channels, nick=nickname):
 
    def f_uliHTTPalias(m, origin, (cmd, channel), text, p=p):
       if debug: p.msg(origin.sender, 'alias accepted')
-      allsplitup = text.split(" ")
-      aliaslist[ allsplitup[1]] = (http, allsplitup[2])
-   p.rule(f_uliHTTPalias, 'ulihttpalias', "uli-http [a-zA-Z]+ http://([a-z]+.)?[a-z]+.[a-z]+(:([0-9])*)?/?$" )
+      allsplitup = text.split()
+      aliaslist[allsplitup[1]] = (http, allsplitup[2])
+   p.rule(f_uliHTTPalias, 'ulihttpalias', "uli-http [a-zA-Z]+ http://.+$" )
 
    def f_uliXMLRPCalias(m, origin, (cmd, channel), text, p=p):
       if debug: p.msg(origin.sender, 'alias accepted')
-      allsplitup = text.split(" ")
-      aliaslist[ allsplitup[1]] = (xmlrpc, allsplitup[2])
-   p.rule(f_uliXMLRPCalias, 'ulixmlrpcalias', "uli-xmlrpc [a-zA-Z]+ http://([a-z]+.)?[a-z]+.[a-z]+(:([0-9])*)?(/)?$" )
+      allsplitup = text.split()
+      aliaslist[allsplitup[1]] = (xmlrpc, allsplitup[2])
+   p.rule(f_uliXMLRPCalias, 'ulixmlrpcalias', "uli-xmlrpc [a-zA-Z]+ http://.+$" )
 
    def f_uliListAliases(m,origin, (cmd, channel), text, p=p):
       p.msg(origin.sender, "the current list of bindings:")
@@ -87,8 +87,7 @@ def suwbot(host, port, channels, nick=nickname):
 
    def f_uliBotDebugMode(m, origin, (cmd, channel), text, p=p):
       global debug
-      if debug: debug = False
-      else: debug = True
+      debug = not debug
    p.rule(f_uliBotDebugMode, 'ulibotdebugmode', "debug toggle %s" % p.nick )
 
    def f_chop_by_length( longline, length):
