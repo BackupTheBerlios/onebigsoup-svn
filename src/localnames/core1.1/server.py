@@ -207,16 +207,24 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                            "validate": self.xmlrpc_validate,
                            "render": self.xmlrpc_render}
         try:
+            print "funct:", funct
+            print "args:", args
+            print "first:", str(args[0])
+            args = list(args)
+            args[0] = str(args[0]) # hehehe
             result = xmlrpc_bindings[funct](*args)
             self.respond(200, u'Content-type', 'text/html; charset=utf-8')
             self.wfile.write(xmlrpclib.dumps((result,)))
+            print result
+            print "response:", xmlrpclib.dumps((result,))
         except IndexError:
             pass
 
     def xmlrpc_filterData(self, data, contentType, params):
         data = data.decode("utf-8", "replace")
         url = params["namespace"]
-        return (localnames.replace_text(data, url), contentType)
+        return ({"data": xmlrpclib.Binary(localnames.replace_text(data.encode("utf-8"), url)),
+                 "contentType": contentType})
 
     def xmlrpc_cached(self):
         results = []
@@ -253,6 +261,6 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    httpd = BaseHTTPServer.HTTPServer(("localhost", 9000), LocalNamesHandler)
+    httpd = BaseHTTPServer.HTTPServer(("services.taoriver.net", 9090), LocalNamesHandler)
     httpd.serve_forever()
 
