@@ -1,4 +1,8 @@
 
+import cgi
+form = cgi.FieldStorage() # CGI form data
+
+
 PAGE_KEY = "page"
 PAGE_FRONT = "front"
 PAGE_EDITSPACES = "editspaces"

@@ -24,9 +24,6 @@ elif code_info.page() == code_info.PAGE_EDITNAMES:
     import cmp_editframe
     print text_html()
     print cmp_editframe.response()
-    #import cmp_editnames
-    #print text_html()
-    #print cmp_editnames.response()
 else:
     print text_html()
     print "<p>not made yet</p>"

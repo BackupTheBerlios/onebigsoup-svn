@@ -46,7 +46,14 @@ class PickleData:
         d = {}
         s.hub.event_savetodict( d )
         pickle.dump( d, open(s.filename,"w") )
-
+    def uli(s, msg):
+        d = pickle.load( open(s.filename) )
+        if msg.startswith( "keys" ):
+            return "keys: " + ", ".join( d.keys() )
+        elif msg.startswith( "data" ):
+            import pprint
+            return pprint.pformat( d )
+        return "%s pickle data understands: keys, data" % s.filename
 
 class DataHub:
     def __init__( s ):
@@ -157,6 +164,9 @@ class NameSpaceFile:
         file.seek(0)
         return file.read()
 
+    def replace_names(s, in_order, to_urls ):
+        s.data["LN-list"] = in_order
+        s.data["LN"] = to_urls
 
     def get_names(s):
         return s.data["LN"]

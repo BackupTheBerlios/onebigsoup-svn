@@ -1,3 +1,7 @@
+
+  <tr>
+    <td style="width: 650px;" class="darker">
+
       <h4>Add a Name:</h4>
       <form method="get" action="index.cgi">
         <input type="hidden" name="$PAGE_KEY" value="$PAGE_EDITNAMES"/>
@@ -45,8 +49,15 @@
 	</table>
       </form>
 
+    </td>
+  </tr>
+
+  <tr>
+    <td style="width: 650px;" class="darker">
+
       <h4>Change / Delete Names:</h4>
-      <form method="post" action="index.cgi">
+      <form method="post" action="index.cgi?$PAGE_KEY=$PAGE_EDITNAMES&$SPACE_KEY=$SPACE">
+      <input type="hidden" name="NUM_ENTRIES0" value="$NUM_ENTRIES"/>
       <p><input type="submit" value="Submit Changes"/></p>
         <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
           <tbody>
@@ -75,3 +86,6 @@
         </table>
       <p><input type="submit" value="Submit Changes"/></p>
       </form>
+
+    </td>
+  </tr>
