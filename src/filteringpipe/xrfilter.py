@@ -45,11 +45,17 @@ def main():
         function_name = "%s.%s" % (options.namespace, function_name)
     result = getattr(server, function_name)(data, options.encoding,
                                             filter_args)
-    if options.show_content_type:
-        print result["contentType"]
-    print result["data"]
+    if type(result) == type({}) and \
+       result.has_key("contentType") and \
+       result.has_key("data"):
+        if options.show_content_type:
+            print result["contentType"]
+        print result["data"]
+    else:
+        print "Unusual response data:"
+        print str(result)
 
-    
+
 if __name__ == "__main__":
     main()
 
