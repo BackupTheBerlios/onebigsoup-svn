@@ -22,7 +22,7 @@ import localnames,time,socket
 
 
 HOST_NAME    = "services.taoriver.net"
-PORT_NUMBER = 9090
+PORT_NUMBER = 9093
 
 PASSWORD    = "password" # client password for receiving ding-ding events
 
@@ -48,10 +48,10 @@ class Server:
         * commands are case insensitive
         * one session for all users- hopefully not a big problem..!
 
-        HELP
-
-          Tell how to use the system
         """
+        import shlex
+        quoted = lambda x: '"%s"' % x
+        
         NO_NAMESPACE_YET = "(You must first set a namespace with SET-NAMESPACE (url))"
         
         if type(message) != type("string"):
@@ -60,7 +60,7 @@ class Server:
         while message[-1] in ["\r","\n"]:
             message = message[:-1]
 
-        message = message.split()
+        message = shlex.split(message)
         if len(message)>0:
             cmd = message[0].upper()
             rest = message[1:]
@@ -68,29 +68,12 @@ class Server:
             cmd = None
 
         if cmd == "HELP":
-            return "\n".join( ["Valid commands are:",
-                               "* HELP",
-                               "* SET-NAMESPACE (url)",
-                               "* LOOKUP (space) (space) ... (name)  --abbreviation: just 'L'",
-                               "* DUMP-CACHE (url)",
-                               "* LIST-CACHE",
-                               "* LIST-NAMES",
-                               "* LIST-SPACES",
-                               "* LIST-DEFAULTS",
-                               "",
-                               "Presently set to namespace:",
-                               s.uli_ns or "(none! set with set-namespace)"] )
-
-        if cmd == "SET-NAMESPACE":
+            return "Other: help, set-namespace (url), list-cache, dump-cache (url), list-names, list-spaces, list-defaults, lookup (space) (space)... (name). Anything else interpreted as a lookup. Presently set to namespace: %s" % (s.uli_ns or "(none! set with set-namespace)" )
+        elif cmd == "SET-NAMESPACE":
             s.uli_ns = rest[0]
             return "Set namespace to: %s\n" % s.uli_ns
 
-        if cmd in ["L","LOOKUP"]:
-            if s.uli_ns == "":
-                return NO_NAMESPACE_YET
-            return s.lookup( s.uli_ns, rest, 1 ) + "\n"
-
-        if cmd == "DUMP-CACHE":
+        elif cmd == "DUMP-CACHE":
             url = rest[0]
             if not ULI_ALLOW_DUMP:
                 return "Dumping cache by ULI has been turned off."
@@ -99,34 +82,40 @@ class Server:
             del s.store.namespaces[ url ]
             return "Cache dumped for namespace by URL %s" % url
 
-        if cmd == "LIST-CACHE":
+        elif cmd == "LIST-CACHE":
             return " ".join( s.store.namespaces.keys() ) + "\n"
 
-        if cmd == "LIST-NAMES":
+        elif cmd == "LIST-NAMES":
             if s.uli_ns == "":
                 return NO_NAMESPACE_YET
-            space = s.store.namespaces.get( s.uli_ns )
+            space = s.store.get( s.uli_ns )
             if space == None:
                 return "Invalid namespace: %s." % s.uli_ns
-            return " ".join( space.names.keys() ) + "\n"
+            return " ".join( [quoted(x) for x in space.canonical_names()] ) + "\n"
 
-        if cmd == "LIST-SPACES":
+        elif cmd == "LIST-SPACES":
             if s.uli_ns == "":
                 return NO_NAMESPACE_YET
-            space = s.store.namespaces.get( s.uli_ns )
+            space = s.store.get( s.uli_ns )
             if space == None:
                 return "Invalid namespace: %s." % s.uli_ns
-            return " ".join( space.spaces.keys() ) + "\n"
+            return " ".join( [quoted(x) for x in space.canonical_names_of_spaces()] ) + "\n"
 
-        if cmd == "LIST-DEFAULTS":
+        elif cmd == "LIST-DEFAULTS":
             if s.uli_ns == "":
                 return NO_NAMESPACE_YET
-            space = s.store.namespaces.get( s.uli_ns )
+            space = s.store.get( s.uli_ns )
             if space == None:
                 return "Invalid namespace: %s." % s.uli_ns
-            return " ".join( space.defaults ) + "\n"
+            return " ".join( [quoted(x) for x in space.defaults] ) + "\n"
 
-        return "LocalNames XML-RPC server ULI interface does not understand the request.\n Received: %s\n" % message
+        else:
+            if s.uli_ns == "":
+                return NO_NAMESPACE_YET
+            if cmd != "LOOKUP":
+                # oops! not a command! put it back in with the rest.
+                rest.insert(0,cmd)
+            return s.lookup( s.uli_ns, rest, 1 ) + "\n"
 
     def notify( s, load, client_password ):
         """
