@@ -6,7 +6,8 @@
 # 
 
 
-XMLRPC_NAMESERVER = "http://services.taoriver.net:9089/"
+import conf
+XMLRPC_LN_SERVER = conf.XMLRPC_LN_SERVER
 
 MAX_LOGS=100
 
@@ -80,7 +81,8 @@ class XmlRpcServerNotification:
     def __init__( s, datahub ):
         s.datahub = datahub
     def tell_dump(s, space_name):
-        uli_xmlrpc( XMLRPC_NAMESERVER, "dump-cache %s" % (conf.URL_DOMAIN_NAME+conf.URL_DIRECTORY_BASE+description_key( space_name )) )
+        import conf
+        uli_xmlrpc( XMLRPC_LN_SERVER, "dump-cache %s" % (conf.URL_DOMAIN_NAME+conf.URL_DIRECTORY_BASE+description_key( space_name )) )
     def event_namesadded( s, space_name, new_names, new_url ):
         s.tell_dump( space_name )
     def event_namespacesadded( s, space_name, new_names, new_url ):
@@ -237,7 +239,7 @@ class NameSpaceFile:
 class ForeignNameSpace:
     def __init__( s, url ):
         s.url = url
-        server = xmlrpclib.ServerProxy( XMLRPC_NAMESERVER )
+        server = xmlrpclib.ServerProxy( XMLRPC_LN_SERVER )
         s.data = server.parse_description( url )
     def load_names_into_namespace_file( s, nsf, overwrite=False ):
         for name in s.data[ "LN" ]:
