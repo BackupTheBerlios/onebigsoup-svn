@@ -15,6 +15,10 @@ ULI_KEY = "uli"
 NUM_LOGS_ON_FRONT_PAGE = 20
 NUM_LOGS_ON_EDIT_PAGES = 5
 
+
+LOCALNAMES_IMG='<img style="width: 80px; height: 15px;" alt="Local Names v1.0" src="img_namesv10.png"><br>'
+NLSD_IMG='<img style="width: 80px; height: 15px;" alt="nLSD namespace description" src="img_nlsdnames.png">'
+
 def query_string():
     import os
     return os.environ.get( "QUERY_STRING", "" )
@@ -49,6 +53,8 @@ def inform_template( t ):
     t.PAGE_EDITNAMES = PAGE_EDITNAMES
     t.PAGE_EDITOPTS = PAGE_EDITOPTS
     t.SPACE_KEY = SPACE_KEY
+    t.LOCALNAMES_IMG = LOCALNAMES_IMG
+    t.NLSD_IMG = NLSD_IMG
 
     t.PAGE = page()
     t.SPACE = space()
