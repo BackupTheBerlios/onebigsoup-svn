@@ -428,7 +428,7 @@ def replace_text(text, namespace_url, softlink_base=""):
     Softlinks have the form:
       ((foo)(bar))
     ...which becomes a link to:
-      (SOFTLINK_BASE)?action=redir&url=(URL)&lookup=foo&lookup=bar
+      (SOFTLINK_BASE)?action=redirect&url=(URL)&lookup=foo&lookup=bar
     """
 
     def replace_link(match):
@@ -443,7 +443,7 @@ def replace_text(text, namespace_url, softlink_base=""):
     def replace_softlink(match):
         flags = sets.Set(["loose", "check-neighboring-spaces"])
         path = match.group(1)[1:-1].split(')(')
-        map = {'action': 'redir', 'url': namespace_url, 'lookup': path}
+        map = {'action': 'redirect', 'url': namespace_url, 'lookup': path}
         url = softlink_base + "?" + urllib.urlencode(map, True)
         title = match.group(2)
         if title == None:
