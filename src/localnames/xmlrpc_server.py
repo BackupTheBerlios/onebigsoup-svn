@@ -52,6 +52,8 @@ class Server:
 
           Tell how to use the system
         """
+        NO_NAMESPACE_YET = "(You must first set a namespace with SET-NAMESPACE (url))"
+        
         if type(message) != type("string"):
             return "ULI requires string arguments."
 
@@ -77,13 +79,15 @@ class Server:
                                "* LIST-DEFAULTS",
                                "",
                                "Presently set to namespace:",
-                               s.uli_ns] )
+                               s.uli_ns or "(none! set with set-namespace)"] )
 
         if cmd == "SET-NAMESPACE":
             s.uli_ns = rest[0]
             return "Set namespace to: %s\n" % s.uli_ns
 
         if cmd in ["L","LOOKUP"]:
+            if s.uli_ns == "":
+                return NO_NAMESPACE_YET
             return s.lookup( s.uli_ns, rest, 1 ) + "\n"
 
         if cmd == "DUMP-CACHE":
@@ -99,18 +103,24 @@ class Server:
             return " ".join( s.store.namespaces.keys() ) + "\n"
 
         if cmd == "LIST-NAMES":
+            if s.uli_ns == "":
+                return NO_NAMESPACE_YET
             space = s.store.namespaces.get( s.uli_ns )
             if space == None:
                 return "Invalid namespace: %s." % s.uli_ns
             return " ".join( space.names.keys() ) + "\n"
 
         if cmd == "LIST-SPACES":
+            if s.uli_ns == "":
+                return NO_NAMESPACE_YET
             space = s.store.namespaces.get( s.uli_ns )
             if space == None:
                 return "Invalid namespace: %s." % s.uli_ns
             return " ".join( space.spaces.keys() ) + "\n"
 
         if cmd == "LIST-DEFAULTS":
+            if s.uli_ns == "":
+                return NO_NAMESPACE_YET
             space = s.store.namespaces.get( s.uli_ns )
             if space == None:
                 return "Invalid namespace: %s." % s.uli_ns
@@ -209,16 +219,20 @@ class Server:
         If it still isn't found, return error.
 
         Error codes:
-          "NAMESPACE-NOT-FOUND" - namespace wasn't found
-          "NOT-FOUND" - word not found
+          "NAMESPACE-FILE-DOESNT-LOAD" - namespace_uri named a namespace that couldn't be loaded
+          "NAMESPACE-NOT-FOUND" - namespace wasn't found in the list of other namespaces
+          "NOT-FOUND" - word not found in the list of words in the last namespace
         """
-        search = localnames.SpaceTraverser( namespace_uri, s.store )
         try:
-            return search.simple_find( lookup_list )
+            search = localnames.SpaceTraverser( namespace_uri, s.store )
+            results = search.simple_find( lookup_list )
+            return results
         except localnames.NAME_NOT_FOUND:
             return "NOT-FOUND"
         except localnames.NAMESPACE_NOT_FOUND:
             return "NAMESPACE-NOT-FOUND"
+        except localnames.NAMESPACE_FILE_DOESNT_LOAD:
+            return "NAMESPACE-FILE-DOESNT-LOAD"
         
     def lookup_many( s, namespace_uri, list_of_lookup_lists, search_depth ):
         """
