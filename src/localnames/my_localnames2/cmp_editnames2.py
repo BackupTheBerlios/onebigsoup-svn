@@ -10,17 +10,15 @@ def subtitle():
 def register_new_names():
     qd = code_info.query_dict()
     if qd.has_key( "url" ) and qd.has_key( "name" ) and qd.has_key( code_info.SPACE_KEY ):
-        nsf = code_old.hub.namespace_files.get_space( qd[ code_info.SPACE_KEY ] )
-        new_names = [ qd["name"] ]
+        space = qd[ code_info.SPACE_KEY ]
+        url = qd[ "url" ]
+        names = [ qd[ "name" ] ]
         if qd.has_key( "alt" ):
-            if type( qd["alt"] ) == type( "" ):
-                new_names.append( qd["alt"] )
-            elif type( qd["alt"] ) == type( [] ):
-                new_names.extend( qd["alt"] )
-        nsf.add_names( new_names, qd["url"] )
-        code_old.hub.event_namesadded( qd[ code_info.SPACE_KEY ],
-                                       new_names,
-                                       qd[ "url" ] )
+            if type( qd[ "alt" ] ) == type( "" ):
+                new_names.append( qd[ "alt" ] )
+            elif type( qd[ "alt" ] ) == type( [] ):
+                new_names.extend( qd[ "alt" ] )
+        code_info.add_new_names( space, names, url )
 
 def response():
     register_new_names()

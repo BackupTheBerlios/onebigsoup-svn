@@ -53,3 +53,10 @@ def inform_template( t ):
     t.SPACE = space()
 
 
+# control code - may want to move into code_old
+def add_new_names( space, names, url ):
+    import code_old
+    nsf = code_old.hub.namespace_files.get_space( space )
+    nsf.add_names( names, url )
+    code_old.hub.event_namesadded( space, names, url )
+
