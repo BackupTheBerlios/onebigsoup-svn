@@ -18,4 +18,5 @@ def stripped_copy( load ):
             del copy[k]
     return copy
 
-
+def construct_url( hostname, portnumber, path="/" ):
+    return "http://%s:%s%s" % (hostname,portnumber,path)
