@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<resource>
+  <object class="wxFrame" name="LiveEditFrame">
+    <title>Live Edit</title>
+    <size>650,400</size>
+    <object class="wxBoxSizer">
+      <orient>wxVERTICAL</orient>
+      <object class="sizeritem">
+        <object class="wxBoxSizer">
+          <orient>wxHORIZONTAL</orient>
+          <object class="sizeritem">
+            <object class="wxStaticText">
+              <label>Page:</label>
+              <style></style>
+            </object>
+            <flag>wxLEFT|wxALIGN_CENTRE_VERTICAL|wxALIGN_CENTRE_HORIZONTAL</flag>
+            <border>10</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxTextCtrl" name="PageName">
+              <tooltip>URL of wiki page to edit</tooltip>
+            </object>
+            <option>1</option>
+            <flag>wxRIGHT</flag>
+            <border>10</border>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Load">
+              <label>Load</label>
+              <tooltip>load from wiki</tooltip>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <object class="wxButton" name="Save">
+              <label>Save</label>
+              <tooltip>save to wiki</tooltip>
+            </object>
+            <flag>wxRIGHT</flag>
+            <border>10</border>
+          </object>
+        </object>
+        <flag>wxTOP|wxBOTTOM|wxEXPAND</flag>
+        <border>10</border>
+      </object>
+      <object class="sizeritem">
+        <object class="wxTextCtrl" name="PageText">
+          <style>wxTE_MULTILINE</style>
+        </object>
+        <option>1</option>
+        <flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND</flag>
+        <border>10</border>
+      </object>
+    </object>
+    <style></style>
+  </object>
+</resource>
