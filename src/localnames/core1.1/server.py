@@ -182,7 +182,7 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         if not form_dict.has_key("namespace"):
             self.wfile.write('Error: no form entry with key "namespace"')
             return
-        result = localnames.replace_text(form_dict["body"][0],
+        result = localnames.replace_text(form_dict["text"][0],
                                          form_dict["namespace"][0])
         self.wfile.write(result.encode("utf-8"))
 
