@@ -116,7 +116,7 @@ class Server:
             return r
         if r == early_exit:
             return r
-        return _custom_reduce(foo, [r]+list_[2:], early_exit, load)
+        return s._custom_reduce(foo, [r]+list_[2:], early_exit, load)
 
     def _match(s, load, pattern):
         op = pattern[0].upper()
@@ -125,11 +125,11 @@ class Server:
         elif op == "NOT":
             return not s._match(load, pattern[1])
         elif op == "AND":
-            return _custom_reduce(lambda x, y: x and y,
-                                 pattern[1:], False, load)
+            return s._custom_reduce(lambda x, y: x and y,
+                                    pattern[1:], False, load)
         elif op == "OR":
-            return _custom_reduce(lambda x, y: x or y,
-                                 pattern[1:], True, load)
+            return s._custom_reduce(lambda x, y: x or y,
+                                    pattern[1:], True, load)
         elif op == "VAL":
             var_name = pattern[1]
             test_val = pattern[2]

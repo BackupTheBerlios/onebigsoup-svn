@@ -202,9 +202,9 @@ def as_html(logs):
             tables.add_row( log["TransparencyXhtmlRow"],
                             escaped_headers )
         elif log.has_key( "TransparencyXhtml" ):
-            tables.add_row( log["TransparencyXhtml"], None )
+            tables.add_row( [log["TransparencyXhtml"]], None )
         elif log.has_key( "TransparencyText" ):
-            tables.add_row( log["TransparencyText"], None )
+            tables.add_row( [log["TransparencyText"]], None )
         else:
             tables.add_row( ["(no self-description)"], None )
     return tables.as_html()
