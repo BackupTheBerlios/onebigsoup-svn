@@ -114,6 +114,67 @@ class LocalNamesSink:
         self.namespace.pattern = pattern
 
 
+class Resolver:
+    """
+    Facade over the whole system.
+    """
+    def __init__( s, default_ns_url, store_filename, store=None ):
+        s.store = store
+        s.store_filename = store_filename
+        s.default_ns_url = default_ns_url
+        
+        if s.store == None:
+            s.store = NameSpaceStore(24*60*60) # one full day
+            try:
+                s.store.load(store_filename)
+            except IOError:
+                # file not found? it's okay.
+                pass
+        
+    def save(s):
+        s.store.save(store_filename)
+
+    def lookup_tuple( s, tup ):
+        """
+        Goes 1 level deep into defaults,
+        match's against 0 depths pattern if nothing found,
+        returns None if there is no 0 depth pattern.
+        
+        Doesn't check defaults on Connections.
+        
+        returns URL or None
+        
+        tup:
+           tuple where first items are connection names,
+           and last item is the name of an item
+        """
+        space = s.store.get( s.default_ns_url )
+
+        # Go through all the Connections first...
+        connection_list = list(tup[:-1])
+        connection_list.reverse() # we're going to pop
+        while len(connection_list)>0:
+            next_space_name = space.lookup_connection( connection_list.pop() )
+            if next_space_name == None:
+                return None # can't resolve :(
+            space = s.store.get( next_space_name )
+
+        # okay, we've got the final space
+        # now look up the term
+        url = space.lookup( tup[-1] )
+        if url != None:
+            return url
+
+        # okay, wasn't there, so lets check the defaults.
+        for subspace in [s.store.get(space.lookup_connection(name)) for name in space.list_defaults()]:
+            url=subspace.lookup( tup[-1] )
+            if url != None:
+                return url
+
+        # didn't find anything. whattawe do?
+        # go to our default space, and return our default pattern match
+        return s.store.get( s.default_ns_url ).default_for_name( tup[-1] )
+
 def test():
     store = NameSpaceStore(24*60*60) # one day timeout
     space = store.get( "http://taoriver.net/tmp/nstest.txt" )
