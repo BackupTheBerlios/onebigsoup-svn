@@ -19,6 +19,8 @@ import futures
 import cPickle as pickle
 from DocXMLRPCServer import DocXMLRPCServer
 
+import shared # event system shared code
+
 
 
 HOST_NAME    = "services.taoriver.net"
@@ -152,23 +154,13 @@ class Server:
             return load["RESERVED-RECEIVED-TIME"] > time_ago
         raise "Bad op: " + str(op)
 
-    def _stripped_copy( s, load ):
-        """
-        Strip out "RESERVED" information before resending.
-        """
-        copy = load.copy()
-        for k in copy.keys():
-            if k.startswith( "RESERVED" ):
-                del copy[k]
-        return copy
-    
     def _ding(s, client_info, Cpw, load):
         xmlrpc_url = client_info.get( "CLIENT-XMLRPC", None )
         if xmlrpc_url:
             try:
                 server=xmlrpclib.ServerProxy( xmlrpc_url )
                 print time.asctime(),"-- notify %s" % xmlrpc_url
-                server.notify( s._stripped_copy(load), Cpw )
+                server.notify( shared.stripped_copy(load), Cpw )
                 return True # success
             except httplib.socket.error:
                 pass
@@ -291,7 +283,7 @@ class Server:
         
         for load in log:
             if s._match( load, ptrn ):
-                to_return.append( s._stripped_copy(load) )
+                to_return.append( shared.stripped_copy(load) )
 
         to_return.reverse() # newest first
         if len( to_return ) > MAX_LOGS_RETURNED:
