@@ -22,7 +22,7 @@ import localnames,time,socket
 
 
 HOST_NAME    = "services.taoriver.net"
-PORT_NUMBER = 9093
+PORT_NUMBER = 9090
 
 PASSWORD    = "password" # client password for receiving ding-ding events
 
