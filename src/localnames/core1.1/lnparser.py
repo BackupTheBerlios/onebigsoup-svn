@@ -113,4 +113,4 @@ if __name__ == '__main__':
     for num, line in enumerate(test_string.splitlines()):
         print "#%2d:  %s" % (num, line)
     pprint.pprint(parse_text(test_string))
-    
+
