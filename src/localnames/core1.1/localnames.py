@@ -463,7 +463,7 @@ def replace_text(text, namespace_url, softlink_base=""):
         flags = sets.Set(["loose", "check-neighboring-spaces"])
         path = match.group(1)[1:-1].split('][')
         url = lookup(path, namespace_url, flags)
-        if type(url) != type("string"):
+        if type(url) not in [type("string"), type(u'unicode')]:
             return '<font color="red">%s</a>' % url
         img = False
         for extension in image_extensions:
