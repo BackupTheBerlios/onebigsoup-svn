@@ -2,6 +2,17 @@
 LocalNames lookup XML-RPC Event Server
 
   thin wrapper around the resolver in localnames.py
+
+
+
+Subscription:
+
+server = xmlrpclib.ServerProxy( "http://services.taoriver.net:9011/" )
+server.subscribe( ["VAL","Action","wikipost2"],
+                  { "CLIENT-XMLRPC": "http://services.taoriver.net:9090/" }, "password" )
+server.subscribe( ["VAL","Action","post"],
+                  { "CLIENT-XMLRPC": "http://services.taoriver.net:9090/" }, "password" )
+
 """
 
 from DocXMLRPCServer import DocXMLRPCServer
@@ -12,7 +23,10 @@ import localnames,time
 
 HOST_NAME    = "services.taoriver.net"
 PORT_NUMBER = 9090
-PASSWORD    = "password"
+
+PASSWORD    = "password" # client password for receiving ding-ding events
+
+CACHE_TTL_IN_SECONDS = 7*24*60*60 # one week!
 
 
 
@@ -31,7 +45,38 @@ class Server:
         s.port_number = port_number
         s.password = password
 
-        s.store = localnames.NameSpaceStore( 5*60 ) # 5 minutes
+        s.store = localnames.NameSpaceStore( CACHE_TTL_IN_SECONDS )
+
+    def notify( s, load, client_password ):
+        if client_password != s.password:
+            return 0
+        # get the URL of the page that was edited,
+        if load["Action"] not in ["wikipost2","post"]:
+            return 0
+
+        page_url = load.get("PageUrl","")
+        page_name = load.get("PageName","")
+        print "RECEIVED:", page_name, page_url
+        # check it against metadata sensitivies, if any.
+        for (ns_url, ns) in s.store.namespaces.items():
+            what_to_do = "nothing"
+            if page_url == ns_url: # the namespace description has changed!
+                what_to_do = "invalidate"
+            elif page_url == ns.meta.get("INVALIDATE-UPON-CHANGE-TO"): # the ns desc has changed, by another form!
+                what_to_do = "invalidate"
+            elif ns.meta.has_key( "ACCEPT-ADDITION-BY-FORM" ):
+                match_against = ns.meta["ACCEPT-ADDITION-BY-FORM"]
+                match_against = match_against.replace("$NAME",page_name)
+                if page_url == match_against:
+                    what_to_do = "add"
+            print "CONSIDERING FOR:", ns_url
+            print "DECISION:", what_to_do
+            if what_to_do == "invalidate":
+                del s.store.namespaces[ns_url]
+            if what_to_do == "add":
+                s.store.namespaces[ns_url].names[page_name] = page_url
+        print "-------------\n\n"
+        return 1
 
     def locate_list( s, namespace_uri, list_of_words, search_depth ):
         """
@@ -88,6 +133,16 @@ class Server:
         lookup_list:
            list where first items are connection names,
            and last item is the name of an item
+
+        Examples:
+
+        lookup( "http://lion.taoriver.net/localnames.txt",
+                ["SlashDot"],
+                1 )
+
+        lookup( "http://lion.taoriver.net/localnames.txt",
+                ["CommunityWiki","OneBigSoup"],
+                1 )
         """
         space = s.store.get( from_namespace )
         final_name = lookup_list[-1]
@@ -127,6 +182,7 @@ class Server:
         server.register_function( s.lookup )
         server.register_function( s.lookup_many )
         server.register_function( s.locate_list )
+        server.register_function( s.notify )
 
         print time.asctime(), "LocalNames Server Starts - %s:%s" % (s.host_name,
                                                                     s.port_number)
