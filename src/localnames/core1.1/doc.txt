@@ -155,7 +155,7 @@ GET:
       ?action=lookup
       &namespace=http://...
     [ &lookup=(lookup term) ]+
-    [ &seperator=(character) ]
+    [ &separator=(character) ]
 
 XML-RPC:
 
