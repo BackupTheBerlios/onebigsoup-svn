@@ -49,24 +49,15 @@ def uli(line):
             s = s + x + "\n"
         return s.strip()
 
+
+
 #def main():
 #    while True:
 #        print uli_dwim(raw_input(">>> "))
 
 if __name__ == "__main__":
-    HOST_NAME = 'services.taoriver.net' # !!!REMEMBER TO CHANGE THIS!!!
-    PORT_NUMBER = 9300
-
     import http_server
-    import time
     
-    httpd = http_server.UliHttpServer( (HOST_NAME,PORT_NUMBER), uli_func=uli )
-
-    print time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    httpd.close()
-    print time.asctime(), "Server Stops - %s:%s" % (HOST_NAME, PORT_NUMBER)
-
+    http_server.run( "ULI List Server",
+                     "services.taoriver.net", 9302,
+                     uli_func=uli )
