@@ -136,10 +136,14 @@ class Resolver:
 
     def lookup_tuple( s, tup ):
         """
-        Goes 1 level deep into defaults,
-        match's against 0 depths pattern if nothing found,
-        returns None if there is no 0 depth pattern.
-        
+        (1) Follows connections chain.
+
+        (2) Looks for name,
+            and checks 1 level into defaults, too.
+
+        (3) Returns against last connection's pattern,
+            if nothing found.
+
         Doesn't check defaults on Connections.
         
         returns URL or None
@@ -149,6 +153,7 @@ class Resolver:
            and last item is the name of an item
         """
         space = s.store.get( s.default_ns_url )
+        final_name = tup[-1]
 
         # Go through all the Connections first...
         connection_list = list(tup[:-1])
@@ -161,24 +166,38 @@ class Resolver:
 
         # okay, we've got the final space
         # now look up the term
-        url = space.lookup( tup[-1] )
+        url = space.lookup( final_name )
         if url != None:
             return url
 
         # okay, wasn't there, so lets check the defaults.
         for subspace in [s.store.get(space.lookup_connection(name)) for name in space.list_defaults()]:
-            url=subspace.lookup( tup[-1] )
+            url=subspace.lookup( final_name )
             if url != None:
                 return url
 
         # didn't find anything. whattawe do?
         # go to our default space, and return our default pattern match
-        return s.store.get( s.default_ns_url ).default_for_name( tup[-1] )
+        return space.default_for_name( final_name )
 
 def test():
     store = NameSpaceStore(24*60*60) # one day timeout
     space = store.get( "http://taoriver.net/tmp/nstest.txt" )
     print space.lookup( "FirstName" )
+
+def test_resolver():
+    resolver = Resolver( "http://taoriver.net/tmp/nstest.txt",
+                         "localnames_cache" )
+    print resolver.lookup_tuple( ["FirstName"] )
+    print resolver.lookup_tuple( ["SecondName"] )
+    print resolver.lookup_tuple( ["World Wide Web Consortium"] )
+    print resolver.lookup_tuple( ["SomethingElse"] )
+    print resolver.lookup_tuple( ["OneBigSoup"] )
+    print resolver.lookup_tuple( ["CommunityWiki","Bogus"] )
+    print resolver.lookup_tuple( ["Bogus"] )
+    
     
 if __name__=="__main__": 
     test()
+    print "---------"
+    test_resolver()
