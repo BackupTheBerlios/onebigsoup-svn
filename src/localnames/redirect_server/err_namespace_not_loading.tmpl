@@ -1,0 +1,28 @@
+<html>
+
+<head>
+<title>LocalNames Redirection Server</title>
+</head>
+
+<body>
+
+<p>
+  Sorry! It looks like the URL <b><a href="$namespace_url">$namespace_url</a></b>, bound to <b>$binding_point</b>, isn't loading!
+</p>
+
+<p>
+  Perhaps it should be rebound?
+</p>
+
+<form method="post" action="index.cgi">
+<p> Redirection base: <b>$url_prefix/$binding_point/</b> <input type="hidden" name="spacename" value="$binding_point"/></p>
+<p> LocalNames Description URL: <input type="text" name="localnamesdescription" value="http://"/> </p>
+<p> <input type="submit" value="bind"> </p>
+</form>
+
+<p><a href="$url_prefix/">(...to front page)</a></p>
+
+</body>
+
+</html>
+

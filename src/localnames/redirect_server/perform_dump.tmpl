@@ -1,0 +1,30 @@
+<html>
+
+<head>
+<title>LocalNames Redirection Server</title>
+</head>
+
+<body>
+<center><h1>LocalNames Redirection</h1></center>
+
+<center>
+<table><tr>
+<td><a href="$url_prefix/">bind</a></td>
+<td><b>dump</b></td>
+<td><a href="$url_prefix/about/">about</a></td>
+</tr></table>
+</center>
+
+<form method="post" action="/dump/">
+<center><table>
+<tr><td> name or URL: <input type="text" name="spacename"/> </td>
+    <td> <input type="hidden" name="action" value="dump"/> <input type="submit" value="dump"/> </td></tr>
+</table></center>
+</form>
+
+<center><p><b>$response</b></p></center>
+
+</body>
+
+</html>
+

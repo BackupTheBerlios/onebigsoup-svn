@@ -1,0 +1,31 @@
+<html>
+
+<head>
+<title>LocalNames Redirection</title>
+</head>
+
+<body>
+<center><h1>LocalNames Redirection</h1></center>
+
+<center>
+<table><tr>
+<td><b>bind</b></td>
+<td><a href="$url_prefix/dump/">dump</a></td>
+<td><a href="$url_prefix/about/">about</a></td>
+</tr></table>
+</center>
+
+<form method="post" action=".">
+<center><table>
+<tr><td> Redirection base: <b> $url_prefix/ </b> <input type="text" name="spacename"/> <b>/</b> </td></tr>
+<tr><td> LocalNames Description URL: <input type="text" name="localnamesdescription" value="http://" size="80"/> </td></tr>
+<tr><td> <input type="hidden" name="action" value="bind"/> <input type="submit" value="bind"/> </td></tr>
+</table></center>
+</form>
+
+<center> <p> If you're using <a href="http://www.mozilla.org/products/firefox/">FireFox,</a> you can <a href="http://onebigsoup.wiki.taoriver.net/moin.cgi/UsingLocalNamesInFirefox">use LocalNames in the address bar!</a> </p> </center>
+
+</body>
+
+</html>
+
