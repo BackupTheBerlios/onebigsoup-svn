@@ -7,6 +7,7 @@ import cPickle as pickle
 import cgi # for the "escape" function
 
 import shared # event system shared code
+import log_display
 
 
 
@@ -101,78 +102,20 @@ class ShowLogsHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
     def write_tail(s):
         s.wfile.write( "</body></html>" )
 
-    def draw_raw(s):
-        for log in s.logs():
-            pprinted_text = pprint.pformat( shared.stripped_copy(log) )
-            s.wfile.write( pprinted_text )
-            s.wfile.write( "\n" )
-
-    def draw_text(s):
-        for log in s.logs():
-            s.wfile.write( log.get( "TransparencyText",
-                                    "(no self-description)" ) )
-            s.wfile.write( "\n" )
-
     def draw_rss(s):
-        s.wfile.write( """<?xml version="1.0" encoding="ISO-8859-1" ?>
- <rss version="0.91">
-
- <channel>
- <title>%(HOST_NAME)s:%(PORT_NUMBER)s - Event Server - Recent Logs by RSS</title>
- <link>%(WEBSERVER_URL)s</link>
- <description>Event System Observation</description>
- <language>en-us</language>
-        """ % globals() )
-        for log in s.logs():
-            s.wfile.write( "<item>" )
-            s.wfile.write( "<title>%s</title>" %
-                           log.get( "TransparencyText",
-                                    "(no self-description)" ) )
-            s.wfile.write( "<description>" )
-            s.wfile.write( html_escape(pprint.pformat(shared.stripped_copy(log))) )
-            s.wfile.write( "</description>" )
-            s.wfile.write( "</item>" )
-        s.wfile.write( "</channel>" )
-        s.wfile.write( "</rss>" )
-
-    def draw_html(s):
-        s.write_head( "HTML logs" )
+        sorted_logs = log_display.sort_logs( s.logs() )
+        title = "%(HOST_NAME)s:%(PORT_NUMBER)s - Event Server - Recent Logs by RSS" % globals()
+        link = WEBSERVER_URL
+        description = "Event System Observation"
+        language = "en-us"
         
-        in_table = 0
-        current_headers = None
+        code = log_display.as_rss( sorted_logs,
+                                   title,
+                                   link,
+                                   description,
+                                   language )
         
-        for log in s.logs():
-            if log.has_key( "TransparencyXhtmlColumnHeaders" ) and log.has_key( "TransparencyXhtmlRow" ):
-                if current_headers != log["TransparencyXhtmlColumnHeaders"]:
-                    current_headers = log["TransparencyXhtmlColumnHeaders"]
-                    escaped_headers = []
-                    for header in current_headers:
-                        escaped_headers.append( html_escape(header) )
-                    if not in_table:
-                        s.wfile.write( "<table>" )
-                    else:
-                        s.wfile.write( "</table><table>" )
-                    in_table = 1
-                    s.wfile.write( "<tr><td><b>" + "</td><td><b>".join( escaped_headers ) + "</b></tr>" )
-                s.wfile.write( "<tr><td>" + "</td><td>".join( log["TransparencyXhtmlRow"] ) )
-            else:
-                if in_table:
-                    if current_headers != None:
-                        s.wfile.write( "</table><table>" )
-                        current_headers = None
-                else:
-                    s.wfile.write( "<table>" )
-                    in_table = 1
-                    current_headers = None
-                if log.has_key( "TransparencyXhtml" ):
-                    s.wfile.write( "<tr><td>%s</td></tr>" % log["TransparencyXhtml"] )
-                elif log.has_key( "TransparencyText" ):
-                    s.wfile.write( "<tr><td>%s</td></tr>" % html_escape(log["TransparencyText"]) )
-                else:
-                    s.wfile.write( "<tr><td>(no self-description)</td></tr>" )
-        if in_table == 1:
-            s.wfile.write( "</table>" )
-        s.write_tail()
+        s.wfile.write( code )
 
     def content_type(s):
         if s.path in ["/text/", "/raw/"]:
@@ -190,18 +133,34 @@ class ShowLogsHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         s.send_response(200)
         s.send_header("Content-type", s.content_type())
         s.end_headers()
+
         if s.path == "/":
             s.wfile.write( root_page )
-        elif s.path == "/text/":
-            s.draw_text()
-        elif s.path == "/html/":
-            s.draw_html()
-        elif s.path == "/raw/":
-            s.draw_raw()
-        elif s.path == "/rss/":
+            return
+        if s.path == "/rss/":
             s.draw_rss()
+            return
+        
+        sorted_logs = log_display.sort_logs(s.logs())
+        stripped = []
+        for log in sorted_logs:
+            stripped.append( shared.stripped_copy(log) )
+        sorted_logs = stripped
+        
+        if s.path == "/text/":
+            output = log_display.as_text( sorted_logs )
+        elif s.path == "/html/":
+            output = log_display.as_html( sorted_logs )
+        elif s.path == "/raw/":
+            output = log_display.as_raw( sorted_logs )
         else:
-            s.wfile.write( root_page )
+            output = root_page
+            
+        if s.path == "/html/":
+            s.write_head( "HTML Log" )
+        s.wfile.write( output )
+        if s.path == "/html/":
+            s.write_tail()
 
     def logs(s):
         try:
