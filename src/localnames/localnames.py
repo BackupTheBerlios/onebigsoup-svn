@@ -1,5 +1,5 @@
 
-import cPickle
+import marshal
 
 
 class NameSpaceStore:
@@ -7,17 +7,17 @@ class NameSpaceStore:
         s.time_before_reload = time_before_reload
         s.namespaces = {}
     def get( s, ns_url ):
-        if s.namespaces.has_key( ns_url )
-            return s.namespaces[ ns_url ]
-        new_ns = NameSpace( ns_url )
-        s.namespaces[ ns_url ] = new_ns
-        return new_ns
+        try: return s.namespaces[ ns_url ]
+        except KeyError:
+            new_ns = NameSpace( ns_url )
+            s.namespaces[ ns_url ] = new_ns
+            return new_ns
     def get_if_already_have( s, ns_url ):
-        return s.namespaces.get( s, ns_url, None )
-    def save( s, pickle_filename ):
-        pickle.dump( s.namespaces, open( pickle_filename, "w" ) )
-    def load( s, pickle_filename ):
-        s.namespaces = pickle.load( open( pickle_filename, "r" ) )
+        return s.namespaces.get( s, ns_url )
+    def save( s, marshal_filename ):
+        marshal.dump( s.namespaces, open( marshal_filename, "wb" ) )
+    def load( s, marshal_filename ):
+        s.namespaces = marshal.load( open( marshal_filename, "rb" ) )
 
 
 class NameSpace:
@@ -30,9 +30,9 @@ class NameSpace:
         s._parse_from_url()
         
     def lookup(s, name):
-        return s.names.get( name, None )
+        return s.names.get( name )
     def lookup_gateway(s, name):
-        return s.gateways.get( name, None )
+        return s.gateways.get( name )
     def list_defaults(s):
         return s.defaults
     def default_for_name(s, name):
