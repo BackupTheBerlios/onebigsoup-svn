@@ -14,7 +14,7 @@ import pprint
 
 HOST_NAME = 'services.taoriver.net' # !!!REMEMBER TO CHANGE THIS!!!
 PORT_NUMBER = 9095 # Maybe set this to 80
-XMLRPC_TARGET = "http://services.taoriver.net:9096/"
+XMLRPC_TARGET = "http://services.taoriver.net:9090/"
 
 
 class MyHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
@@ -29,7 +29,7 @@ class MyHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         s.wfile.write( "<p>Done!</p>" )
         s.wfile.write( "</body></html>" )
     def do_POST(s):
-        s.do_GET()
+        s.do_HEAD()
         clen = int( s.headers.getheader("content-length") )
         body = s.rfile.read( clen )
         print "-----  POST  ------"
@@ -49,7 +49,7 @@ class MyHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         print ">>>", uli_string
         print "-------------------"
         server = xmlrpclib.ServerProxy( XMLRPC_TARGET )
-        server.uli( uli_string )
+        s.wfile.write( server.uli( uli_string ) )
         
 
 if __name__ == '__main__':
