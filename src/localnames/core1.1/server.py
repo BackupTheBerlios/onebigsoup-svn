@@ -16,75 +16,6 @@ import localnames
 
 redirect_lookup_flags = sets.ImmutableSet(["loose", "check-neighboring-spaces"])
 
-xmlrpc_documentation = '''
-<html>
-<head><title>Local Names Server 1.1 XML-RPC interface</title></head>
-<body>
-  Not yet!
-</body>
-'''
-
-filterData_p = '''Replaces marked up text with HTML links.
-
-filterData is an implementation of Les Orchard\'s
-XmlRpcFilteringPipe. It can be called as either
-"filterData", or in the traditional "wiki" namespace
-("wiki.filterData".)
-
-Argument 1: The text to perform replacements on.
-
-Argument 2: "text/plain; charset=utf-8" (always)
-
-Argument 3: A structure / dictionary with one key, "namespace."
-            The value for the key is the URL of the namespacen
-            you want to resolve Local Names from.
-
-The markup is like so:
-
-  [[name]]  : look up a name, and link it.
-              <a href="http://foobar/">name</a>
-
-  [[name]frozboz]  : look up a name, and link it with
-                     alternative text.
-                     <a href="http://foobar/">frozboz</a>
-
-  [[name][name]frozboz]   : look up a path, and link
-                            it with alternative text.
-
-  [[name][name][name][name]frozboz]  : You can go as long
-                                       as you like.
-
-  ((name))  : Soft linking- forms a link that works via
-              the nameservers redirection engine, rather
-              than just pointing straight at the thing
-              pointed to. That is, the link will be resolved
-              at click-time, dynamically via the name
-              servers Location: redirection, rather than at
-              text replacement time.
-
-Local Names are resolved from the namespace description
-specified in the "namespace" argument.
-
-Example:
-
-    filterData("[[Lion Kimbro]] works on [[Local Names.]]",
-               "text/plain; charset=utf-8",
-               {"namespace": "http://taoriver.net/tmp/gmail.txt"})
-
-  Returns:
-      
-      ['<a href="http://www.speakeasy.org/~lion/">Lion Kimbro</a>
-        works on <a href="http://ln.taoriver.net/">Local Names.</a>',
-       'text/plain; charset=utf-8']
-'''
-
-filterData_h = ''
-filterData_s = [('string', 'string'),
-                ('string', 'string', 'struct')]
-xmlrpc_info = {'filterData': {"plain": filterData_p,
-                              "html": filterData_h,
-                              "sig": filterData_s,}}
-
 
 def un_unicode_dict(d):
     """Convert the keys in a dictionary from Unicode strings to Python strings."""
@@ -206,10 +137,6 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             return
         
         self.respond(200, u'Content-type', 'text/html; charset=utf-8')
-        
-        if args.get("action") == "xmlrpc":
-            self.wfile.write(xmlrpc_documentation)
-            return
         
         self.wfile.write('<html>'
                          '<head><title>Local Names Server 1.1</title></head>'
