@@ -1,5 +1,14 @@
 """
 Local Names 1.1 Server
+
+dump_cache -- dump cache entry
+preferred_names -- list names of cached namespaces
+get_namespace -- cache a namespace
+aggregate -- form a namespace from several namespaces
+clean -- render a "clean" description of a namespace
+lookup -- resolve a path to a URL
+replace_text -- add <A HREF's> to a text based on lookups
+
 """
 import time
 import urllib
