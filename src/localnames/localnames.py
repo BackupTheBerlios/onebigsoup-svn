@@ -22,11 +22,17 @@ class NameSpaceStore:
         ns_url:
            URL of NameSpace to retrieve
         """
-        try: return s.namespaces[ ns_url ]
+        
+        try:
+            ns = s.namespace[ ns_url ]
+            now = time.time()
+            if now < ns.loaded_time + s.time_before_reload:
+                return ns
         except KeyError:
-            new_ns = NameSpace( ns_url )
-            s.namespaces[ ns_url ] = new_ns
-            return new_ns
+            pass
+        new_ns = NameSpace( ns_url )
+        s.namespaces[ ns_url ] = new_ns
+        return new_ns
     def get_if_already_have( s, ns_url ):
         return s.namespaces.get( s, ns_url )
     def save( s, marshal_filename ):
@@ -48,6 +54,7 @@ class NameSpace:
         s.connections = {}
         s.defaults = []
         s.pattern = None
+        s.loaded_time = None # filled with time.time() after parse
         s._parse_from_url()
         
     def lookup(s, name):
@@ -74,5 +81,5 @@ class NameSpace:
         return s.pattern.replace( "$PAGE", name )
 
     def _parse_from_url(s):
-        # put parser here
+        # invoke parser here
         s.loaded_time = time.time()
