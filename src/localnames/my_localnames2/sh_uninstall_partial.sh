@@ -40,14 +40,16 @@ fi
 # UNINSTALL
 ########################################
 
-rm "$TARGET"/*.html
-rm "$TARGET"/*.css
-rm "$TARGET"/*.py
-rm "$TARGET"/*.png
-
 rm "$TARGET"/.htaccess
 rm "$TARGET"/conf.py
 rm "$TARGET"/index.cgi
+
+rm "$TARGET"/*.html
+rm "$TARGET"/*.css
+rm "$TARGET"/*.py
+rm -f "$TARGET"/*.pyc # ideally, test if any exist, first
+rm "$TARGET"/*.png
+
 
 
 if [[ "$?" -ne "0" ]] ; then
@@ -55,7 +57,7 @@ if [[ "$?" -ne "0" ]] ; then
     exit $ERROR_CANNOT_DELETE_IN_TARGET
 fi
 
-if [[ `ls $TARGET | grep -v data | wc -l` -ne "0" ]] ; then
+if [[ `ls $TARGET | grep -v data | grep -v .pyc | wc -l` -ne "0" ]] ; then
     echo ":error: still files in $TARGET"
     exit $ERROR_CANNOT_DELETE_IN_TARGET
 fi
