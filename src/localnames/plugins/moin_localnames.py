@@ -5,23 +5,29 @@ MoinMoin - localnames action generates v1.1 Local Names descriptions
 This action generates a Local Names v1.1 namespace description representing
 the wiki.
 
-To use it:
- * copy this file to your /MoinMoin/action/ directory
- * rename it to "localnames.py"
- * define "wiki_url_prefix" in your moin_config.py file
-      ex: "http://wiki.taoriver.net/moin.cgi/"
- * define "interwikiname" in your moin_config.py file
-      ex: "robotics"
+You must define "wiki_url_prefix" and "interwikiname" in your moin_config.py
+file.
+
+If your wiki's URL begins with:
+
+    http://wiki.taoriver.net/moin.cgi/
+    
+...then your moin_config.py file should contain:
+
+    wiki_url_prefix = "http://wiki.taoriver.net/moin.cgi/"
+    interwikiname = "(something)"
 
 The URL for your namespace description would then be:
 
     http://wiki.taoriver.net/moin.cgi/?action=localnames
 
+...provided that this file is named localnames.py
+
 @copyright: (c) 2004 by Lion Kimbro <lion@speakeasy.org>
 @license: GNU GENERAL PUBLIC LICENSE, Version 2, June 1991
 """
 
-from MoinMoin import config, util, wikiutil
+from MoinMoin import config, util, wikiutil, intermap
 
 
 output = u"""Content-Type: text/plain; charset=utf-8
@@ -63,11 +69,16 @@ def execute(pagename, request):
     pages = filter(request.user.may.read, pages)
 
     for name in pages:
-        import sys
         name = name.decode('iso-8859-1')
         line = u'LN "%(NAME)s" "%(URL)s"\n' % \
                {"NAME": name,
                 "URL": config.wiki_url_prefix + name}
+        request.write(line.encode('utf-8'))
+
+    request.write(u'\n'.encode('utf-8'))
+    
+    for wikitag, urlprefix in intermap.load_intermap().items():
+        line = u'PATTERN "%s" "%s"\n' % (wikitag, urlprefix)
         request.write(line.encode('utf-8'))
     
     request.no_closing_html_code = True
