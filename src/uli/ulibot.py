@@ -21,6 +21,8 @@ picklefile = 'ulibot.p'
 aliaslist = { }
 debug = False
 
+funcnames = { uli.http: "http", uli.xmlrpc: "xml-rpc"}
+
 def ulibot(host, port, channels, nick=nickname):
    p = ircbot.Bot(nick=nick, channels=channels)
 
