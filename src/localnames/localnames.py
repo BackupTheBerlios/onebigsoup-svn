@@ -1,6 +1,9 @@
 
 import marshal
 import time
+import urllib
+
+import lnparser # Sean Palmer's Parser
 
 
 class NameSpaceStore:
@@ -24,7 +27,7 @@ class NameSpaceStore:
         """
         
         try:
-            ns = s.namespace[ ns_url ]
+            ns = s.namespaces[ ns_url ]
             now = time.time()
             if now < ns.loaded_time + s.time_before_reload:
                 return ns
@@ -81,5 +84,40 @@ class NameSpace:
         return s.pattern.replace( "$PAGE", name )
 
     def _parse_from_url(s):
-        # invoke parser here
+        parser = lnparser.Parser( LocalNamesSink(s) )
+        parser.feedString( urllib.urlopen( s.ns_url ).read() )
         s.loaded_time = time.time()
+
+class LocalNamesSink:
+    """
+    Sinks data from the parser into a NameSpace object.
+    """
+    def __init__(self, namespace):
+        self.namespace = namespace
+    def comment(self, s):
+        pass
+
+    def meta(self, key, value):
+        pass
+
+    def map(self, name, uri):
+        self.namespace.names[ name ] = uri
+
+    def connection(self, name, uri):
+        self.namespace.connections[ name ] = uri
+
+    def defaultConnection(self, name):
+        self.namespace.defaults.append( name )
+
+    def defaultPagePattern(self, pattern):
+        self.namespace.pattern = pattern
+
+
+def test():
+    store = NameSpaceStore(24*60*60) # one day timeout
+    space = store.get( "http://taoriver.net/tmp/nstest.txt" )
+    print space.lookup( "FirstName" )
+    
+if __name__=="__main__": 
+    print __doc__
+    test()
