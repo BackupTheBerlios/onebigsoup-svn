@@ -9,7 +9,7 @@ Local Names Namespace File Parser
 
 import urllib,re
 
-LEADING_URL = "http://purl.net/net/onebigsoup/localnames/"
+LEADING_URL = "http://purl.net/net/localnames/"
 
 
 r_token = re.compile(r'(?:"([^"\\]*(?:\\.[^"\\]*)*)")|(\S+)')
@@ -206,7 +206,7 @@ This is a Local Names namespace spec for describing Marshall Brain's sites that 
 
 For more information, see:
 
-  http://purl.net/net/onebigsoup/localnames/
+  http://purl.net/net/localnames/
 
 General Robotics interest:
 
@@ -259,7 +259,7 @@ def test2():
    parseString("""
 Lion Kimbro's favorites.
 
-   http://purl.net/net/onebigsoup/localnames/
+   http://purl.net/net/localnames/
 
    NamesListPattern http://www.speakeasy.org/~lion/$NAME/$NAME/
    NamesList
@@ -282,7 +282,7 @@ def test3():
     parseString("""
 Testing a wiki's names space
 
-     http://purl.net/net/onebigsoup/localnames/
+     http://purl.net/net/localnames/
 
      NamesListPattern http://onebigsoup.wiki.taoriver.net/moin.cgi/$NAME
      NamesList http://onebigsoup.wiki.taoriver.net/moin.cgi/TitleIndex?action=titleindex
