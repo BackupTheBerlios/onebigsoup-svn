@@ -182,27 +182,18 @@ class Resolver:
         return space.default_for_name( final_name )
 
 def test_resolver():
-##     resolver = Resolver( "http://onebigsoup.wiki.taoriver.net/moin.cgi/LocalNamesDescription?action=raw",
-##                          "localnames_cache" )
-##     print resolver.lookup_tuple( ["FrontPage"] )
-##     print resolver.lookup_tuple( ["Robots"] )
-##     print resolver.lookup_tuple( ["PublicEmail"] )
-##     print resolver.lookup_tuple( ["IntComm", "OneBigSoup"] )
-##     print resolver.lookup_tuple( ["IntComm", "CommunityWiki", "OneBigSoup"] )
-##     print resolver.lookup_tuple( ["CommunityWiki", "OneBigSoup"] )
-##     print resolver.lookup_tuple( ["ThePublicWeb"] )
     print "READING:"
     print urllib.urlopen("http://lion.taoriver.net/localnames.txt").read()
     print "------"
     resolver = Resolver( "http://lion.taoriver.net/localnames.txt",
                          "localnames_cache" )
     print resolver.lookup_tuple( ["WeirdFile"] )
-    print resolver.lookup_tuple( ["Kitty"] )
     print resolver.lookup_tuple( ["MarshallBrain"] )
     print resolver.lookup_tuple( ["/."] )
-    #print resolver.lookup_tuple( ["OneBigSoup","FrontPage"] )
-    #print resolver.lookup_tuple( ["OneBigSoup","DingDing"] )
-    #print resolver.lookup_tuple( ["LocalNames"] )
+    print resolver.lookup_tuple( ["OneBigSoup","FrontPage"] )
+    print resolver.lookup_tuple( ["OneBigSoup","DingDing"] )
+    print resolver.lookup_tuple( ["LocalNames"] )
+    print resolver.lookup_tuple( ["FrontPage"] )
     
     
 if __name__=="__main__": 

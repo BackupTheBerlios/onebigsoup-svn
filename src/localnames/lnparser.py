@@ -28,14 +28,19 @@ class Parser:
         s.lines = None
         s.indent = None
         s.names_list_pattern = None
+        s.feed_name = "(feedname)"
 
     def feedFile( s, f ):
+        s.feed_name = "(some file)"
         s.sanitizeLines( f.readlines() )
     def feedFilename( s, fn ):
+        s.feed_name = "(file: %s)" % fn
         s.sanitizeLines( file(fn,"r").readlines() )
     def feedUrl( s, url ):
+        s.feed_name = "(url: %s)" % url
         s.sanitizeLines( urllib.urlopen(uri).readlines() )
     def feedString( s, a_string ):
+        s.feed_name = "(some string)"
         s.sanitizeLines( a_string.split("\n") )
     def sanitizeLines( s, lines ):
         def count_spaces( x ):
@@ -49,7 +54,7 @@ class Parser:
     
     def parse(s):
         while 1:
-            if len(s.lines)==0:raise "Leading URL %s not found alone in document." % LEADING_URL
+            if len(s.lines)==0:raise "Leading URL %s not found alone in %s." % (LEADING_URL,s.feed_name)
             (line_number,spaces,line) = s.lines.pop(0)
             if line == LEADING_URL:
                 s.indent = spaces
@@ -155,7 +160,7 @@ class Parser:
     def defaultNameSpaces( s, value ):
         if value == '':
             for line in s.getBlock():
-                s.sink.defaultNameSpaces(line)
+                s.sink.defaultNameSpaces(line[0])
         else:
             u = urllib.urlopen(value)
             while 1: 
