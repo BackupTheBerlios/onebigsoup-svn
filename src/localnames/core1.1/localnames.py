@@ -22,7 +22,7 @@ import lnparser
 image_extensions = [".png", ".jpeg", ".jpg", ".gif"]
 
 store = {}
-time_to_live = 24*60*60  # one day
+time_to_live = 7*24*60*60  # one week
 
 punctuation_re = re.compile(r'[^A-Za-z0-9\s]+', re.UNICODE)
 ws_re = re.compile(r'\s+', re.UNICODE)
