@@ -1,5 +1,5 @@
 """
-python2.3 server3.py password -Hservices.taoriver.net -p9009 -t"test dingdingv5 server" -d
+python2.3 dingding.py password -Hservices.taoriver.net -p9009 -t"test dingdingv5 server" -d
 """
 
 import cPickle as pickle
@@ -9,6 +9,39 @@ import xmlrpclib
 import select
 from xml.parsers.expat import ExpatError
 
+
+class Unsubscription:
+    """
+    Unsubscription - augment an unsubscription dictionary
+    """
+    def __init__( s, d, dingding ): # unsusbcription dictionary
+        """
+        unsubscribe dict:
+        * MatchPattern (*OPTIONAL*) - pattern to unsubscribe; if missing, unsubscribe ALL patterns
+        * XmlRpcRecvUrl (REQUIRED) - XML-RPC URL of unsubscribing interface
+        * RecvPassword (OPTIONAL) - if there is a password associated with the receiver, put it here
+
+        nothing else
+        """
+        s.dingding = dingding
+
+        s.match_pattern = d.get( "MatchPattern", None )
+        s.xmlrpc_recv_url = d[ "XmlRpcRecvUrl" ]
+        s.recv_password = d.get( "RecvPassword", None )
+    def matches( s, subs ):
+        """
+        Return True if this unsubscription request matches the subscription.
+        """
+        if s.xmlrpc_recv_url != subs.xmlrpc_recv_url:
+            return False
+        # so, talking about the same server-
+        if s.recv_password != subs.recv_password:
+            return False
+        # authorized,
+        if not s.match_pattern:
+            return True # no match pattern? Unsubscribe all of 'em.
+        # if we have a match pattern, only unsubscribe that ONE pattern.
+        return s.match_pattern == subs.match_pattern
 
 class Subscription:
     """
@@ -40,8 +73,8 @@ class Subscription:
         s.who_can_see_this = d.get( "WhoCanSeeThis", s.dingding.options.get_defaultcomponentvisibility() )
         
         s.title = d.get( "Title", "(untitled)" )
-        s.url = d.get( "Url", None )
-        s.comment = d.get( "Comment", None )
+        s.url = d.get( "Url", "(no info url)" )
+        s.comment = d.get( "Comment", "(no comment)" )
 
     def get_permit(s):
         """
@@ -209,7 +242,8 @@ class DingDingUli:
         elif msg == "help": return "list-subscriptions, subscribe server-pw xmlrpc-url subs-pw, pnote server-pw note\n"
         elif msg == "list-subscriptions":
             visible = s.dingding.subscriptions.visible_by_permit( PUBLIC_PERMIT )
-            return "Subscriptions: " + " ".join( [subs.title for subs in visible] ) + "\n"
+            results = [ "%s - %s\n" % (subs.title,subs.xmlrpc_recv_url) for subs in visible ]
+            return "".join( results )
         elif msg.startswith( "pnote" ):
             import shlex
             (cmd, server_pw, note) = shlex.split( msg,3 )
@@ -228,6 +262,14 @@ class DingDingUli:
                                                               s.dingding ),
                                                 Connection( { "Password": server_pw }, s.dingding ) )
             return "(subscribing %s...)\n" % xmlrpc_url
+        elif msg.startswith( "unsubscribe" ):
+            import shlex
+            (cmd, server_pw, xmlrpc_url, subscribers_pw) = shlex.split( msg )
+            s.dingding.subscriptions.unsubscribe( Unsubscription( { "XmlRpcRecvUrl": xmlrpc_url,
+                                                                    "RecvPassword": subscribers_pw },
+                                                                  s.dingding ),
+                                                  Connection( { "Password": server_pw }, s.dingding ) )
+            return "(unsubscribing %s...)\n" % xmlrpc_url
         return "(I do not understand: %s)\n" % msg
 
 class DingDingOptions:
@@ -372,15 +414,47 @@ class DingDingSubscriptions:
         if subs.title: notice_dict[ "SubscriberName" ] = subs.title
         if subs.url: notice_dict[ "SubscriberUrl" ] = subs.url
         s.dingding.work_orders.add_order( s.dingding.notice_dispatch.notify, [notice_dict, conn] )
+        
+    def unsubscribe( s, unsubs, conn ):
+        if not s.dingding.security.is_connection_okay( conn ):
+            return False
+
+        # go backwards, so that when we remove, everything's ok
+        indexes = range( len(s.subscriptions) )
+        indexes.reverse()
+        found_one = False
+
+        for i in indexes:
+            subs = s.subscriptions[ i ]
+            if unsubs.matches( subs ):
+                del s.subscriptions[ i ]
+                found_one = True
+                # tell ppl about it
+                notice_dict = { "Action": "unsubscribe",
+                                "SubscriptionSystem": "DingDingV5",
+                                "TargetName": s.dingding.options.get_servertitle(),
+                                "TargetUrl": s.dingding.options.get_serverurl(),
+                                "TargetXmlRpc": s.dingding.options.get_serverurl(),
+                                "SubscriberXmlRpc": unsubs.xmlrpc_recv_url, # required subscriber info
+                                }
+                if unsubs.match_pattern != None:
+                    notice_dict[ "MatchPattern" ] = unsubs.match_pattern
+                if subs.title: notice_dict[ "SubscriberName" ] = subs.title
+                if subs.url: notice_dict[ "SubscriberUrl" ] = subs.url
+                s.dingding.work_orders.add_order( s.dingding.notice_dispatch.notify, [notice_dict, conn] )
+                # so like, if your connection for disconnecting is ADMIN-ONLY,
+                # then nobody will see that you are disconnecting.
+        
+        if found_one == True:
+            s.dingding.work_orders.add_order( s.dingding.pickle.save, [] )
+        
     def visible_by_permit( s, permit ):
         return [subs for subs in s.subscriptions if s.dingding.censor.is_this_visible( permit, subs )]
     def event_readfromdict( s, data_dict ):
         """
         Loading data from the data dictionary.
         """
-        print data_dict[ "subscriptions" ]
         s.subscriptions = [ Subscription( subscription_dictionary, s.dingding ) for subscription_dictionary in data_dict[ "subscriptions" ] ]
-        print s.subscriptions
     def event_writetodict( s, data_dict ):
         """
         Writing data to the data dictionary.
@@ -477,9 +551,15 @@ class DingDingHttpHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
             uli_string = None
         try:
             (args,func_name) = xmlrpclib.loads( body )
+            if func_name == "uli":
+                uli_result = s.server.dingding.uli.uli( args[0] )
+                s.wfile.write( xmlrpclib.dumps( (uli_result,) ) )
+                return
             s.wfile.write( xmlrpclib.dumps( (1,) ) ) # auto response, for now
             if func_name == "subscribe":
                 s.handle_xmlrpc_subscribe( *args )
+            elif func_name == "unsubscribe":
+                s.handle_xmlrpc_unsubscribe( *args )
         except ExpatError:
             pass
         if uli_string != None:
@@ -497,7 +577,18 @@ class DingDingHttpHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
             return 0
         s.server.dingding.work_orders.add_order( s.server.dingding.subscriptions.subscribe, [subs,conn] )
         return 1
-
+    def handle_xmlrpc_unsubscribe( s, unsubscription_dict, connection_dict ):
+        """
+        XML-RPC interface to unsubscription.
+        Returns 0 if password doesn't check out.
+        Returns 1 otherwise.
+        """
+        unsubs = Unsubscription( unsubscription_dict, s.dingding )
+        conn = Connection( connection_dict, s.server.dingding )
+        if not s.server.dingding.security.is_connection_okay( conn ):
+            return 0
+        s.server.dingding.work_orders.add_order( s.server.dingding.subscriptions.unsubscribe, [unsubs,conn] )
+        return 1
 
 
 if __name__ == "__main__":
