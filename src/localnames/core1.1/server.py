@@ -170,6 +170,15 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 self.wfile.write(u'%4d.  %s' % (num, line))
             return
 
+        if args.get("action") == ["render"] and \
+           args.get("namespace") != None:
+            format = args.get("format", ["version1.1"])[0]
+            if format == "XML-RPC":
+                format = "XML-RPC-text"
+            self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
+            self.wfile.write(self.xmlrpc_render(format, args["namespace"]))
+            return
+        
         self.respond(200, u'Content-type', 'text/html; charset=utf-8')
         
         if args.get("action") == "xmlrpc":
