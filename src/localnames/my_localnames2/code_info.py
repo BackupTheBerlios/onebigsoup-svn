@@ -13,6 +13,7 @@ ULI_KEY = "uli"
 
 
 NUM_LOGS_ON_FRONT_PAGE = 20
+NUM_LOGS_ON_EDIT_PAGES = 5
 
 def query_string():
     import os

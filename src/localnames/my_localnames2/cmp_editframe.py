@@ -15,6 +15,7 @@ def ahref( page ):
 
 def response():
     code_info.inform_template(t)
+    
     t.NAMES_OPEN = ahref( code_info.PAGE_EDITNAMES )
     t.NAMES_CLOSE = "</a>"
     t.SPACES_OPEN = ahref( code_info.PAGE_EDITSPACES )
@@ -36,5 +37,9 @@ def response():
         pass # illegal
     t.EDIT_SECTION_NAME = cmp.subtitle()
     t.EDIT_SECTION = cmp.response()
+
+    import cmp_activity
+    t.ACTIVITY = cmp_activity.response( code_info.NUM_LOGS_ON_EDIT_PAGES )
+
     return str(t)
 

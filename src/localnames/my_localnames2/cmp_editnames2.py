@@ -22,6 +22,7 @@ def register_new_names():
 
 def response():
     register_new_names()
+
     code_info.inform_template(t)
     return str(t)
 
