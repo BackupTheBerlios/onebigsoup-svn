@@ -38,10 +38,10 @@ class AbstractListClass:
         return "".join(response)
     def get_localnames(s):
         results = []
-        if s.title:
-            results.append(s.title)
         if s.local_name:
             results.append(s.local_name)
+        if s.title:
+            results.append(s.title)
         return results
     
 class MasterList(AbstractListClass):
@@ -192,10 +192,18 @@ def get(path):
         response.append("# This is an uli_list local names description file")
         response.append("# visit http://purl.net/net/localnames/ to learn more about local names")
         mlo = MasterList()
-        for ln in mlo.get_localnames():
+        response.append( '# this document' )
+        response.append( 'LN this %s%s' % (WEB_SERVICE_URL,"localnames/") )
+        response.append( '# master List of Lists' )
+        response.append( 'LN lists %s' % WEB_SERVICE_URL )
+        response.append( 'LN "list of lists" %s' % WEB_SERVICE_URL )
+        response.append( 'LN ListOfLists %s' % WEB_SERVICE_URL )
+        if mlo.local_name != None:
+            ln = mlo.local_name
             if " " in ln:
                 ln = '"%s"' % ln
             response.append("LN %s %s" % (ln, WEB_SERVICE_URL))
+        response.append( '# individual lists' )
         for lo in mlo:
             for ln in lo.get_localnames():
                 if " " in ln:
@@ -215,7 +223,10 @@ def get(path):
         response.append('<a href="%s%s">Local Names</a><h3>List of Lists</h3>\n<ul>' % (WEB_SERVICE_URL, "localnames/"))
         for lo in mlo:
             response.append('<li><a href="%s%d/">%d - %s </a></li>' % (WEB_SERVICE_URL, lo.id, lo.id, lo.title))
-    response.append("</ul></body></html>")
+    response.append("</ul>")
+    response.append('<p><form method="post" action="%s%s">' % (WEB_SERVICE_URL, "uliform/"))
+    response.append('<a href="http://onebigsoup.wiki.taoriver.net/moin.cgi/UniversalLineInterface">uli:</a> <input type="text" name="uli"></form></p>')
+    response.append("</body></html>")
     return "\n".join(response)+"\n"
 
 
