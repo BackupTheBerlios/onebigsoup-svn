@@ -1,4 +1,4 @@
-
+from Cheetah.Template import Template
 import cgi
 form = cgi.FieldStorage() # CGI form data
 
@@ -11,6 +11,7 @@ PAGE_EDITOPTS = "editopts"
 PAGE_DESCRIPTION = "desc"
 
 SPACE_KEY = "space"
+SPACE_GLOBAL = "global"
 # key: name of the user's space to work with
 
 ULI_KEY = "uli"
@@ -20,8 +21,16 @@ NUM_LOGS_ON_FRONT_PAGE = 20
 NUM_LOGS_ON_EDIT_PAGES = 5
 
 
-LOCALNAMES_IMG='<img style="width: 80px; height: 15px;" alt="Local Names v1.0" src="img_namesv10.png"><br>'
+LOCALNAMES_IMG='<a href="index.cgi?$PAGE_KEY=$PAGE_DESCRIPTION&$SPACE_KEY=$SPACE"><img style="width: 80px; height: 15px;" alt="Local Names v1.0" src="img_namesv10.png"></a>'
 NLSD_IMG='<img style="width: 80px; height: 15px;" alt="nLSD namespace description" src="img_nlsdnames.png">'
+
+def localnames_img():
+    t=Template( LOCALNAMES_IMG )
+    t.PAGE_KEY = PAGE_KEY
+    t.PAGE_DESCRIPTION = PAGE_DESCRIPTION
+    t.SPACE_KEY = SPACE_KEY
+    t.SPACE = space()
+    return str(t)
 
 def query_string():
     import os
@@ -51,6 +60,8 @@ def space():
     result = query_dict().get( SPACE_KEY )
     if result:
         result=result.upper()
+    if result == None:
+        result=SPACE_GLOBAL
     return result
 
 def blank_request():
@@ -63,7 +74,7 @@ def inform_template( t ):
     t.PAGE_EDITNAMES = PAGE_EDITNAMES
     t.PAGE_EDITOPTS = PAGE_EDITOPTS
     t.SPACE_KEY = SPACE_KEY
-    t.LOCALNAMES_IMG = LOCALNAMES_IMG
+    t.LOCALNAMES_IMG = localnames_img()
     t.NLSD_IMG = NLSD_IMG
 
     t.PAGE = page()

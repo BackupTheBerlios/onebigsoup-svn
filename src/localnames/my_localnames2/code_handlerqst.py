@@ -16,6 +16,9 @@ if code_info.uli_string():
     import code_handleuli
     print text_plain()
     print code_handleuli.uli( code_info.uli_string() )
+elif code_info.page() == code_info.PAGE_DESCRIPTION:
+    print text_plain()
+    print code_old.hub.namespace_files.get_space( code_info.space() ).get_contents()
 elif (code_info.page() == code_info.PAGE_FRONT) or (code_info.blank_request()):
     import cmp_frontpage
     print text_html()
