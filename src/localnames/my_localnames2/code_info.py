@@ -9,6 +9,9 @@ PAGE_DESCRIPTION = "desc"
 SPACE_KEY = "space"
 # key: name of the user's space to work with
 
+ULI_KEY = "uli"
+
+
 NUM_LOGS_ON_FRONT_PAGE = 20
 
 def query_string():
@@ -22,6 +25,9 @@ def query_dict():
         if type(v) == type([]) and len(v)==1:
             _dict[k]=v[0]
     return _dict
+
+def uli_string():
+    return query_dict().get( ULI_KEY )
 
 def page():
     return query_dict().get( PAGE_KEY )

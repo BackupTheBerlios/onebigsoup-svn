@@ -3,13 +3,19 @@ import code_info
 def text_html():
     return "Content-type: text/html\n\n"
 
+def text_plain():
+    return "Content-type: text/plain\n\n"
+
 import cgitb
 cgitb.enable()
 
 import code_old
 # in code_old, it will open the main pickle file
 
-if (code_info.page() == code_info.PAGE_FRONT) or (code_info.blank_request()):
+if code_info.uli_string():
+    print text_plain()
+    print "pong"
+elif (code_info.page() == code_info.PAGE_FRONT) or (code_info.blank_request()):
     import cmp_frontpage
     print text_html()
     print cmp_frontpage.response()
