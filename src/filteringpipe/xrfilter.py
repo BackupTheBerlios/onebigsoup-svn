@@ -27,6 +27,10 @@ def main():
                       help="the name of an XmlRpcFilteringPipe " \
                       "argument, followed by its string value",
                       action="append", type="string", nargs=2)
+    parser.add_option("-c", "--content-type", action="store_true",
+                      dest="show_content_type", default=False,
+                      help="report returned content type on " \
+                      "first line")
     (options, args) = parser.parse_args()
     if len(args) != 1:
         parser.error("incorrect number of arguments")
@@ -35,12 +39,17 @@ def main():
     filter_args = {}
     for key, val in options.filter_args:
         filter_args[key] = val
-    proxy = xmlrpclib.ServerProxy(args[0])
+    server = xmlrpclib.ServerProxy(args[0])
     function_name = "filterData"
     if options.namespace:
         function_name = "%s.%s" % (options.namespace, function_name)
-    print getattr(proxy,function_name)(data, options.encoding, filter_args)
+    result = getattr(server, function_name)(data, options.encoding,
+                                            filter_args)
+    if options.show_content_type:
+        print result["contentType"]
+    print result["data"]
 
+    
 if __name__ == "__main__":
     main()
 
