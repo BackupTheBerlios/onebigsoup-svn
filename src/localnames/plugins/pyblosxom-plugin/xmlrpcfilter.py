@@ -45,5 +45,9 @@ def cb_postformat(args):
 		data = xmlrpclib.Binary(args['entry_data']['body'])
 		encoding = "text/plain; charset=utf-8"
 		proxy = xmlrpclib.ServerProxy(url)
-		args['entry_data']['body'] = str(getattr(proxy, function_name)(data, encoding, filters[filter]['args'])['data'])
+		response = getattr(proxy, function_name)(data, encoding, filters[filter]['args'])
+		if type(response) == type("string"):
+			raise response
+		else:
+			args['entry_data']['body'] = str(response['data'])
 
