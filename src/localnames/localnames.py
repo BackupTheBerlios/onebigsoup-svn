@@ -8,6 +8,7 @@ import lnparser # Sean Palmer's Parser
 # TODO: FIX NameSpaceStore.save,
 #       which doesn't know how to marshal objects, I guess.
 
+NAMESPACE_FILE_DOESNT_LOAD = "NAMESPACE-FILE-DOESNT-LOAD"
 NAME_NOT_FOUND = "NAME-NOT-FOUND"
 NAMESPACE_NOT_FOUND = "NAMESPACE-NOT-FOUND"
 
@@ -95,7 +96,11 @@ class NameSpace:
 
     def _parse_from_url(s):
         parser = lnparser.Parser( LocalNamesSink(s) )
-        parser.feedString( urllib.urlopen( s.ns_url ).read() )
+        try:
+            url_data = urllib.urlopen( s.ns_url ).read()
+        except IOError,e:
+            raise NAMESPACE_FILE_DOESNT_LOAD
+        parser.feedString( url_data )
         parser.parse()
         s.loaded_time = time.time()
 
@@ -197,7 +202,7 @@ class SpaceTraverser:
         """
         s.enter_spaces( path[:-1] )
 
-        return s.lookup_name_one_deep( path[-1] ) or s.default_for_name( path[-1] ) or name_not_found()
+        return s.lookup_name_one_deep( path[-1] ) or s.default_for_name( path[-1] ) or name_not_found_error()
 
     
 class Resolver:
