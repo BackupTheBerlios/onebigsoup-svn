@@ -1,0 +1,47 @@
+
+Getting started:
+
+  Type the following on the command line:
+
+    python ulitool.py http://localnames.taoriver.net/uli/ "help"
+    python ulitool.py http://localnames.taoriver.net/uli/ "keys"
+    python ulitool.py http://localnames.taoriver.net/uli/ "look lion this"
+
+    alias "ln" "python ulitool.py http://localnames.taoriver.net/uli/"
+
+    ln "keys"
+    ln "look lion RoboticEvidence"
+    ln "look lion RecentChanges"
+    ln "look lion OneBigSoup RecentChanges"
+
+  That should give you the basic idea of what this is all about-
+  Command line services, available over the Internet.
+
+
+Some services to explore:
+
+  (list recorded on: 2004-08-01)
+
+  http://localnames.taoriver.net/uli/
+  http://services.taoriver.net:9090/  (use ULI/XML-RPC)
+  http://services.taoriver.net:9303/
+
+  Send a line with just "help" to get a list of commands.
+
+
+What we want:
+
+  We are working to make a bunch of services:
+  * data-structure builders
+  * one-time pad password generators and authenticators
+  * URL information gatherers (like ChumpBot)
+  * document editing (like "ed", but smarter, and HTML/wiki-like)
+
+  We also want to expand to...:
+  * Jabber Bots
+  * CGI scripts that make it so you can do ULI calls (should be basic)
+
+
+Additional information:
+
+  http://onebigsoup.wiki.taoriver.net/moin.cgi/UniversalLineInterface

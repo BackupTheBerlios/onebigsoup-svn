@@ -1,0 +1,14 @@
+uli.py -- module teaches Python to talk with ULI ports
+
+ulitool.py -- command-line tool for talking with ULI ports
+
+ulibot.py -- lets you talk to ULI ports from inside IRC
+ircbot.py -- source IRC bot code, used by ulibot.py
+
+uli_lists.py -- a list-keeping ULI service
+
+http_server.py -- a web server that makes handling ULI and GET requests easy
+
+uli_to_xmlrpc.py -- a gateway server from ULI/HTTP to ULI/XML-RPC
+
+
