@@ -7,7 +7,7 @@ class DingDing:
    def __init__(s, URL, pw):
      s.URL=URL
      s.pw=pw
-   def notify(s, load)
+   def notify(s, load):
      xmlrpclib.ServerProxy(s.URL).notify(load, s.pw)
      
 
@@ -39,6 +39,12 @@ class Scanner:
              "PageUrl":entry["link"],
              "TimeEventHappened":entry["date"][:19],
             }
+
+       load["TransparencyText"] = """Posted to %(InterWikiName)s:%(PageName)s - %(Comment)s""" % load
+       load["TransparencyXhtml"] = """Posted to <a href="%(WikiUrl)s">%(InterWikiName)s</a>:<a href="%(PageUrl)s">%(PageName)s</a> - %(Comment)s""" % load
+       load["TransparencyXhtmlColumnHeaders"] = [ "Wiki", "Page", "Comment" ]
+       load["TransparencyXhtmlRow"] = [ """<a href="%(WikiUrl)s">%(InterWikiName)s</a>""" % load, """<a href="%(PageUrl)s">%(PageName)s</a>""" % load, "%(Comment)s" % load ]
+
        s.dingding.notify(load)
 
      s.lastseen = feed["entries"][0]["link"]
