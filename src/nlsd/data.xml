@@ -1,0 +1,30 @@
+<?xml version="1.0" standalone="yes"?>
+
+<zone>
+  <dictionary id="0">
+    <bind from="1" to="2"/>
+    <bind from="3" to="4"/>
+    <bind from="5" to="6"/>
+  </dictionary>
+  <string id="1">Name<!--I hope this doesn't count!--></string>
+  <string id="2">Lion Kimbro</string>
+  <string id="3">Age</string>
+  <integer id="4">27</integer>
+  <string id="5">some list</string>
+  <list id="6">
+    <item at="0"/>
+    <item at="1"/>
+    <item at="2"/>
+    <item at="3"/>
+    <item at="4"/>
+    <item at="5"/>
+    <item at="6"/> <!-- Yep! It points to itself, too! -->
+  </list>
+  <string id="7">
+Big long multi-paragraph string.
+Super large!
+  </string>
+  <reference id="8" url="http://www.speakeasy.org/~lion/" at="3"/>
+  <flag at="7" name="big string"/>
+  <flag at="0" name="START"/>
+</zone>

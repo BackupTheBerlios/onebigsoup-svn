@@ -1,0 +1,19 @@
+<?xml version="1.0" standalone="yes"?>
+
+<zone>
+  <dictionary id="0">
+    <bind from="1" to="5"/>
+    <bind from="6" to="4"/>
+    <bind from="8" to="3"/>
+  </dictionary>
+  <string id="1">dirs</string>
+  <reference id="2" url="file:forest.xml" at="0"/>
+  <string id="3">You are standing in front of a white house. There is a mailbox here.</string>
+  <string id="4">in front of a house</string>
+  <dictionary id="5">
+    <bind from="7" to="2"/>
+  </dictionary>
+  <string id="6">desc</string>
+  <string id="7">north</string>
+  <string id="8">description</string>
+</zone>
