@@ -223,8 +223,10 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             call_data = xmlrpclib.loads(body)
         except xml.parsers.expat.ExpatError:
             call_data = None
-        # d = cgi.parse_qs(body) -- for later
-        # -- for now, assuming always XML-RPC
+        form_dict = cgi.parse_qs(body)
+        if call_data == None:
+            self.handle_httppipe(form_dict)
+            return
         (args, funct) = call_data
         xmlrpc_bindings = {"filterData": self.xmlrpc_filterData,
                            "wiki.filterData": self.xmlrpc_filterData,
@@ -242,6 +244,20 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.wfile.write(xmlrpclib.dumps((result,)))
         except IndexError:
             pass
+
+    def handle_httppipe(self, form_dict):
+        """Called by do_POST when body looks like a form post."""
+        
+        self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
+        if not form_dict.has_key("body"):
+            self.wfile.write('Error: no form entry with key "body"')
+            return
+        if not form_dict.has_key("namespace"):
+            self.wfile.write('Error: no form entry with key "namespace"')
+            return
+        result = localnames.replace_text(form_dict["body"][0],
+                                         form_dict["namespace"][0])
+        self.wfile.write(result.encode("utf-8"))
 
     def xmlrpc_lookup(self, path, namespace, flags):
         if type(path) == type("string"):
@@ -295,7 +311,7 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 return xmlrpclib.dumps((ns2,))
         elif format == "version1.1":
             return localnames.clean(ns)
-        elif format == "version1.1-original":
+        elif format == "original":
             return ns["TEXT"]
         elif format == "python":
             import pprint
