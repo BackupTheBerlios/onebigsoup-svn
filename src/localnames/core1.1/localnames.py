@@ -19,6 +19,8 @@ import cgi
 import lnparser
 
 
+image_extensions = [".png", ".jpeg", ".jpg", ".gif"]
+
 store = {}
 time_to_live = 24*60*60  # one day
 
@@ -107,6 +109,10 @@ def _namespace_from_text(text):
     "NS": (same)
     "PATTERN": (same)
     "X": dictionary of X entries, {"name":["one","two",...]}
+    "LN-loose": dictionary of LN entries {"loose name":"URL"}
+    "NS-loose": (same)
+    "PATTERN-loose": (same)
+    "X-loose": (same)
 
     """
     (results, errors) = lnparser.parse_text(text)
@@ -128,10 +134,15 @@ def _namespace_from_text(text):
     namespace["NS"] = {}
     namespace["PATTERN"] = {}
     namespace["X"] = {}
+    namespace["LN-loose"] = {}
+    namespace["NS-loose"] = {}
+    namespace["PATTERN-loose"] = {}
+    namespace["X-loose"] = {}
     for record_type in ["LN", "NS", "PATTERN"]:
         for line_number, second, third in namespace[record_type+"-raw"]:
             if not namespace[record_type].has_key(second):
                 namespace[record_type][second] = third
+                namespace[record_type+"-loose"][_prepare_key(second)] = third
             else:
                 msg = "redefinition of %s" % second
                 namespace["ERRORS"].append((line_number, msg))
@@ -197,7 +208,7 @@ def clean(namespace):
 
     Data is seperated into four blocks: X, LN, PATTERN, and NS.
     Within blocks, original order is preserved.
-    Stanard X keys are handled particularly and intelligently.
+    Standard X keys are handled particularly and intelligently.
     X LAST-CHANGED is updated to the present time.
     
     """
@@ -241,53 +252,74 @@ def clean(namespace):
     return ''.join(text)
 
 
-def lookup(path, url, flags):
+def lookup(path, url, flags, success_path = None):
     """
     Resolve a path to a URL.
 
     Returns the resolved URL.
+    If the search failed, returns a tuple.  (see below)
 
     path: ["space", "space", ..., "name"]
     url: "http://url.to.first.namespace.description/"
     flags: Python 2.3 Set of flags
+    success_path: (used internally for recursion)
 
     The following flags are understood:
 
-      "no-case":  ignore capitalization
-      "no-punctuation":  ignore punctuation
-      "no-space":  ignore white space
-      "forgive-spelling":  accept plausible mis-spellings
-      "loose": "no-case" + "no-punctuation" + "no-space"
-               + "check-neighboring-spaces" +
+      "loose": ignore case, ignore punctuation, ignore white space
       "check-neighboring-spaces":  check spaces linked by NS
       "reverse":  reverse lookup (URL, not name, at end of path)
       "NS":  namespace-lookup; (NS, not LN, at end of path)
       "suppress-final":  don't use "X FINAL"
+
+    Failure Tuple:
+
+    Upon failure, returns a tuple of the following form:
+
+      1. (list) [URL-of-successful load, NS-of-successful lookup, ...]
+      2. (string) failure type: "NS" lookup, "LN" lookup, or "LOAD" failure
+      3. (string) name of failed NS or LN lookup, or URL of failed LOAD
+      4. (string) human readable error string
+
+    If you re doing a reverse lookup, there is no such thing as an
+    "LN" failure type;  You get either a list of names, an empty list (no
+    matches,) or an NS or LOAD error.
+    
     """
+    if success_path == None:
+        success_path = list()
+    
     flags = sets.Set(flags)
-    if "loose" in flags:
-        flags = flags | loose_flags
-        flags.discard("loose")
     assert len(path) > 0
-    namespace = get_namespace(url)
+    try:
+        namespace = get_namespace(url)
+    except IOError:
+        return (success_path, "LOAD", url,
+                'unable to load namespace "%s"' % url)
+    success_path.append(url)
+    pname = _prepare_key(path[0])
 
     if len(path) == 1:
         if "NS" in flags:
-            records = namespace["NS-raw"]
+            record_type = "NS"
         else:
-            records = namespace["LN-raw"]
+            record_type = "LN"
 
-        # If "loose" flags are being used, try resolving without loose
-        # flags, first.  If there is an exact match, it has priority.
-
-        if flags & loose_flags:
-            result = _check_list(path[0], records, flags - loose_flags)
+        if not "reverse" in flags:
+            result = namespace[record_type].get(path[0])
             if result:
                 return result
-
-        result = _check_list(path[0], records, flags)
-        if result:
-            return result
+            if "loose" in flags:
+                result = namespace[record_type+"-loose"].get(pname)
+            if result:
+                return result
+        else:
+            found = []
+            for num, name, url in namespace[record_type+"-raw"]:
+                if name == url:
+                    found.append(name)
+                elif pname == _prepare_key(url):
+                    found.append(name)
 
         if "check-neighboring-spaces" in flags:
             wo_neighboring = flags.copy()
@@ -296,104 +328,92 @@ def lookup(path, url, flags):
             urls = sets.Set()
             for num, neighborname, url in namespace["NS-raw"]:
                 if url not in urls:
-                    result = lookup([path[0]], url, wo_neighboring)
-                    if result:
+                    result = lookup([path[0]], url, wo_neighboring, [])
+                    if type(result) in [type(u'unicode'), type(u'string')]:
                         return result
+                    if "reverse" in flags:
+                        found.extend( result)
                     urls.add(url)
 
-        if (not "suppress-final" in flags) and ("reverse" not in flags) and \
-               ("FINAL" in namespace["X"]):
-            return namespace["X"]["FINAL"][0].replace("$PAGE", path[0])
-        return None
+        if "reverse" in flags:
+            return found
+
+        if record_type == "LN" and not "suppress-final" in flags \
+           and "reverse" not in flags:
+            final = namespace["X-loose"].get(_prepare_key("FINAL"))
+            if final:
+                return final.replace("$NAME", path[0])
+
+        return (success_path, record_type, path[0],
+                'unable to find %s "%s" at namespace "%s"'
+                % (record_type, path[0], url))
+    
     else:
-        pattern_raw = namespace["PATTERN-raw"]
-        ns_raw = namespace["NS-raw"]
-        original_flags = flags
-        flags = flags.copy()
-        flags.discard("reverse")
-        if flags & loose_flags:
-            result = _check_list(path[0], pattern_raw, flags - loose_flags)
-            if result:
-                return result.replace("$NAME", path[1])
-            result = _check_list(path[0], ns_raw, flags - loose_flags)
-            if result:
-                return lookup(path[1:], result, original_flags)
+        ns_result = namespace["NS"].get(path[0])
+        ns_loose = False
+        if ns_result == None and "loose" in flags:
+            ns_result = namespace["NS-loose"].get(pname)
+            ns_loose = True
+        
+        pattern_result = namespace["PATTERN"].get(path[0])
+        pattern_loose = False
+        if pattern_result == None and "loose" in flags:
+            pattern_result = namespace["PATTERN-loose"].get(pname)
+            pattern_loose = True
 
-        result = _check_list(path[0], pattern_raw, flags)
-        if result:
-            return result.replace("$PATH", path[1])
-        result = _check_list(path[0], ns_raw, flags)
-        if result:
-            return lookup(path[1:], result, original_flags)
+        # precedence: NS, PATTERN, NS-loose, PATTERN-loose.
 
-        return None
+        if ns_result and not ns_loose:
+            use = "ns"
+        elif pattern_result and not pattern_loose:
+            use = "pattern"
+        elif ns_result:
+            use = "ns"
+        elif pattern_result:
+            use = "pattern"
+        else:
+            use = None
+
+        if use == "pattern":
+            try:
+                pattern_result = pattern_result.replace("$NAME", path[1])
+                for num in range(1, 10):
+                    argkey = "$ARG%d" % num
+                    if argkey in pattern_result:
+                        pattern_result = pattern_result.replace(argkey, path[num])
+            except IndexError:
+                pass
+            return pattern_result
+
+        if use == "ns":
+            success_path.append(path[0])
+            return lookup(path[1:], ns_result, flags, success_path)
+
+        return (success_path, "NS", path[0],
+                'unable to find NS "%s" at namespace "%s"' % (path[0], url))
 
 
-def _check_list(name, records, flags):
+def _prepare_key(name):
     """
-    Lookup a name in one of the namespace's raw lists.
+    Prepares a key for loose comparison.
 
-    Returns None if no matches found.
-    Returns the first match found, otherwise.
-    "reverse" searches return a list of matches.
-
-    name:  name to look for
-    records:  list of (line#, name, URL) to search
-    flags:  list of strings representing flags
-
-    Recognized flags: "no-case", "no-punctuation", "no-space",
-                      "forgive-spelling", "reverse"
-
+    Returns the name in lower case, without any punctuation, white space,
+    trailing "s", "int", "ed", or articles the, a, and an.
+    
     """
-    pname = _prepare_key(name, flags)
-    reversed = "reverse" in flags
-    forgive_spelling = "forgive-spelling" in flags
-    reversed_list = []
-
-    for num, second, third in records:
-        if reversed:
-            second, third = third, second
-        psecond = _prepare_key(second, flags)
-        if pname == psecond:
-            if reversed:
-                reversed_list.append( third )
-            else:
-                return third
-        if forgive_spelling:
-            pass  # not coded yclass HostNotFound(Exception):
-
-    if reversed:
-        if len(reversed_list) > 0:
-            return reversed_list
-    return None
-
-
-def _prepare_key(name, flags):
-    """
-    Prepares a key for comparison.
-
-    name: string,  flags: list of strings
-    Recognized flags: "no-case", "no-punctuation",
-                      "no-space", "forgive-spelling".
-
-    """
-    if "no-case" in flags:
-        name = name.lower()
-    if "no-punctuation" in flags:
-        name = punctuation_re.sub("", name)
-    if "no-space" in flags:
-        name = ws_re.sub("", name)
-    if "forgive-spelling" in flags:
-        try:
-            if name.endswith("s"):
-                name=name[:-1]
-            if name.endswith("ing"):
-                name=name[:-3]
-            if name.endswith("ed"):
-                name=name[:-2]
-            the_re.sub("",name)
-        except IndexError:
-            pass
+    name = name.lower()
+    name = punctuation_re.sub("", name)
+    name = ws_re.sub("", name)
+    try:
+        if name.endswith("s"):
+            name=name[:-1]
+        if name.endswith("ing"):
+            name=name[:-3]
+        if name.endswith("ed"):
+            name=name[:-2]
+        the_re.sub("",name)
+    except IndexError:
+        pass
     return name
 
 
@@ -415,7 +435,7 @@ def display_namespace_errors(namespace):
 
 def replace_text(text, namespace_url, softlink_base=""):
     """
-    Replace links denoted by [[foo]] with A HREFs.
+    Replace links, images, denoted by [[foo]] with A HREFs.
 
     text:  text to make replacements in
     namespace_url:  URL of namespace to start from
@@ -426,20 +446,32 @@ def replace_text(text, namespace_url, softlink_base=""):
         [[NS link][NS link][LN name]]
         [[some name]some other text covering it]
         [[NS link][LN name]some other text]
+        [[:)]]
 
     Softlinks have the form:
       ((foo)(bar))
     ...which becomes a link to:
       (SOFTLINK_BASE)?action=redirect&url=(URL)&lookup=foo&lookup=bar
+
+    Images (.png, .gif, .jpeg, .jpg) are made into
+    <IMG SRC="http://..."/>, unless there is cover text,
+    in which case it's linked text.  Only applies to
+    hard lookups.
     """
 
     def replace_link(match):
         flags = sets.Set(["loose", "check-neighboring-spaces"])
         path = match.group(1)[1:-1].split('][')
         url = lookup(path, namespace_url, flags)
+        img = False
+        for extension in image_extensions:
+            if url.endswith(extension):
+                img = True
         title = match.group(2)
-        if title == None:
+        if title == None and not img:
             title = path[-1]
+        if img and not title:
+            return '<img src="%s"/>' % url
         return '<a href="%s">%s</a>' % (url, cgi.escape(title))
 
     def replace_softlink(match):

@@ -115,22 +115,34 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         if args.get("action") in [["redirect"],["lookup"]] and \
                args.get("namespace") != None and \
                args.get("lookup") != None:
-            lookup = args["lookup"]
-            if args.has_key("separator"):
-                lookup = args["lookup"][0].split(args["separator"][0])
-            url = localnames.lookup(lookup, args["namespace"][0],
-                                    redirect_lookup_flags)
+            all_lookups = []
+            all_urls = []
+            for lookup in args["lookup"]:
+                if args.has_key("separator"):
+                    lookup = lookup.split(args["separator"][0])
+                else:
+                    lookup = [lookup]
+                all_lookups.append(lookup)
+                url = localnames.lookup(lookup,args["namespace"][0],
+                                        redirect_lookup_flags)
+                all_urls.append(url)
             if args["action"] == ["redirect"]:
-                #self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
-                #self.wfile.write(url)
-                self.respond(301, u'Location', url)
+                self.respond(301, u'Location', all_urls[0])
                 return
             if args.has_key("html"):
                 self.respond(200, u'Content-type', 'text/html; charset=utf-8')
-                self.wfile.write('<a href="%s">%s</a>' % (url, url))
+                line = u'<a href="%s">%s</a>\n'
             else:
                 self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
-                self.wfile.write(url)
+                line = u'%s\n'
+            for url in all_urls:
+                if type(url) in [type(u'unicode'), type("string")]:
+                    if args.has_key("html"):
+                        self.wfile.write(line % (url,url))
+                    else:
+                        self.wfile.write(line % url)
+                else:
+                    self.wfile.write(url[3]+'\n')
             return
 
         if args.get("action") == ["cached"]:
@@ -184,6 +196,14 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 url=args["namespace"] # aggregate
             self.wfile.write(self.xmlrpc_render(format, url))
             return
+
+        if args.get("action") == ["index"] and \
+           args.get("namespace") != None:
+            record_type = args.get("record-type", ["LN"])[0]
+            self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
+            for text in self.xmlrpc_index(args["namespace"], record_type):
+                self.wfile.write((text+u'\n').encode('utf-8'))
+            return
         
         self.respond(200, u'Content-type', 'text/html; charset=utf-8')
         
@@ -211,20 +231,33 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                            "cached": self.xmlrpc_cached,
                            "dump_cache": self.xmlrpc_dump_cache,
                            "validate": self.xmlrpc_validate,
-                           "render": self.xmlrpc_render}
+                           "render": self.xmlrpc_render,
+                           "index": self.xmlrpc_index,
+                           "lookup": self.xmlrpc_lookup}
         try:
-            print "funct:", funct
-            print "args:", args
-            print "first:", str(args[0])
             args = list(args)
             args[0] = str(args[0]) # hehehe
             result = xmlrpc_bindings[funct](*args)
             self.respond(200, u'Content-type', 'text/html; charset=utf-8')
             self.wfile.write(xmlrpclib.dumps((result,)))
-            print result
-            print "response:", xmlrpclib.dumps((result,))
         except IndexError:
             pass
+
+    def xmlrpc_lookup(self, path, namespace, flags):
+        if type(path) == type("string"):
+            paths = [[path]] # Path is a single name.
+        elif type(path[0]) == type("string"):
+            paths = [path]  # Path is a single path.
+        else:
+            paths = path  # Path is a list of paths.
+        results = []
+        flags = sets.ImmutableSet(flags)
+        for single_path in paths:
+            results.append(localnames.lookup(single_path, namespace, flags))
+        if type(path) == type("string") or type(path[0]) == type("string"):
+            return results[0]
+        else:
+            return results
 
     def xmlrpc_filterData(self, data, contentType, params):
         data = data.decode("utf-8", "replace")
@@ -264,6 +297,22 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             return localnames.clean(ns)
         elif format == "version1.1-original":
             return ns["TEXT"]
+        elif format == "python":
+            import pprint
+            return pprint.pformat(ns)
+
+    def xmlrpc_index(self, url, record_type):
+        if record_type not in ["LN", "NS", "PATTERN", "X"]:
+            return []
+        if type(url) == type(""):
+            urls = [url]
+        else:
+            urls = url
+        response = []
+        for url in urls:
+            ns = localnames.get_namespace(url)
+            response.extend(ns[record_type].keys())
+        return response
 
 
 if __name__ == '__main__':
