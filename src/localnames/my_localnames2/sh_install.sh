@@ -97,10 +97,8 @@ check_file "$FULL_CGI_FILE"
 #
 #   Please help fix this, should you know how.
 #
-FULL_HTACCESS_FILE="$TARGET/.htaccess"
-
-
-check_file "$FULL_HTACCESS_FILE"
+cp "htaccess" "$TARGET/.htaccess"
+check_file "$TARGET/.htaccess"
 
 
 # build conf.py
@@ -116,13 +114,27 @@ check_file "$FULL_CONF_PY_FILE"
 
 # copy files
 
-cp * "$TARGET"
+cp *.html "$TARGET"
+cp *.css "$TARGET"
+cp *.py "$TARGET"
+cp *.png "$TARGET"
 
 
-# rename htaccess to .htaccess
+# create a data directory
 
-mv "$TARGET/htaccess" "$TARGET/.htaccess"
-check_file "$TARGET/.htaccess"
+if [ ! -d "$TARGET/data" ] ; then
+    mkdir "$TARGET/data"
+    chown "$CHOWN_TO" "$TARGET/data"
+    chmod 775 "$TARGET/data"
+fi
+
+# if not exists data summary file, create it
+
+if [ ! -f "$TARGET/data.p" ] ; then
+    cp data.p "$TARGET"
+    chown "$CHOWN_TO" "$TARGET/data.p"
+    chmod 664 "$TARGET/data.p"
+fi
 
 
 # done!

@@ -40,18 +40,22 @@ fi
 # UNINSTALL
 ########################################
 
-cp "$TARGET/data.p" "$TMP/localnames-data.p"
-cp -r "$TARGET/data/" "$TMP/localnames-data"
-rm -rf "$TARGET"/*
-mv "$TMP/localnames-data.p" "$TARGET"
-mv "$TMP/localnames-data" "$TARGET"
+rm "$TARGET"/*.html
+rm "$TARGET"/*.css
+rm "$TARGET"/*.py
+rm "$TARGET"/*.png
+
+rm "$TARGET"/.htaccess
+rm "$TARGET"/conf.py
+rm "$TARGET"/index.cgi
+
 
 if [[ "$?" -ne "0" ]] ; then
     echo ":error: could not delete all files in $TARGET"
     exit $ERROR_CANNOT_DELETE_IN_TARGET
 fi
 
-if [[ `ls $TARGET | wc -l` -ne "0" ]] ; then
+if [[ `ls $TARGET | grep -v data | wc -l` -ne "0" ]] ; then
     echo ":error: still files in $TARGET"
     exit $ERROR_CANNOT_DELETE_IN_TARGET
 fi
