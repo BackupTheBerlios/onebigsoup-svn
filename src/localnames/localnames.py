@@ -135,8 +135,9 @@ class LinkStore:
     * upper-case name --> Link
     * URL --> Link
 
-    Links have canonical names, so you can
-    get the canonical name as well.
+    A "Link" isn't just one name to one URL,
+    a "Link" is a collection of names to a URL.
+    It also keeps track of which name is canonical.
     """
     def __init__(s):
         s.names = {}
