@@ -3,196 +3,134 @@
 Local Names Namespace File Parser
 
 1. Read file
-2. Sanitize to [(#spaces indent,string)]
-3. Go through list, processing what isn't a comment.
+2. Sanitize to [(line_number,three_tokens)...]
+3. Go through list, reporting to data sink
 """
 
-import urllib,re
+import re
 
-LEADING_URL = "http://purl.net/net/localnames/"
+# white space
+optional_ws = "\s*"
+ws = "\s+"
 
+token_without_ws = '\S+' # blah
+quoted_token = '"[^"]+"' # " blah  blah blah  "
 
-r_token = re.compile(r'(?:"([^"\\]*(?:\\.[^"\\]*)*)")|(\S+)')
+token = "("+quoted_token+"|"+token_without_ws+")" # check quoted_token 1st
+record = "^"+optional_ws+token+ws+token+ws+token+optional_ws+"$"
 
-def parseMapping(line):
-    m = r_token.match(line)
-    if not m: raise Exception, "Couldn't find token in %r." % line
-    name, end = m.group(1) or m.group(2), m.end()
-    uri = line[(end + 1):]
-    return name, uri
+# end result is:
+#
+#    ^\s+?("[^"]+"|\S+)\s+("[^"]+"|\S+)\s+("[^"]+"|\S+)\s+?$
+
+tokenizer = re.compile( record )
 
 
 class Parser:
     def __init__( s, sink ):
         s.sink = sink
         s.lines = None
-        s.indent = None
-        s.names_list_pattern = None
         s.feed_name = "(feedname)"
 
+    def sanitizeLines( s, lines ):
+        """
+        
+        Accepts a list of lines, cuts the list of lines into
+        lists of lists of tokens, and remembers the line #.
+
+        ex:
+            ['''This is "a list" "of lines"\n''',
+             '''\n''',
+             '''\n''',
+             '''Foo Bar\n''',]
+
+        becomes:
+            [ (1,["This","is","a list","of lines"]),
+              (4,["Foo","Bar"]) ]
+              
+        """
+        result = []
+        
+        for (i,x) in enumerate( lines ):
+            if x.strip() != "" and x[0] != "#":
+                try:
+                    xmatch = list( tokenizer.match( x ).groups() )
+                    for (i,elem) in enumerate(xmatch):
+                        if elem[0]=='"' and elem[-1]=='"':
+                            elem = elem[1:-1] # de-quote the ends
+                            xmatch[i] = elem
+                    result.append( (i+1,xmatch) )
+                except AttributeError:
+                    s.sink.warning( i+1, "line improperly formatted" )
+        return result
     def feedFile( s, f ):
         s.feed_name = "(some file)"
-        s.sanitizeLines( f.readlines() )
+        s.lines = s.sanitizeLines( f.readlines() )
     def feedFilename( s, fn ):
         s.feed_name = "(file: %s)" % fn
-        s.sanitizeLines( file(fn,"r").readlines() )
+        s.lines = s.sanitizeLines( file(fn,"r").readlines() )
     def feedUrl( s, url ):
         s.feed_name = "(url: %s)" % url
-        s.sanitizeLines( urllib.urlopen(url).readlines() )
+        s.lines = s.sanitizeLines( urllib.urlopen(url).readlines() )
     def feedString( s, a_string ):
         s.feed_name = "(some string)"
-        s.sanitizeLines( a_string.split("\n") )
-    def sanitizeLines( s, lines ):
-        def count_spaces( x ):
-            if len(x)>0 and x[0]==" ":
-                return 1+count_spaces(x[1:])
-            return 0
-        linenumbers = iter(range(1,len(lines)+1))
-        s.lines = [ (linenumbers.next(), # line-number (starting from 1)
-                     count_spaces(line), # number of spaces at front
-                     line.strip()) for line in lines ] # stripped contents
+        s.lines = s.sanitizeLines( a_string.split("\n") )
     
     def parse(s):
-        while 1:
-            if len(s.lines)==0:raise "Leading URL %s not found alone in %s." % (LEADING_URL,s.feed_name)
-            (line_number,spaces,line) = s.lines.pop(0)
-            if line == LEADING_URL:
-                s.indent = spaces
-                break
+        """
+        Go through each line of data, and invoke the sink appropriately.
 
-        while 1:
-            if len(s.lines)==0:break
-            (linenum,spaces,line) = s.lines.pop(0)
-            if spaces == 0:
-                continue # comment line
-            if spaces != s.indent:
-                raise "Indentation on line %d of %s should be %d spaces, presently %d spaces." % (linenum,s.feed_name,s.indent,spaces)
-
-            linedata = line.split(' ', 1)
-            if len(linedata)==1: (key,value) = linedata[0],""
-            if len(linedata)==2: (key,value) = linedata
-            value=value.strip()
-            
-            {'NamesListPattern': s.namesListPattern,
-             'NamesList': s.namesList,
-             'NamesTable': s.namesTable,
-             'OtherNameSpaces': s.otherNameSpaces,
-             'KeyValue': s.keyValue,
-             'DefaultNameSpaces': s.defaultNameSpaces,
-             'LastResortNamePattern': s.lastResortNamePattern}[key](value)
-    
-    def getBlock(s):
-        result=[]
-        while 1:
-            if len(s.lines)==0: return result # EOF
-            (linenum,spaces,line) = whole = s.lines.pop(0)
-            if spaces == 0: continue # comment
-            if spaces == s.indent:         # out of block:
-                s.lines.insert( 0, whole ) # |-> so revert
-                return result              # |-> and return
-            if spaces != s.indent*2:
-                raise "Indentation on line %d should be %d spaces, presently %d spaces." % (linenum,s.indent*2,spaces)
-            result.append( parseMapping(line) )
-
-    def namesListPattern(s, value):
-        s.names_list_pattern = value
-
-    def namesList(s, value):
-        if s.names_list_pattern is None:
-            raise ValueError, "No substitution pattern found for NamesList."
-
-        if value != "":
-            u = urllib.urlopen(value)
-            while 1:
-                line = u.readline()
-                line = line.rstrip('\r\n')
-                if not line: break
-                if not line.strip(): continue
-                s.sink.map(line, s.names_list_pattern.replace('$NAME', line))
-            u.close()
-            
-        for row in s.getBlock():
-            name,dummy = row
-            s.sink.map( name, s.names_list_pattern.replace("$NAME",name) )
-
-    def namesTable(s, value):
-        old_uri = None
+        The Sink interface is this:
+        * LN( name, uri ) -- for local names
+        * NS( name, uri ) -- for namespaces
+        * X( key, value ) -- for extensions
+        * FINAL( pattern ) -- for last resort URL, with "$NAME" substitution
+        * warning( line_number, message ) -- for warnings, errors
+        """
+        last = (None,None,None)
         
-        if value != "":
-            u = urllib.urlopen(value)
-            while 1: 
-                line = u.readline()
-                line = line.rstrip('\r\n')
-                if not line: break
-                if not line.strip(): continue
-                name, uri = parseMapping(line)
-                s.sink.map(name, uri)
-            u.close()
+        for (line_number,line_data) in s.lines:
+            if len( line_data ) != 3:
+                s.sink.warning( line_number, "3 tokens required" )
+                continue
             
-        for row in s.getBlock():
-            name,uri = row
-            if row[1] == "":uri=old_uri
-            s.sink.map( name,uri)
-            old_uri=uri
+            for index in range(3):
+                if line_data[ index ] == ".":
+                    line_data[ index ] = last[ index ]
+            (record_type, key, val ) = line_data
 
-    def otherNameSpaces(s, value):
-        old_uri = None
-        
-        if value != "":
-            u = urllib.urlopen(value)
-            while 1: 
-                line = u.readline()
-                line = line.rstrip('\r\n')
-                if not line: break
-                if not line.strip(): continue
-                name, uri = parseMapping(line)
-                s.sink.otherNameSpace(name, uri)
-            u.close()
-            
-        for row in s.getBlock():
-            name, uri = row
-            if uri == "": uri=old_uri
-            s.sink.otherNameSpace(name, uri)
-            old_uri = uri
+            if record_type not in [ "LN", "NS", "X", "FINAL" ]:
+                s.sink.warning( line_number, "must be a LN, NS, X, or FINAL record" )
+                continue
 
-    def keyValue( s, value ):
-        key, value = parseMapping( value )
-        s.sink.meta(key,value)
+            last = line_data
 
-    def defaultNameSpaces( s, value ):
-        if value != "":
-            u = urllib.urlopen(value)
-            while 1: 
-                line = u.readline()
-                line = line.rstrip('\r\n')
-                if not line: break
-                if not line.strip(): continue
-                s.sink.defaultNameSpaces(line)
-            u.close()
-            
-        for line in s.getBlock():
-            s.sink.defaultNameSpaces(line[0])
-
-    def lastResortNamePattern( s, value ):
-        s.sink.lastResortNamePattern( value )
+            if record_type == "LN":
+                s.sink.LN( key, val )
+            elif record_type == "NS":
+                s.sink.NS( key, val )
+            elif record_type == "X":
+                s.sink.X( key, val )
+            elif record_type == "FINAL":
+                s.sink.FINAL( key )
 
 class TestSink(object): 
    """A Test Sink for the Parser class above."""
 
-   def meta(self, key, value): 
-      print 'META:', repr(key), repr(value)
+   def LN(s, name, uri ): 
+       print 'LN:', name, uri
 
-   def map(self, name, uri): 
-      print 'MAP:', repr(name), repr(uri)
+   def NS(s, name, uri ):
+       print 'NS:', name, uri
 
-   def otherNameSpace(self, name, uri): 
-      print 'OTHER NAME SPACE:', repr(uri)
+   def X(s, key, val ):
+       print "X:", key, val
 
-   def defaultNameSpaces(self, name): 
-      print 'DEFAULT NAME SPACE:', repr(name)
+   def FINAL(s, pattern ):
+       print "FINAL:", pattern
 
-   def lastResortNamePattern(self, pattern): 
-      print 'LAST RESORT NAME PATTERN:', repr(pattern)
+   def warning(s, line_number, msg ):
+       print 'WARNING (%d): %s' % (line_number, msg)
 
 def parseString(s, sink=None): 
    if sink is None: 
@@ -204,96 +142,54 @@ def parseString(s, sink=None):
 
 def test1(): 
    parseString("""
-This is a Local Names namespace spec for describing Marshall Brain's sites that I find interesting.
+# This is a Local Names namespace spec for
+# describing Marshall Brain's sites that
+# I find interesting.
 
-For more information, see:
+# For more information, see:
+#   http://purl.net/net/localnames/
 
-  http://purl.net/net/localnames/
+# General Robotics interest:
+LN  "Robotic Nation" http://www.marshallbrain.com/robotic-nation.htm
+LN  RoboticNation .
+LN  "Robots in 2015" http://marshallbrain.com/robots-in-2015.htm
+LN  RobotsIn2015 .
+LN  "Robotic Freedom" http://marshallbrain.com/robotic-freedom.htm
+LN  RoboticFreedom .
+LN  "Robotic Nation FAQ" http://marshallbrain.com/robotic-faq.htm
+LN  RoboticNationFAQ .
+LN  RoboticNationFaq .
+LN  "Robotic Nation Evidence" http://roboticnation.blogspot.com/
+LN  RoboticNationEvidence .
+LN  Evidence .
 
-General Robotics interest:
+LN  Manna http://www.marshallbrain.com/manna1.htm
 
-  NamesTable
-    "Robotic Nation" http://www.marshallbrain.com/robotic-nation.htm
-    RoboticNation
-    "Robots in 2015" http://marshallbrain.com/robots-in-2015.htm
-    RobotsIn2015
-    "Robotic Freedom" http://marshallbrain.com/robotic-freedom.htm
-    RoboticFreedom
-    "Robotic Nation FAQ" http://marshallbrain.com/robotic-faq.htm
-    RoboticNationFAQ
-    RoboticNationFaq
-    "Robotic Nation Evidence" http://roboticnation.blogspot.com/
-    RoboticNationEvidence
-    Evidence
+# Other stuff:
 
-    Manna http://www.marshallbrain.com/manna1.htm
+LN "Intentionally buggy - look, no final quotation mark! http://blahblah/
 
-Other stuff:
+LN  "How Stuff Works" http://www.howstuffworks.com/
+LN  HowStuffWorks .
+LN  HowThingsWork .
 
-    "How Stuff Works" http://www.howstuffworks.com/
-    HowStuffWorks
-    HowThingsWork
+NS  "Robotics Wiki" http://www-robotics.usc.edu/~dshell/roboticswiki/index.php/LocalNamesDescription
+NS  RoboticsWiki .
+NS  Robotics .
 
-  OtherNameSpaces
+LN  NamespaceLocation http://taoriver.net/lns/marshall-brain.txt
+LN  NamespaceAuthor   http://purl.net/net/lions/homepage/
 
-So far, only one.
+# And some meta-data:
 
-    "Robotics Wiki" http://www-robotics.usc.edu/~dshell/roboticswiki/index.php/LocalNamesDescription
-    RoboticsWiki
-    Robotics
+X  Author     "Lion Kimbro"
+X  AuthorURL  http://purl.net/net/lions/homepage/
+X  AuthorFOAF http://purl.net/net/lions/foaf/
 
-And miscellaneous information...
-
-  NamesTable
-    NamespaceLocation http://taoriver.net/lns/marshall-brain.txt
-    NamespaceAuthor   http://purl.net/net/lions/homepage/
-
-And some meta-data:
-
-  KeyValue Author     "Lion Kimbro"
-  KeyValue AuthorURL  http://purl.net/net/lions/homepage/
-  KeyValue AuthorFOAF http://purl.net/net/lions/foaf/
-
-Enjoy!
-""")
-
-def test2(): 
-   parseString("""
-Lion Kimbro's favorites.
-
-   http://purl.net/net/localnames/
-
-   NamesListPattern http://www.speakeasy.org/~lion/$NAME/$NAME/
-   NamesList
-      Foo
-      Bar
-      Baz
-
-   OtherNameSpaces
-      MarshallBrain http://taoriver.net/lns/marshall-brain.txt
-
-   NamesTable
-      NamespaceAuthor http://purl.net/net/lions/homepage/
-
-   KeyValue Author     "Lion Kimbro"
-   KeyValue AuthorURL  http://purl.net/net/lions/homepage/
-   KeyValue AuthorFOAF http://purl.net/net/lions/foaf/
-""")
-
-def test3():
-    parseString("""
-Testing a wiki's names space
-
-     http://purl.net/net/localnames/
-
-     NamesListPattern http://onebigsoup.wiki.taoriver.net/moin.cgi/$NAME
-     NamesList http://onebigsoup.wiki.taoriver.net/moin.cgi/TitleIndex?action=titleindex
+# Enjoy!
 """)
 
 if __name__=="__main__": 
    print __doc__
    test1()
-   print "----------------"
-   test2()
-   print "----------------"
-   test3()
+
