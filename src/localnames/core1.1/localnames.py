@@ -28,6 +28,11 @@ standard_X_keys = ["FINAL", "VERSION", "AUTHOR", "AUTHOR-FOAF",
                    "LAST-CHANGED", "PREFERRED-NAME"]
 
 
+def isotime():
+    """Time in ISO8601 form: yyyy-mm-ddThh:mm:ss form."""
+    return time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime())
+
+
 def dump_cache(url):
     """Dump cache entry for a particular url."""
     try:
@@ -72,17 +77,14 @@ def preferred_names():
     return bindings
 
 
-def get_namespace(url):
+def _namespace_from_text(text):
     """
-    Returns a namespace dictionary.
-
-    Returns a cached version if possible,
-    retrieves fresh from the web otherwise.
-
+    Returns namespace dictionary given some UTF-8 text.
+    
     The namespace dictionary is structured so:
 
     "TIME": (INTERNAL) cache timestamp
-    "URL": url used to fetch namespace
+    "URL": url used to fetch namespace - to be filled out by caller
     "TEXT": raw UTF-8 text cached
     "ERRORS": list of parse errors;
               each error is a tuple:
@@ -97,21 +99,14 @@ def get_namespace(url):
     "X": dictionary of X entries, {"name":["one","two",...]}
 
     """
-    now = time.time()
-    try:
-        if now < store[url]["TIME"] + time_to_live:
-            return store[url]
-    except KeyError:
-        pass
-    
+    (results, errors) = lnparser.parse_text(text)
+
     namespace = {}
-    namespace["TIME"] = now
-    namespace["URL"] = url
-    namespace["TEXT"] = urllib.urlopen( url ).read().decode("utf-8","replace")
-
-    (results, errors) = lnparser.parse_text(namespace["TEXT"])
-
+    namespace["TIME"] = time.time()
+    namespace["URL"] = None
+    namespace["TEXT"] = text
     namespace["ERRORS"] = errors
+    
     namespace["LN-raw"] = []
     namespace["NS-raw"] = []
     namespace["PATTERN-raw"] = []
@@ -133,6 +128,28 @@ def get_namespace(url):
     for line_number, second, third in namespace["X-raw"]:
         namespace["X"].setdefault(second, []).append(third)
 
+    return namespace
+
+
+def get_namespace(url):
+    """
+    Returns a namespace dictionary.
+
+    Returns a cached version if possible,
+    retrieves fresh from the web otherwise.
+
+    """
+    now = time.time()
+    try:
+        if now < store[url]["TIME"] + time_to_live:
+            return store[url]
+    except KeyError:
+        pass
+
+    text = urllib.urlopen( url ).read().decode("utf-8","replace")
+    namespace = _namespace_from_text(text)
+    namespace["URL"] = url
+
     store[url] = namespace
     return namespace
 
@@ -142,62 +159,76 @@ def aggregate(urls):
     Aggregate several namespaces into one.
 
     Aggregation is mostly simple:
-    Pure concatenation of text files;
-    With one exception:
-    An "aggregation" block appears at the
-    bottom of the file, that lists sources
-    of aggregation like so:
+    Pure concatenation of text files.
 
+    At the head of the concatenation is a
+    summary of the aggregation, like so:
+
+      X PREFERRED-NAME "aggregate"
+      X LAST-CHANGED "yyyy-mm-ddThh:mm:ss"
       X AGGREGATES "URL"
       X AGGREGATES "URL"
-      (and so on and so forth)
+      ...
 
     """
-    namespaces = [get_namespace(url) for url in urls]
-
-    super_text = [ns["TEXT"] for ns in namespaces]
+    super_text = []
+    super_text.append(u'X PREFERRED-NAME "aggregate"\n')
+    super_text.append(u'X LAST-CHANGED "%s"\n' % isotime())
     for url in urls:
         super_text.append(u'X AGGREGATES "%s"\n' % url)
+    for url in urls:
+        super_text.append(get_namespace(url)["TEXT"])
+    return _namespace_from_text("".join(super_text))
 
-    namespace = {}
-    namespace["TIME"] = time.time()
-    namespace["URL"] = None
-    namespace["TEXT"] = "".join(super_text)
 
-    (results, errors) = lnparser.parse_text(namespace["TEXT"])
+def clean(namespace):
+    """
+    Returns a clean VERSION 1.1 rendition of a namespace.
+
+    Data is seperated into four blocks: X, LN, PATTERN, and NS.
+    Within blocks, original order is preserved.
+    Stanard X keys are handled particularly and intelligently.
+    X LAST-CHANGED is updated to the present time.
     
-    namespace["ERRORS"] = errors
-    namespace["LN-raw"] = []
-    namespace["NS-raw"] = []
-    namespace["PATTERN-raw"] = []
-    namespace["X-raw"] = []
-    for ns in namespaces:
-        for record_type in ["LN-raw", "NS-raw", "PATTERN-raw", "X-raw"]:
-            namespace[record_type].extend(ns[record_type])
+    """
+    text = []
 
-    namespace["LN"] = {}
-    namespace["NS"] = {}
-    namespace["PATTERN"] = {}
-    namespace["X"] = {}
-    for record_type in ["LN", "NS", "PATTERN"]:
-        for line_number, second, third in namespace[record_type+"-raw"]:
-            if not namespace[record_type].has_key(second):
-                namespace[record_type][second] = third
-    for line_number, second, third in namespace["X-raw"]:
-        if second not in standard_X_keys:
-            namespace["X"].setdefault(second, []).append(third)
-        elif second == "FINAL":
-            if not namespace["X"].has_key("FINAL"):
-                namespace["X"]["FINAL"] = [third]
-        elif second in ["AUTHOR", "AUTHOR-FOAF"]:
-            namespace["X"].setdefault(second,[]).append(third)
+    def show_wo_repeating(key):
+        """Write X records, but don't repeat any values."""
+        if key not in namespace["X"]:
+            return
+        vals = namespace["X"][key]
+        shown = []
+        for val in vals:
+            if val not in shown:
+                shown.append(val)
+                text.append(u'X %s "%s"\n' % (key, lnparser.escape(val)))
     
-    namespace["X"]["VERSION"] = ["1.1"]
-    isotime = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime())
-    namespace["X"]["LAST-CHANGED"] = [isotime]
-    namespace["X"]["PREFERRED-NAME"] = ["aggregate"]
+    text.append(u'X VERSION 1.1\n')
+    text.append(u'X LAST-CHANGED %s\n' % isotime())
+    show_wo_repeating("PREFERRED-NAME")
+    show_wo_repeating("AUTHOR")
+    show_wo_repeating("AUTHOR-FOAF")
+    if "FINAL" in namespace["X"]:
+        final = lnparser.escape(namespace["X"]["FINAL"][0])
+        text.append(u'X FINAL "%s"\n' % final)
 
-    return namespace
+    for record_type in ["X", "LN", "PATTERN", "NS"]:
+        covered = []
+        for line_num, second, third in namespace[record_type+"-raw"]:
+            if record_type == "X":
+                if second in standard_X_keys:
+                    continue
+            elif second in covered:
+                continue
+            covered.append(second)
+            text.append(u'%s "%s" "%s"\n' % (record_type,
+                                             lnparser.escape(second),
+                                             lnparser.escape(third)))
+        if len(namespace[record_type+"-raw"]) > 0:
+            text.append(u'\n')
+
+    return ''.join(text)
 
 
 def lookup(path, url, flags):
@@ -446,5 +477,7 @@ if __name__ == '__main__':
            '((name server)) to resolve it at click-time.'
     print text
     print replace_text(text, "http://ln.taoriver.net/localnames.txt")
-    print aggregate(["http://taoriver.net/tmp/gmail.txt", "http://ln.taoriver.net/localnames.txt"])
+    ns = aggregate(["http://taoriver.net/tmp/gmail.txt",
+                    "http://ln.taoriver.net/localnames.txt"])
+    print clean(ns)
 
