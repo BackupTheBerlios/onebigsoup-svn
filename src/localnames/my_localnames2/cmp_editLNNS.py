@@ -103,8 +103,10 @@ def response():
 
     code_info.inform_template(t)
 
-    t.NAME_OR_NAMESPACE = { "LN":"Name",
-                            "NS":"Namespace" }[ LN_or_NS ]
+    t.NAME_OR_NAMESPACE = { "LN":"a Name for a Link",
+                            "NS":"a Name for a Namespace" }[ LN_or_NS ]
+    t.NAMES_OR_NAMESPACES = { "LN":"Names for Links",
+                              "NS":"Names for Namespaces" }[ LN_or_NS ]
     t.PAGE_VALUE = { "LN": code_info.PAGE_EDITNAMES,
                      "NS": code_info.PAGE_EDITSPACES }[ LN_or_NS ]
 

@@ -2,7 +2,7 @@
   <tr>
     <td style="width: 650px;" class="darker">
 
-      <h4>Add a $NAME_OR_NAMESPACE:</h4>
+      <h4>Add $NAME_OR_NAMESPACE:</h4>
       <form method="get" action="index.cgi">
         <input type="hidden" name="$PAGE_KEY" value="$PAGE_VALUE"/>
 	<input type="hidden" name="$SPACE_KEY" value="$SPACE"/>
@@ -44,10 +44,11 @@
     </td>
   </tr>
 
+#if len($NAMES)>0
   <tr>
     <td style="width: 650px;" class="darker">
 
-      <h4>Change / Delete $NAME_OR_NAMESPACE:</h4>
+      <h4>Change / Delete $NAMES_OR_NAMESPACES:</h4>
       <form method="post" action="index.cgi?$PAGE_KEY=$PAGE_VALUE&$SPACE_KEY=$SPACE">
       <input type="hidden" name="NUM_ENTRIES0" value="$NUM_ENTRIES"/>
       <p><input type="submit" value="Submit Changes"/></p>
@@ -78,12 +79,13 @@
 
     </td>
   </tr>
+#end if
 
 #if len($EXTRA)>0
   <tr>
     <td style="width: 650px;" class="darker">
     <form method="post" action="index.cgi?$PAGE_KEY=$PAGE_VALUE&$SPACE_KEY=$SPACE">
-      <p>Pre-defined $(NAME_OR_NAMESPACE)s, add by checking.</p>
+      <p>Pre-defined $(NAMES_OR_NAMESPACES), add by checking.</p>
       <table style="width: 100%; text-align: left;" border="0" cellpadding="2" cellspacing="2">
         <tbody>
 #for $X in $EXTRA
@@ -91,7 +93,7 @@
 #end for
         </tbody>
       </table>
-      <p><input value="Add Checked $(NAME_OR_NAMESPACE)s" type="submit"></p>
+      <p><input value="Add Checked $(NAMES_OR_NAMESPACES)" type="submit"></p>
     </form>
     </td>
   </tr>
