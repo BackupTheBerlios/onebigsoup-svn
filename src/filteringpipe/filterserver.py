@@ -10,6 +10,7 @@ import BaseHTTPServer
 import cgi
 import xmlrpclib
 import xml.parsers.expat
+import os
 
 import pymarkdown
 
@@ -30,6 +31,8 @@ class FiltersHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         if funct in ["filterData", "wiki.filterData"]:
             if self.path.lower() == "/markdown/":
                 result = self.xmlrpc_markdown(*args)
+            elif self.path.lower() == "/smartypants/":
+                result = self.xmlrpc_smartypants(*args)
             else:
                 result = "the path URL tells what filter to use: ex: http://services.taoriver.net:9001/markdown/"
             self.send_response(200)
@@ -44,6 +47,15 @@ class FiltersHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         data = data.decode("utf-8", "replace")
         data = pymarkdown.Markdown(data)
         data = data.encode("utf-8", "replace")
+        data = xmlrpclib.Binary(data)
+        return {"data": data, "contentType": contentType}
+
+    def xmlrpc_smartypants(self, data, contentType, params):
+        data = str(data)
+        (stdin,stdout) = os.popen2("perl SmartyPants.pl", "b")
+        stdin.write(data)
+        stdin.close()
+        data = stdout.read()
         data = xmlrpclib.Binary(data)
         return {"data": data, "contentType": contentType}
 
