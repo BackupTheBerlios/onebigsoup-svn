@@ -1,0 +1,31 @@
+<html>
+
+<head>
+<title>LocalNames Wrapper</title>
+</head>
+
+<body>
+<center>
+<h1>LocalNames Wrapper</h1>
+
+<p><a href="$webservice_prefix/">(register a new space?)</a></p>
+
+#if $spaces
+<p>Registered Spaces:</p>
+
+<table>
+#for $space in $spaces
+<tr><td><a href="$space.url">$space.name</a></td></tr>
+#end for
+</table>
+#else
+<p>No name spaces have been registered yet..!</p>
+
+<p><a href="$webservice_prefix/">(...register a space?)</a></p>
+#end if
+</center>
+
+</body>
+
+</html>
+
