@@ -1,26 +1,30 @@
 <html>
 
 <head>
-<title>LocalNames Wrapper</title>
+<title>Names Wrapper</title>
 </head>
 
 <body>
-<center><h1>LocalNames Wrapper</h1></center>
+<center><h1>Names Wrapper</h1></center>
+
+<center>
+<table><tr>
+<td><b>bind</b></td>
+<td><a href="$url_prefix/dump/">dump</a></td>
+<td><a href="$url_prefix/about/">about</a></td>
+</tr></table>
+</center>
 
 <form method="post" action=".">
 <center><table>
-<tr><td> Binding Point: <b> <a href="$webservice_prefix/spaces/">$webservice_prefix/spaces/</a> </b> <input type="text" name="spacename" value="$default_spacename"/> <b>/</b> </td></tr>
-<tr><td> Names List URL: <input type="text" name="nameslisturl" value="$default_nameslisturl" size="80"/> </td></tr>
-<tr><td> (or, wiki XML-RPC URL, with getAllPages:) <input type="text" name="xmlrpcurl" value="$default_xmlrpcurl" size="80"/> </td></tr>
-<tr><td> URL Pattern: <input type="text" name="urlpattern" value="$default_urlpattern" size="80"/> </td></tr>
-<tr><td> Final URL Pattern: <input type="text" name="finalurlpattern" value="$default_finalurlpattern" size="80"/> (optional) </td></tr>
+<tr><td> Namespace URL: <b> $url_prefix/ </b> <input type="text" name="spacename"/> <b>/</b> </td></tr>
+<tr><td> List of Names URL: <input type="text" name="namesurl" value="http://" size="80"/> </td></tr>
+<tr><td> Substitution Pattern: <input type="text" name="pattern" value="http://.../../$NAME" size="80"/>
 <tr><td> <input type="hidden" name="action" value="bind"/> <input type="submit" value="bind"/> </td></tr>
 </table></center>
 </form>
 
-#if $msg
-<center><p><b>$msg</b></p></center>
-#end if
+<center> <p> After you've setup your <a href="http://onebigsoup.wiki.taoriver.net/moin.cgi/LocalNames">Local Names</a> description, you can <a href="http://localnames.taoriver.net/">make URL shortcuts as well!</a> </center>
 
 </body>
 
