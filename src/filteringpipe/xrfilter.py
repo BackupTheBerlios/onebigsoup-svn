@@ -20,7 +20,7 @@ def main():
                       help="function namespace to use")
     parser.add_option("-e", "--encoding", dest="encoding",
                       default=default_encoding,
-                      help='encoding to report [defualt: "%s"]'
+                      help='encoding to report [default: "%s"]'
                       % default_encoding)
     parser.add_option("-a", "--argument", dest="filter_args",
                       default=[],
@@ -31,7 +31,7 @@ def main():
     if len(args) != 1:
         parser.error("incorrect number of arguments")
     
-    data = sys.stdin.read()
+    data = xmlrpclib.Binary(sys.stdin.read())
     filter_args = {}
     for key, val in options.filter_args:
         filter_args[key] = val
