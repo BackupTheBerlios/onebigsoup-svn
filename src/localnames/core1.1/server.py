@@ -158,6 +158,18 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.wfile.write(u'\n'.join(dumped))
             return
 
+        if args.get("action") == ["validate"] and \
+           args.get("namespace") != None:
+            ns = localnames.get_namespace(args["namespace"][0])
+            self.respond(200, u'Content-type', 'text/html; charset=utf-8')
+            if len(ns["ERRORS"]) == 0:
+                self.wfile.write(u'No Errors. OK!')
+                return
+            self.wfile.write(u'ERRORS:\n')
+            for num, line in ns["ERRORS"]:
+                self.wfile.write(u'%4d.  %s' % (num, line))
+            return
+
         self.respond(200, u'Content-type', 'text/html; charset=utf-8')
         
         if args.get("action") == "xmlrpc":
