@@ -22,12 +22,12 @@ import time
 def edit_key( space_name ):
     import code_info
     return "index.cgi?%s=%s&%s=%s" % ( code_info.PAGE_KEY, code_info.PAGE_EDITNAMES,
-                                       code_info.SPACE_KEY, space_name )
+                                       code_info.SPACE_KEY, space_name.upper() )
 
 def description_key( space_name ):
     import code_info
     return "index.cgi?%s=%s&%s=%s" % ( code_info.PAGE_KEY, code_info.PAGE_DESCRIPTION,
-                                       code_info.SPACE_KEY, space_name )
+                                       code_info.SPACE_KEY, space_name.upper() )
 
 def uli_xmlrpc( url, line ):
     return xmlrpclib.ServerProxy( url ).uli( line )
@@ -82,7 +82,7 @@ class XmlRpcServerNotification:
         s.datahub = datahub
     def tell_dump(s, space_name):
         import conf
-        uli_xmlrpc( XMLRPC_LN_SERVER, "dump-cache %s" % (conf.URL_DOMAIN_NAME+conf.URL_DIRECTORY_BASE+description_key( space_name )) )
+        uli_xmlrpc( XMLRPC_LN_SERVER, "dump-cache http://%s" % (conf.URL_DOMAIN_NAME+conf.URL_DIRECTORY_BASE+description_key( space_name )) )
     def event_namesadded( s, space_name, new_names, new_url ):
         s.tell_dump( space_name )
     def event_namespacesadded( s, space_name, new_names, new_url ):
