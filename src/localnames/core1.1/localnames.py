@@ -263,6 +263,7 @@ def lookup(path, url, flags):
       "NS":  namespace-lookup; (NS, not LN, at end of path)
 
     """
+    flags = sets.Set(flags)
     if "loose" in flags:
         flags = flags | loose_flags
         flags.discard("loose")
@@ -299,7 +300,7 @@ def lookup(path, url, flags):
                     urls.add(url)
 
         if ("FINAL" in namespace["X"]) and ("reverse" not in flags):
-            return namespace["X"][0].replace("$PAGE", path[0])
+            return namespace["X"]["FINAL"][0].replace("$PAGE", path[0])
         return None
     else:
         pattern_raw = namespace["PATTERN-raw"]
