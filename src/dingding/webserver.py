@@ -28,6 +28,21 @@ MAX_LOGS_RETURNED = 50
 
 
 
+html_escape_table = {
+    "&": "&amp;",
+    '"': "&quot;",
+    "'": "&apos;",
+    ">": "&gt;",
+    "<": "&lt;" }
+
+def html_escape( text ):
+    l=[]
+    for c in text:
+        l.append( html_escape_table.get(c,c) )
+    return "".join(l)
+
+
+
 root_page = """
 <html>
   <head>
@@ -98,8 +113,7 @@ class ShowLogsHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
             s.wfile.write( "\n" )
 
     def draw_rss(s):
-        s.wfile.write( """
-<?xml version="1.0" encoding="ISO-8859-1" ?>
+        s.wfile.write( """<?xml version="1.0" encoding="ISO-8859-1" ?>
  <rss version="0.91">
 
  <channel>
@@ -114,7 +128,7 @@ class ShowLogsHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
                            log.get( "TransparencyText",
                                     "(no self-description)" ) )
             s.wfile.write( "<description>" )
-            s.wfile.write( cgi.escape(pprint.pformat(shared.stripped_copy(log))) )
+            s.wfile.write( html_escape(pprint.pformat(shared.stripped_copy(log))) )
             s.wfile.write( "</description>" )
             s.wfile.write( "</item>" )
         s.wfile.write( "</channel>" )
@@ -132,7 +146,7 @@ class ShowLogsHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
                     current_headers = log["TransparencyXhtmlColumnHeaders"]
                     escaped_headers = []
                     for header in current_headers:
-                        escaped_headers.append( cgi.escape(header) )
+                        escaped_headers.append( html_escape(header) )
                     if not in_table:
                         s.wfile.write( "<table>" )
                     else:
@@ -152,7 +166,7 @@ class ShowLogsHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
                 if log.has_key( "TransparencyXhtml" ):
                     s.wfile.write( "<tr><td>%s</td></tr>" % log["TransparencyXhtml"] )
                 elif log.has_key( "TransparencyText" ):
-                    s.wfile.write( "<tr><td>%s</td></tr>" % cgi.escape(log["TransparencyText"]) )
+                    s.wfile.write( "<tr><td>%s</td></tr>" % html_escape(log["TransparencyText"]) )
                 else:
                     s.wfile.write( "<tr><td>(no self-description)</td></tr>" )
         if in_table == 1:
@@ -162,6 +176,8 @@ class ShowLogsHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
     def content_type(s):
         if s.path in ["/text/", "/raw/"]:
             return "text/plain"
+        if s.path == "/rss/":
+            return "application/rss+xml"
         return "text/html"
         
     def do_HEAD(s):
