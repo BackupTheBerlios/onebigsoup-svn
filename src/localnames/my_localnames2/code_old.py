@@ -80,7 +80,7 @@ class XmlRpcServerNotification:
     def __init__( s, datahub ):
         s.datahub = datahub
     def tell_dump(s, space_name):
-        uli_xmlrpc( XMLRPC_NAMESERVER, "dump-cache %s" % description_key( space_name ) )
+        uli_xmlrpc( XMLRPC_NAMESERVER, "dump-cache %s" % (conf.URL_DOMAIN_NAME+conf.URL_DIRECTORY_BASE+description_key( space_name )) )
     def event_namesadded( s, space_name, new_names, new_url ):
         s.tell_dump( space_name )
     def event_namespacesadded( s, space_name, new_names, new_url ):
@@ -268,9 +268,11 @@ class SpacesNotes:
         s.datahub.event_newspace( name )
         return True
     def has_password( s, space_name ):
-        try:
+        if not s.spaces.has_key( space_name ):
+            return False
+        if s.spaces[ space_name ].has_key( "password" ):
             return s.spaces[ space_name ][ "password" ] != None
-        except KeyError:
+        else:
             return False
     def check_password( s, space_name, pw ):
         try:
