@@ -9,11 +9,12 @@ import xmlrpclib
 import select
 from xml.parsers.expat import ExpatError
 
+
 class Subscription:
     """
     Subscription - augment a subscription dictionary
     """
-    def __init__(s, d, server): # subscription dictionary
+    def __init__(s, d, dingding): # subscription dictionary
         """
         subscription dictionary:
          * MatchPattern (*REQUIRED* - pattern of data matching out)
@@ -21,20 +22,26 @@ class Subscription:
          * RecvPassword (OPTIONAL - used when posting a NOTIFY, also a legitimizing recipient password)
          
          * SubscriptionPasswords (OPTIONAL - group passwords that the subscription accepts messages for)
-         * PassiveVisibility (OPTIONAL- "PUBLIC", "ADMIN-ONLY", or [list,of,group-passwords])
+         * WhoCanSeeThis (OPTIONAL- "PUBLIC", "ADMIN-ONLY", or [list,of,group-passwords])
 
          * Title (OPTIONAL) - human-readable string, naming the subscription
          * Url (OPTIONAL) - a URL associated with the subscription
+         * Comment (OPTIONAL) - human-readable comment, describing the subscription
         """
+        s.dingding = dingding
+
+        s.subscription_dictionary = d
+        
         s.match_pattern = d[ "MatchPattern" ]
         s.xmlrpc_recv_url = d[ "XmlRpcRecvUrl" ]
         s.recv_password = d.get( "RecvPassword", None )
         
         s.subscription_passwords = d.get( "SubscriptionPasswords", [] )
-        s.passive_visibility = d.get( "PasswordVisibility", server.default_component_visibility )
+        s.who_can_see_this = d.get( "WhoCanSeeThis", s.dingding.options.get_defaultcomponentvisibility() )
         
         s.title = d.get( "Title", "(untitled)" )
         s.url = d.get( "Url", None )
+        s.comment = d.get( "Comment", None )
 
     def get_permit(s):
         """
@@ -63,26 +70,32 @@ class Permit:
     ADMIN -- this is a permit to see ANYTHING
     """
     def __init__( s, permissions="PUBLIC" ):
-        if type( permissions ) == type( "string" ):
+        """
+        Pass in either:
+         * the string "PUBLIC"
+         * the string "ADMIN"
+         * a list of group passwords
+        """
+        if type( permissions ) == type( [] ):
+            s.permission = "GROUP"
+            s.groups = permissions
+        elif type( permissions ) == type( "string" ):
             if permissions in [ CONST_PERMIT_PUBLIC,
                                 CONST_PERMIT_ADMIN ]:
                 s.permission = permissions
                 s.groups = None
             else:
                 raise "Do not understand permissions string type: %s" % permissions
-        elif type( permissions ) == type( [] ):
-            s.permission = "GROUP"
-            s.groups = permissions
         else:
             raise "Do not understand permissions from type of: %s" % str(permissions)
     def groups(s):
         return s.groups or []
-    def is_public():
-        return s.permissions == CONST_PERMIT_PUBLIC
-    def is_admin():
-        return s.permissions == CONST_PERMIT_ADMIN
-    def is_groups():
-        return s.permissions == "GROUP"
+    def is_public(s):
+        return s.permission == CONST_PERMIT_PUBLIC
+    def is_admin(s):
+        return s.permission == CONST_PERMIT_ADMIN
+    def is_groups(s):
+        return s.permission == "GROUP"
 
 PUBLIC_PERMIT = Permit( CONST_PERMIT_PUBLIC ) # shortcut
 ADMIN_PERMIT = Permit( CONST_PERMIT_ADMIN ) # shortcut
@@ -91,22 +104,23 @@ class Connection:
     """
     Connection - augment a connection dictionary
     """
-    def __init__( s, d, server ): # connection dictionary
+    def __init__( s, d, dingding ): # connection dictionary
         """
         connection dictionary:
         * Password (OPTIONAL - if not specified though, relying on target having no password requirements)
-        * ValidReceipt (OPTIONAL - "PUBLIC", "ADMIN-ONLY", or ["list", "of", "subscription", "passwords"])
+        * WhoCanSeeThis (OPTIONAL - "PUBLIC", "ADMIN-ONLY", or ["list", "of", "subscription", "passwords"])
             PUBLIC -- everyone can receive notice of what you just did/said
             ADMIN-ONLY -- only those with sys-admin priviledges to the DingDing server can see it.
             (list) -- list of subscription passwords that are authorized to receive the message
         * Destroy (OPTIONAL - if set to one, request that no incidental logs are kept of the event.)
 
-        If valid-receipt not specified, server defaults are used. ASSUME PUBLIC, and LOGGED.
+        If WhoCanSeeThis not specified, server defaults are used. ASSUME PUBLIC, and LOGGED.
         Make it ADMIN-ONLY if you want it private to the DingDing server (and the admin), and SET DESTROY
           TO 1 if you want the admin-logs to automatically delete any incidental logs involved.
         """
+        s.dingding = dingding
         s.password = d.get( "Password", None )
-        s.valid_receipt = d.get( "ValidReceipt", server.default_message_visibility )
+        s.who_can_see_this = d.get( "WhoCanSeeThis", s.dingding.options.get_defaultmessagevisibility() )
         s.destroy = d.get( "Destroy", 0 )
     def is_password(s, pword):
         return s.password == pword
@@ -128,6 +142,7 @@ class DingDing:
         s.subscriptions = DingDingSubscriptions(s)
         s.security = DingDingSecurity(s)
         s.work_orders = DingDingWorkOrders(s)
+        s.notice_dispatch = DingDingNoticeDispatch(s)
         s.pickle = DingDingPickle(s)
         s.censor = DingDingCensor(s)
 
@@ -176,7 +191,7 @@ class DingDingWorkOrders:
         if len(s.orders)==0:
             return
         (func,args)=s.orders.pop(0)
-        foo(*args)
+        func(*args)
 
 class DingDingUli:
     """
@@ -191,10 +206,28 @@ class DingDingUli:
         elif msg == "whoareyou": return s.dingding.options.get_servertitle()+"\n"
         elif msg == "frametype": return "Custom frame - Ding Ding v5 HTTP Server.\n"
         elif msg == "whoareyou-data": return "nLSD description retrival not supported yet.\n"
-        elif msg == "help": return "list-subscribers\n"
-        elif msg == "list-subscribers":
+        elif msg == "help": return "list-subscriptions, subscribe server-pw xmlrpc-url subs-pw, pnote server-pw note\n"
+        elif msg == "list-subscriptions":
             visible = s.dingding.subscriptions.visible_by_permit( PUBLIC_PERMIT )
-            return "Subscribers: " + " ".join( [subs.title for subs in visible] ) + "\n"
+            return "Subscriptions: " + " ".join( [subs.title for subs in visible] ) + "\n"
+        elif msg.startswith( "pnote" ):
+            import shlex
+            (cmd, server_pw, note) = shlex.split( msg,3 )
+            dmsg = {"Action":"pnote", "Text":note, "TransparencyText":"pnote: %s" % note}
+            dconn = {"WhoCanSeeThis":s.dingding.options.get_defaultmessagevisibility()}
+            s.dingding.notice_dispatch.notify(dmsg, Connection(dconn, s.dingding))
+            return "pnote sent"
+        elif msg.startswith( "subscribe" ):
+            
+            import shlex
+            (cmd, server_pw, xmlrpc_url, subscribers_pw) = shlex.split( msg )
+            s.dingding.subscriptions.subscribe( Subscription( { "MatchPattern": ["ALL"],
+                                                                "XmlRpcRecvUrl": xmlrpc_url,
+                                                                "RecvPassword": subscribers_pw,
+                                                                "Comment": "(connected via ULI)" },
+                                                              s.dingding ),
+                                                Connection( { "Password": server_pw }, s.dingding ) )
+            return "(subscribing %s...)\n" % xmlrpc_url
         return "(I do not understand: %s)\n" % msg
 
 class DingDingOptions:
@@ -240,12 +273,18 @@ class DingDingOptions:
         s.options = options
     def get_hostname(s):
         return s.options.host_name
-    def get_servertitle(s):
-        return s.options.title
     def get_portnumber(s):
         return s.options.port_number
+    def get_servertitle(s):
+        return s.options.title
+    def get_serverurl(s):
+        return "http://%s:%s/" % (s.options.host_name,s.options.port_number)
     def get_picklefilename(s):
         return s.options.pickle
+    def get_defaultcomponentvisibility(s):
+        return s.options.component_visibility
+    def get_defaultmessagevisibility(s):
+        return s.options.message_visibility
     
 
 class DingDingPickle:
@@ -268,6 +307,55 @@ class DingDingSubscriptions:
     def __init__( s, dingding ):
         s.dingding = dingding
         s.subscriptions = []
+
+    def _custom_reduce(s, foo, list_, early_exit, load):
+        if type(list_[0]) == type([]):
+            a = s._match( load, list_[0] )
+        else:
+            a = list_[0]
+        b = s._match( load, list_[1] )
+        r = foo(a, b)
+        if len(list_) == 2:
+            return r
+        if r == early_exit:
+            return r
+        return s._custom_reduce(foo, [r]+list_[2:], early_exit, load)
+
+    def _match(s, load, pattern):
+        op = pattern[0].upper()
+        if op == "ALL":
+            return True
+        elif op == "NOT":
+            return not s._match(load, pattern[1])
+        elif op == "AND":
+            return s._custom_reduce(lambda x, y: x and y,
+                                    pattern[1:], False, load)
+        elif op == "OR":
+            return s._custom_reduce(lambda x, y: x or y,
+                                    pattern[1:], True, load)
+        elif op == "VAL":
+            var_name = pattern[1]
+            test_val = pattern[2]
+            if not load.has_key( var_name ):
+                return False
+            return load[var_name] == test_val
+        elif op == "INCL":
+            var_name = pattern[1]
+            test_val = pattern[2]
+            if not load.has_key( var_name ):
+                return False
+            return load[var_name].find(test_val) != -1
+        elif op == "IN-LAST-N-SECONDS":
+            seconds_ago = pattern[1]
+            time_ago = time.time()-seconds_ago
+            if not load.has_key( "RESERVED-RECEIVED-TIME" ):
+                return False
+            return load["RESERVED-RECEIVED-TIME"] > time_ago
+        raise "Bad op: " + str(op)
+
+    def get_interested_subscribers(s, msg):
+        return [x for x in s.subscriptions if s._match(msg, x.match_pattern)]
+
     def subscribe( s, subs, conn ):
         if not s.dingding.security.is_connection_okay( conn ):
             return False
@@ -275,9 +363,9 @@ class DingDingSubscriptions:
         s.dingding.work_orders.add_order( s.dingding.pickle.save, [] )
         notice_dict = { "Action": "subscribe",
                         "SubscriptionSystem": "DingDingV5",
-                        "TargetName": s.title,
-                        "TargetUrl": s.full_url,
-                        "TargetXmlRpc": s.full_url,
+                        "TargetName": s.dingding.options.get_servertitle(),
+                        "TargetUrl": s.dingding.options.get_serverurl(),
+                        "TargetXmlRpc": s.dingding.options.get_serverurl(),
                         "SubscriberXmlRpc": subs.xmlrpc_recv_url, # required subscriber info
                         "MatchPattern": subs.match_pattern
                         }
@@ -285,17 +373,19 @@ class DingDingSubscriptions:
         if subs.url: notice_dict[ "SubscriberUrl" ] = subs.url
         s.dingding.work_orders.add_order( s.dingding.notice_dispatch.notify, [notice_dict, conn] )
     def visible_by_permit( s, permit ):
-        return [subs for subs in s.subscriptions if s.dingding.censor.is_subscription_visible( permit, subs )]
+        return [subs for subs in s.subscriptions if s.dingding.censor.is_this_visible( permit, subs )]
     def event_readfromdict( s, data_dict ):
         """
         Loading data from the data dictionary.
         """
-        s.subscriptions = data_dict[ "subscriptions" ]
+        print data_dict[ "subscriptions" ]
+        s.subscriptions = [ Subscription( subscription_dictionary, s.dingding ) for subscription_dictionary in data_dict[ "subscriptions" ] ]
+        print s.subscriptions
     def event_writetodict( s, data_dict ):
         """
         Writing data to the data dictionary.
         """
-        data_dict[ "subscriptions" ] = s.subscriptions
+        data_dict[ "subscriptions" ] = [subs.subscription_dictionary for subs in s.subscriptions]
 
 class DingDingNoticeDispatch:
     """
@@ -309,8 +399,31 @@ class DingDingNoticeDispatch:
     """
     def __init__( s, dingding ):
         s.dingding=dingding
+
     def notify( s, notice_dict, conn ):
-        raise "no definition for notify yet."
+        """
+        Go to subscriptions and get list of interested subscriptions
+        Go to confidentiality module and weed out subscriptions not authorized
+        Send out notice to remaining subscriptions
+
+        Not addressed:
+           Microservers don't receive notice
+           Does notcurrently use Futures
+           Reporting bad subscriptions
+        """
+        subs = s.dingding.subscriptions.get_interested_subscribers(notice_dict)
+        subs = [x for x in subs if s.dingding.censor.is_this_visible(x.get_permit(), conn)]
+        targets = [(x.xmlrpc_recv_url,x.recv_password) for x in subs]
+        unique_targets = []
+        for x in targets:
+            if x not in unique_targets:
+                unique_targets.append(x)
+        for (URL, pw) in unique_targets:
+            server=xmlrpclib.ServerProxy(URL)
+            d = {}
+            if pw!=None:
+                d["Password"] = pw
+            result = server.notify(notice_dict,d)
 
 class DingDingSecurity:
     def __init__( s, dingding ):
@@ -322,15 +435,15 @@ class DingDingSecurity:
 class DingDingCensor:
     def __init__( s, dingding ):
         s.dingding = dingding
-    def is_subscription_visible( s, permit, subs ):
+    def is_this_visible( s, permit, subs ):
         if permit.is_admin():
             return True # admin can see anything
-        if subs.passive_visibility == "PUBLIC":
+        if subs.who_can_see_this == "PUBLIC":
             return True # anyone can see what is public
-        if type(subs.passive_visibility) == type([]):
+        if type(subs.who_can_see_this) == type([]):
             for group_pw in permit.groups():
-                if group_pw in subs.passive_visibility:
-                    return True # group_pw matches passive visibility password
+                if group_pw in subs.who_can_see_this:
+                    return True # group_pw matches visibility password
         return False # otherwise, not allowed to see
 
 class DingDingHttpServer( BaseHTTPServer.HTTPServer ):
@@ -378,8 +491,8 @@ class DingDingHttpHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         Returns 0 if password doesn't check out.
         Returns 1 otherwise.
         """
-        subs = Subscription( subscription_dict, s.server )
-        conn = Connection( connection_dict, s.server )
+        subs = Subscription( subscription_dict, s.server.dingding )
+        conn = Connection( connection_dict, s.server.dingding )
         if not s.server.dingding.security.is_connection_okay( conn ):
             return 0
         s.server.dingding.work_orders.add_order( s.server.dingding.subscriptions.subscribe, [subs,conn] )
