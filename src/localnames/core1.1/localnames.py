@@ -262,7 +262,7 @@ def lookup(path, url, flags):
       "check-neighboring-spaces":  check spaces linked by NS
       "reverse":  reverse lookup (URL, not name, at end of path)
       "NS":  namespace-lookup; (NS, not LN, at end of path)
-
+      "suppress-final":  don't use "X FINAL"
     """
     flags = sets.Set(flags)
     if "loose" in flags:
@@ -292,6 +292,7 @@ def lookup(path, url, flags):
         if "check-neighboring-spaces" in flags:
             wo_neighboring = flags.copy()
             wo_neighboring.discard("check-neighboring-spaces")
+            wo_neighboring.add("suppress-final")
             urls = sets.Set()
             for num, neighborname, url in namespace["NS-raw"]:
                 if url not in urls:
@@ -300,7 +301,8 @@ def lookup(path, url, flags):
                         return result
                     urls.add(url)
 
-        if ("FINAL" in namespace["X"]) and ("reverse" not in flags):
+        if (not "suppress-final" in flags) and ("reverse" not in flags) and \
+               ("FINAL" in namespace["X"]):
             return namespace["X"]["FINAL"][0].replace("$PAGE", path[0])
         return None
     else:
@@ -312,7 +314,7 @@ def lookup(path, url, flags):
         if flags & loose_flags:
             result = _check_list(path[0], pattern_raw, flags - loose_flags)
             if result:
-                return result.replace("$PAGE", path[1])
+                return result.replace("$NAME", path[1])
             result = _check_list(path[0], ns_raw, flags - loose_flags)
             if result:
                 return lookup(path[1:], result, original_flags)
