@@ -259,7 +259,7 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             if format == "XML-RPC":
                 return ns2
             else:
-                return xmlrpclib.dumps((result,))
+                return xmlrpclib.dumps((ns2,))
         elif format == "version1.1":
             return localnames.clean(ns)
         elif format == "version1.1-original":
@@ -267,6 +267,6 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    httpd = BaseHTTPServer.HTTPServer(("services.taoriver.net", 9090), LocalNamesHandler)
+    httpd = BaseHTTPServer.HTTPServer(("localhost", 9001), LocalNamesHandler)
     httpd.serve_forever()
 
