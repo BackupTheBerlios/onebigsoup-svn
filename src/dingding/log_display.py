@@ -54,16 +54,20 @@ def sort_logs( logs ):
 
 
 
-def hour_and_ampm( seconds_since_epoch ):
-    tuple_time = time.localtime( seconds_since_epoch )
+def tuple_from_iso8601( iso8601 ):
+    return time.strptime( iso8601.replace("-",""), "%Y%m%dT%H:%M:%S" )
+
+def iso8601_from_tuple( tuple ):
+    return time.strftime( "%Y-%m-%dT%H:%M:%S", tuple )
+
+def hour_and_ampm( tuple_time ):
     return time.strftime("%I %p", tuple_time)
 
-def dayname( seconds_since_epoch ):
+def dayname( tuple_time ):
     """
     In Python2.3, you can do this with the datetime module.
     But we want to keep Python2.2 compatible.
     """
-    tuple_time = time.localtime( seconds_since_epoch )
     day_names = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
     return day_names[ tuple_time[6] ]
 
