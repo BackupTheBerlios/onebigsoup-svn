@@ -18,8 +18,11 @@ class NameSpaceStore:
     """
     Stores a cache of NameSpace objects, keyed by URL.
     Cache entries expire after a period of time.
+
+    time_before_reload: seconds before cache entries expire
+                        (default: 1 day)
     """
-    def __init__( s, time_before_reload ):
+    def __init__( s, time_before_reload=24*60*60 ):
         """
         time_before_reloaded:
            number of seconds after which cache entries expire
@@ -207,7 +210,7 @@ class Resolver:
         s.default_ns_url = default_ns_url
         
         if s.store == None:
-            s.store = NameSpaceStore(24*60*60) # one full day
+            s.store = NameSpaceStore()
             try:
                 s.store.load(store_filename)
             except IOError:
