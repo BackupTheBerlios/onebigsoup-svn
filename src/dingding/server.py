@@ -9,7 +9,7 @@ In some cases, this may actually be-
  + (./) get_logs( pattern )
  + "IN-LAST-N-SECONDS"
  + (./) standard received time stamp format (ISO8601 DateTime)
-     - *./) screw standards. We'll just claim RECEIVED-TIME as reserved.
+     - *./) screw standards. We'll just use RESERVED information.
  + update conventions doc
 """
 
@@ -26,7 +26,7 @@ PORT_NUMBER = 9011
 PASSWORD    = "password"
 
 SUBSCRIPTIONS_PICKLE = "registry.p"
-LOGS_PICKLE = "log.py"
+LOGS_PICKLE = "log.p"
 LOGS_PUBLIC = True
 MAX_LOGS_KEPT = 1000
 MAX_LOGS_RETURNED = 50
@@ -65,6 +65,7 @@ class Server:
              ["NOT", pattern]
              ["AND", pattern, ... ]
              ["OR", pattern, ... ]
+             ["IN-LAST-N-SECONDS", num-seconds ]
              Examples:
              * ["ALL"]
              * ["VAL", "Author", "LionKimbro"]
@@ -146,18 +147,28 @@ class Server:
         elif op == "IN-LAST-N-SECONDS":
             seconds_ago = pattern[1]
             time_ago = time.time()-seconds_ago
-            if not load.has_key( "RECEIVED-TIME" ):
+            if not load.has_key( "RESERVED-RECEIVED-TIME" ):
                 return False
-            return load["RECEIVED-TIME"] > time_ago
+            return load["RESERVED-RECEIVED-TIME"] > time_ago
         raise "Bad op: " + str(op)
 
+    def _stripped_copy( s, load ):
+        """
+        Strip out "RESERVED" information before resending.
+        """
+        copy = load.copy()
+        for k in copy.keys():
+            if k.startswith( "RESERVED" ):
+                del copy[k]
+        return copy
+    
     def _ding(s, client_info, Cpw, load):
         xmlrpc_url = client_info.get( "CLIENT-XMLRPC", None )
         if xmlrpc_url:
             try:
                 server=xmlrpclib.ServerProxy( xmlrpc_url )
                 print time.asctime(),"-- notify %s" % xmlrpc_url
-                server.notify( load, Cpw )
+                server.notify( s._stripped_copy(load), Cpw )
                 return True # success
             except httplib.socket.error:
                 pass
@@ -171,7 +182,7 @@ class Server:
         Timestamp a load, with whatever value we like.
         (Reserved for server use.)
         """
-        load["RECEIVED-TIME"] = time.time()
+        load["RESERVED-RECEIVED-TIME"] = time.time()
     def _log(s, load):
         try:
             log = pickle.load( open( LOGS_PICKLE,"r" ) )
@@ -258,7 +269,7 @@ class Server:
 
         return found_one
 
-    def get_logs( s, pattern ):
+    def get_logs( s, ptrn ):
         """
         The server is not obligated to keep logs
         for any set period of time.
@@ -270,11 +281,14 @@ class Server:
         """
         to_return = []
 
-        log = pickle.load( open( LOGS_PICKLE, "r" ) )
+        try:
+            log = pickle.load( open( LOGS_PICKLE, "r" ) )
+        except IOError:
+            log = []
         
-        for load in logs:
+        for load in log:
             if s._match( load, ptrn ):
-                to_return.append( load )
+                to_return.append( s._stripped_copy(load) )
 
         to_return.reverse() # newest first
         if len( to_return ) > MAX_LOGS_RETURNED:
