@@ -6,11 +6,6 @@ In some cases, this may actually be-
 
 ----
 
- + (./) get_logs( pattern )
- + "IN-LAST-N-SECONDS"
- + (./) standard received time stamp format (ISO8601 DateTime)
-     - *./) screw standards. We'll just use RESERVED information.
- + update conventions doc
 """
 
 import time
