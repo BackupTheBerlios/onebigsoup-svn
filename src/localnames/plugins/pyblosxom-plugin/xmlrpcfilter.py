@@ -6,7 +6,8 @@ __description__ = "Implements XMLRPCFilterPipes"
 
 filterurls = {
 	'markdown': 'http://services.taoriver.net:9001/markdown/',
-	'localnames': 'http://services.taoriver.net:9090/'
+	'localnames': 'http://services.taoriver.net:9090/',
+	'smartypants': 'http://services.taoriver.net:9001/smartypants/'
 }
 def verify_installation(request):
 	config = request.getConfiguration()
@@ -47,7 +48,8 @@ def cb_postformat(args):
 		proxy = xmlrpclib.ServerProxy(url)
 		response = getattr(proxy, function_name)(data, encoding, filters[filter]['args'])
 		if type(response) == type("string"):
-			raise response
+			args['entry_data']['body'] = "Problem running filter ", filter, " Recieved error" , str(response)	
+			break
 		else:
 			args['entry_data']['body'] = str(response['data'])
 
