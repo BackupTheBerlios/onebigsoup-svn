@@ -5,6 +5,7 @@ import time
 import urllib
 import re
 import sets
+import cgi
 
 import lnparser
 
@@ -17,9 +18,14 @@ ws_re = re.compile(r'\s+', re.UNICODE)
 the_re = re.compile(r'\b(?:the|a|an|in|for)\b', re.UNICODE|re.IGNORECASE)
 link_re = re.compile(r'\[((?:\[.+?\])+)([^\]]+?)?\]',
                      re.MULTILINE|re.IGNORECASE|re.UNICODE|re.DOTALL)
+softlink_re = re.compile(r'\(((?:\(.+?\))+)([^\)]+?)?\)',
+                         re.MULTILINE|re.IGNORECASE|re.UNICODE|re.DOTALL)
 
 loose_flags = sets.ImmutableSet(["no-case", "no-punctuation",
                                  "no-space", "forgive-spelling"])
+
+standard_X_keys = ["FINAL", "VERSION", "AUTHOR", "AUTHOR-FOAF",
+                   "LAST-CHANGED", "PREFERRED-NAME"]
 
 
 def dump_cache(url):
@@ -50,11 +56,19 @@ def preferred_names():
             break
 
     bindings = {}
+    not_found_num = 0
     for space in spaces:
+        found = False
         for name in space["X"].get("PREFERRED-NAME", []):
             if not bindings.has_key(name):
                 bindings[name] = space["URL"]
+                found = True
                 break
+        if not found:
+            while bindings.has_key("anonymous%3d" % not_found_num):
+                not_found_num = not_found_num + 1
+            bindings["anonymous%3d" % not_found_num] = space["URL"]
+            not_found_num = not_found_num + 1
     return bindings
 
 
@@ -94,9 +108,8 @@ def get_namespace(url):
     namespace["TIME"] = now
     namespace["URL"] = url
     namespace["TEXT"] = urllib.urlopen( url ).read().decode("utf-8","replace")
-    lines = namespace["TEXT"].splitlines()
 
-    (results,errors) = lnparser.parse_text(namespace["TEXT"])
+    (results, errors) = lnparser.parse_text(namespace["TEXT"])
 
     namespace["ERRORS"] = errors
     namespace["LN-raw"] = []
@@ -110,10 +123,10 @@ def get_namespace(url):
     namespace["NS"] = {}
     namespace["PATTERN"] = {}
     namespace["X"] = {}
-    for record_type in ["LN","NS","PATTERN"]:
+    for record_type in ["LN", "NS", "PATTERN"]:
         for line_number, second, third in namespace[record_type+"-raw"]:
             if not namespace[record_type].has_key(second):
-                namespace[record_type][second]=third
+                namespace[record_type][second] = third
             else:
                 msg = "redefinition of %s" % second
                 namespace["ERRORS"].append((line_number, msg))
@@ -121,6 +134,69 @@ def get_namespace(url):
         namespace["X"].setdefault(second, []).append(third)
 
     store[url] = namespace
+    return namespace
+
+
+def aggregate(urls):
+    """
+    Aggregate several namespaces into one.
+
+    Aggregation is mostly simple:
+    Pure concatenation of text files;
+    With one exception:
+    An "aggregation" block appears at the
+    bottom of the file, that lists sources
+    of aggregation like so:
+
+      X AGGREGATES "URL"
+      X AGGREGATES "URL"
+      (and so on and so forth)
+
+    """
+    namespaces = [get_namespace(url) for url in urls]
+
+    super_text = [ns["TEXT"] for ns in namespaces]
+    for url in urls:
+        super_text.append(u'X AGGREGATES "%s"\n' % url)
+
+    namespace = {}
+    namespace["TIME"] = time.time()
+    namespace["URL"] = None
+    namespace["TEXT"] = "".join(super_text)
+
+    (results, errors) = lnparser.parse_text(namespace["TEXT"])
+    
+    namespace["ERRORS"] = errors
+    namespace["LN-raw"] = []
+    namespace["NS-raw"] = []
+    namespace["PATTERN-raw"] = []
+    namespace["X-raw"] = []
+    for ns in namespaces:
+        for record_type in ["LN-raw", "NS-raw", "PATTERN-raw", "X-raw"]:
+            namespace[record_type].extend(ns[record_type])
+
+    namespace["LN"] = {}
+    namespace["NS"] = {}
+    namespace["PATTERN"] = {}
+    namespace["X"] = {}
+    for record_type in ["LN", "NS", "PATTERN"]:
+        for line_number, second, third in namespace[record_type+"-raw"]:
+            if not namespace[record_type].has_key(second):
+                namespace[record_type][second] = third
+    for line_number, second, third in namespace["X-raw"]:
+        if second not in standard_X_keys:
+            namespace["X"].setdefault(second, []).append(third)
+        elif second == "FINAL":
+            if not namespace["X"].has_key("FINAL"):
+                namespace["X"]["FINAL"] = [third]
+        elif second in ["AUTHOR", "AUTHOR-FOAF"]:
+            namespace["X"].setdefault(second,[]).append(third)
+    
+    namespace["X"]["VERSION"] = ["1.1"]
+    isotime = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime())
+    namespace["X"]["LAST-CHANGED"] = [isotime]
+    namespace["X"]["PREFERRED-NAME"] = ["aggregate"]
+
     return namespace
 
 
@@ -265,10 +341,12 @@ def _prepare_key(name, flags):
         name = ws_re.sub("", name)
     if "forgive-spelling" in flags:
         try:
-            if name[-1] == "s":
+            if name.endswith("s"):
                 name=name[:-1]
-            if name[-3:] == "ing":
+            if name.endswith("ing"):
                 name=name[:-3]
+            if name.endswith("ed"):
+                name=name[:-2]
             the_re.sub("",name)
         except IndexError:
             pass
@@ -291,27 +369,48 @@ def display_namespace_errors(namespace):
         print "        %s" % lines[num].encode("ascii","replace")
 
 
-def replace_text(text,namespace_url):
+def replace_text(text, namespace_url, softlink_base=""):
     """
     Replace links denoted by [[foo]] with A HREFs.
+
+    text:  text to make replacements in
+    namespace_url:  URL of namespace to start from
+    softlink_base:  URL base to softlink from
 
     Examples:
         [[some name]]
         [[NS link][NS link][LN name]]
         [[some name]some other text covering it]
         [[NS link][LN name]some other text]
+
+    Softlinks have the form:
+      ((foo)(bar))
+    ...which becomes a link to:
+      (SOFTLINK_BASE)?action=redir&url=(URL)&lookup=foo&lookup=bar
     """
 
-    def replace_match(match):
+    def replace_link(match):
         flags = sets.Set(["loose", "check-neighboring-spaces"])
         path = match.group(1)[1:-1].split('][')
         url = lookup(path, namespace_url, flags)
         title = match.group(2)
         if title == None:
             title = path[-1]
-        return '<a href="%s">%s</a>' % (url, title)
+        return '<a href="%s">%s</a>' % (url, cgi.escape(title))
 
-    return link_re.sub(replace_match, text)
+    def replace_softlink(match):
+        flags = sets.Set(["loose", "check-neighboring-spaces"])
+        path = match.group(1)[1:-1].split(')(')
+        map = {'action': 'redir', 'url': namespace_url, 'lookup': path}
+        url = softlink_base + "?" + urllib.urlencode(map, True)
+        title = match.group(2)
+        if title == None:
+            title = path[-1]
+        return '<a href="%s">%s</a>' % (url, cgi.escape(title))
+
+    text = link_re.sub(replace_link, text)
+    text = softlink_re.sub(replace_softlink, text)
+    return text
 
 
 if __name__ == '__main__':
@@ -343,3 +442,9 @@ if __name__ == '__main__':
     text = 'You need to use [[X]an X record] to do that.'
     print text
     print replace_text(text, "http://ln.taoriver.net/localnames.txt")
+    text = 'This is ((soft linked)) text. We\'ll use a' \
+           '((name server)) to resolve it at click-time.'
+    print text
+    print replace_text(text, "http://ln.taoriver.net/localnames.txt")
+    print aggregate(["http://taoriver.net/tmp/gmail.txt", "http://ln.taoriver.net/localnames.txt"])
+
