@@ -155,7 +155,7 @@ def get_namespace(url):
     except KeyError:
         pass
 
-    text = urllib.urlopen( url ).read().decode("utf-8","replace")
+    text = urllib.urlopen( url ).read().decode("utf-8", "replace")
     namespace = _namespace_from_text(text)
     namespace["URL"] = url
 
