@@ -3,14 +3,15 @@ import marshal
 import time
 import urllib
 
-import lnparser # Sean Palmer's Parser
+import lnparser
+
 
 # TODO: FIX NameSpaceStore.save,
 #       which doesn't know how to marshal objects, I guess.
 
 NAMESPACE_FILE_DOESNT_LOAD = "NAMESPACE-FILE-DOESNT-LOAD"
-NAME_NOT_FOUND = "NAME-NOT-FOUND"
 NAMESPACE_NOT_FOUND = "NAMESPACE-NOT-FOUND"
+NAME_NOT_FOUND = "NAME-NOT-FOUND"
 
 def name_not_found_error():
     raise NAME_NOT_FOUND
@@ -277,20 +278,21 @@ class LocalNamesSink:
     def __init__(self, namespace):
         self.namespace = namespace
 
-    def meta(self, key, value):
-        self.namespace.key_values[key] = value
+    def X(s, key, val ):
+        s.namespace.key_values[key] = val
 
-    def map(self, name, uri):
-        self.namespace.bind_name_to_url( name,uri )
+    def LN(s, name, uri ):
+        s.namespace.bind_name_to_url( name, uri )
+        
+    def NS(s, name, uri ):
+        s.namespace.bind_namespace_to_url( name, uri )
+        s.namespace.defaults.append( name )
 
-    def otherNameSpace( self, name, uri ):
-        self.namespace.bind_namespace_to_url( name, uri )
+    def FINAL(s, pattern ):
+        s.namespace.last_resort_name_pattern = pattern
 
-    def defaultNameSpaces(self, name):
-        self.namespace.defaults.append( name )
-
-    def lastResortNamePattern(self, pattern):
-        self.namespace.last_resort_name_pattern = pattern
+    def warning(s, line_number, msg ):
+        print "%d: warning -- %s" % (line_number, msg)
 
 
 class SpaceTraverser:
@@ -407,18 +409,15 @@ class Resolver:
 
 
 def test_resolver():
-    print "READING:"
-    print urllib.urlopen("http://lion.taoriver.net/localnames.txt").read()
-    print "------"
-    resolver = Resolver( "http://lion.taoriver.net/localnames.txt",
+    resolver = Resolver( "http://lion.taoriver.net/localnames2.txt",
                          "localnames_cache" )
     print resolver.simple_find( ["WeirdFile"] )
     print resolver.simple_find( ["MarshallBrain"] )
     print resolver.simple_find( ["/."] )
-    print resolver.simple_find( ["OneBigSoup","FrontPage"] )
-    print resolver.simple_find( ["OneBigSoup","DingDing"] )
-    print resolver.simple_find( ["LocalNames"] )
-    print resolver.simple_find( ["FrontPage"] )
+#    print resolver.simple_find( ["OneBigSoup","FrontPage"] )
+#    print resolver.simple_find( ["OneBigSoup","DingDing"] )
+#    print resolver.simple_find( ["LocalNames"] )
+#    print resolver.simple_find( ["FrontPage"] )
     
     
 if __name__=="__main__": 

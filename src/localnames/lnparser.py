@@ -8,6 +8,7 @@ Local Names Namespace File Parser
 """
 
 import re
+import urllib
 
 # white space
 optional_ws = "\s*"
