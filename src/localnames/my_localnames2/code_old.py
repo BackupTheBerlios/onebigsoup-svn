@@ -288,6 +288,12 @@ class SpacesNotes:
             return False
         s.spaces[ space_name ][ "password" ] = new_pw
         return True
+    def uli( s, msg ):
+        if msg.startswith( "spaces" ):
+            return "spaces: " + ", ".join( s.spaces.keys() )
+        elif msg.startswith( "protected" ):
+            return "protected: " + ", ".join( [k for k in s.spaces.keys()
+                                               if s.spaces[k]["password"] != None] )
 
 
 hub = DataHub()

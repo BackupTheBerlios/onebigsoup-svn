@@ -1,4 +1,4 @@
-LN_HELP="ln (space) (name) (url), pickle"
+LN_HELP="ln (space) (name) (url), pickle, space-notes"
 
 
 def uli_ln( msg ):
@@ -33,4 +33,7 @@ def uli( msg ):
         if first == "pickle":
             import code_old
             return code_old.hub.pickle.uli( rest )
+        if first == "space-notes":
+            import code_old
+            return code_old.hub.space_notes.uli( rest )
     return "not understood"

@@ -16,39 +16,20 @@ def subtitle():
     return { "LN": "Names",
              "NS": "Spaces" }[ LN_or_NS ]
 
-def alts():
-    if qd.has_key( "alt" ):
-        if type( qd[ "alt" ] ) == type( "" ):
-            return [ qd[ "alt" ] ]
-        elif type( qd[ "alt" ] ) == type( [] ):
-            return qd[ "alt" ]
-    else:
-        return []
-
 def names():
-    if qd.has_key( "name" ):
-        n = [ qd["name"] ] # names
-    else:
-        n = []
-    n.extend( alts() )
+    n = qd.get( "name", None ) + qd.get( "alt", [] )
     return n
-
-def url():
-    if qd.has_key( "url" ):
-        return qd["url"]
-    else:
-        return None
 
 
 def register_new_names():
     if code_info.query_keys_found( ["url", "name", code_info.SPACE_KEY ] ):
         if LN_or_NS == "LN":
-            space_file.add_names( names(), url() )
+            space_file.add_names( names(), qd.get( "url", None ) )
         elif LN_or_NS == "NS":
-            space_file.add_namespaces( names(), url() )
+            space_file.add_namespaces( names(), qd.get( "url", None ) )
         else:
             raise "this should never happen"
-        code_old.hub.event_namesadded( code_info.space(), names(), url() )
+        code_old.hub.event_namesadded( code_info.space(), names(), qd.get( "url", None ) )
         space_file.save()
 
 def register_checked_names():
@@ -57,9 +38,9 @@ def register_checked_names():
             name=key[ 6: ]
             if LN_or_NS == "LN":
                 if name == "this":
-                    url = "http://to-be-coded"
+                    url = code_info.url_for_page( code_info.PAGE_DESCRIPTION )
                 elif name == "edit":
-                    url = "http://to-be-coded"
+                    url = code_info.url_for_page( code_info.PAGE_EDITNAMES )
                 else:
                     url=extra_file.get_names()[name]
                 space_file.add_name( name, url )
@@ -71,6 +52,13 @@ def register_checked_names():
             space_file.save()
 
 def gval( k,i ):
+    """
+    value of form entries;
+    of the form: string#
+
+    ex: gval( "foo", 4 )
+    ...returns form value "foo4"
+    """
     if code_info.form.has_key( k+str(i) ):
         return code_info.form[ k+str(i) ].value
     return None
@@ -125,8 +113,8 @@ def response():
 
     if LN_or_NS == "LN":
         extras_in_order = extra_file.get_names_in_order()
-        extras_in_order.insert( 0, ( "this", "http://to-be-coded" ) )
-        extras_in_order.insert( 0, ( "edit", "http://to-be-coded" ) )
+        extras_in_order.insert( 0, ( "this", code_info.url_for_page( code_info.PAGE_DESCRIPTION ) ) )
+        extras_in_order.insert( 0, ( "edit", code_info.url_for_page( code_info.PAGE_EDITNAMES ) ) )
     elif LN_or_NS == "NS":
         extras_in_order = extra_file.get_namespaces_in_order()
 

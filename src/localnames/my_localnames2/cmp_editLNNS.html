@@ -1,3 +1,4 @@
+#import code_info
 
   <tr>
     <td style="width: 650px;" class="darker">
@@ -6,7 +7,7 @@
       <form method="get" action="index.cgi">
         <input type="hidden" name="$PAGE_KEY" value="$PAGE_VALUE"/>
 	<input type="hidden" name="$SPACE_KEY" value="$SPACE"/>
-        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+        <table border="0" cellpadding="2" cellspacing="2">
           <tbody>
             <tr>
               <td style="text-align: right;">Name:</td>
@@ -18,7 +19,7 @@
             </tr>
           </tbody>
         </table>
-        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+        <table border="0" cellpadding="2" cellspacing="2">
           <tbody>
             <tr>
               <td style="white-space: nowrap;">Alternate Name:</td>
@@ -30,12 +31,13 @@
             </tr>
           </tbody>
         </table>
-        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+        <table border="0" cellpadding="2" cellspacing="2">
 	  <tbody>
 	    <tr>
-	      <td>
-	      <input type="submit" value="Add Name"></input>
-	      </td>
+#if $code_info.has_password() != None
+              <td>Password: <input size="20" name="password"/></td>
+#end if
+	      <td><input type="submit" value="Add Name"/></td>
 	    </tr>
 	  </tbody>
 	</table>
@@ -51,7 +53,6 @@
       <h4>Change / Delete $NAMES_OR_NAMESPACES:</h4>
       <form method="post" action="index.cgi?$PAGE_KEY=$PAGE_VALUE&$SPACE_KEY=$SPACE">
       <input type="hidden" name="NUM_ENTRIES0" value="$NUM_ENTRIES"/>
-      <p><input type="submit" value="Submit Changes"/></p>
         <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
           <tbody>
             <tr>
@@ -74,7 +75,12 @@
 #end for
           </tbody>
         </table>
-      <p><input type="submit" value="Submit Changes"/></p>
+      <p>
+#if $code_info.has_password() != None
+        Password: <input size="20" name="password"/>
+#end if
+        <input type="submit" value="Submit Changes"/>
+      </p>
       </form>
 
     </td>
@@ -94,7 +100,12 @@
 #end for
         </tbody>
       </table>
-      <p><input value="Add Checked $(NAMES_OR_NAMESPACES)" type="submit"></p>
+      <p>
+#if $code_info.has_password() != None
+        Password: <input size="20" name="password"/>
+#end if
+        <input value="Add Checked $(NAMES_OR_NAMESPACES)" type="submit">
+      </p>
     </form>
     </td>
   </tr>

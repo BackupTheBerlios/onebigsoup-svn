@@ -32,17 +32,27 @@ def localnames_img():
     t.SPACE = space()
     return str(t)
 
+def url_for_page( page_name ):
+    import conf
+    t=Template( "http://%s%sindex.cgi?$PAGE_KEY=%s&$SPACE_KEY=$SPACE" % (conf.URL_DOMAIN_NAME,
+                                                                         conf.URL_DIRECTORY_BASE,
+                                                                         page_name) )
+    inform_template(t)
+    return str(t)
+
+def has_password():
+    import code_old
+    if space() == None:
+        return False
+    return code_old.hub.space_notes.has_password( space() )
+
 def query_string():
     import os
     return os.environ.get( "QUERY_STRING", "" )
 
 def query_dict():
     import os, cgi
-    _dict = cgi.parse_qs( query_string() )
-    for (k,v) in _dict.items():
-        if type(v) == type([]) and len(v)==1:
-            _dict[k]=v[0]
-    return _dict
+    return cgi.parse_qs( query_string() )
 
 def query_keys_found( keys ):
     for k in keys:
@@ -51,18 +61,24 @@ def query_keys_found( keys ):
     return True
 
 def uli_string():
-    return query_dict().get( ULI_KEY )
+    return query_dict().get( ULI_KEY, [None] )[0]
 
 def page():
-    return query_dict().get( PAGE_KEY )
+    return query_dict().get( PAGE_KEY, [None] )[0]
 
 def space():
-    result = query_dict().get( SPACE_KEY )
+    result = query_dict().get( SPACE_KEY, [None] )[0]
     if result:
         result=result.upper()
     if result == None:
         result=SPACE_GLOBAL
     return result
+
+def password():
+    result = query_dict().get( PASSWORD, [None] )[0]
+    if result:
+        return result
+    result = form[ "password" ][0].value
 
 def blank_request():
     return len( query_dict() ) == 0
