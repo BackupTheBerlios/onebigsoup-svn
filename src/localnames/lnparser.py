@@ -101,11 +101,7 @@ class Parser:
         if s.names_list_pattern is None:
             raise ValueError, "No substitution pattern found for NamesList."
 
-        if value == "":
-            for row in s.getBlock():
-                name,dummy = row
-                s.sink.map( name, s.names_list_pattern.replace("$NAME",name) )
-        else:
+        if value != "":
             u = urllib.urlopen(value)
             while 1:
                 line = u.readline()
@@ -114,16 +110,15 @@ class Parser:
                 if not line.strip(): continue
                 s.sink.map(line, s.names_list_pattern.replace('$NAME', line))
             u.close()
+            
+        for row in s.getBlock():
+            name,dummy = row
+            s.sink.map( name, s.names_list_pattern.replace("$NAME",name) )
 
     def namesTable(s, value):
         old_uri = None
-        if value == '':
-            for row in s.getBlock():
-                name,uri = row
-                if row[1] == "":uri=old_uri
-                s.sink.map( name,uri)
-                old_uri=uri
-        else:
+        
+        if value != "":
             u = urllib.urlopen(value)
             while 1: 
                 line = u.readline()
@@ -133,16 +128,17 @@ class Parser:
                 name, uri = parseMapping(line)
                 s.sink.map(name, uri)
             u.close()
+            
+        for row in s.getBlock():
+            name,uri = row
+            if row[1] == "":uri=old_uri
+            s.sink.map( name,uri)
+            old_uri=uri
 
     def otherNameSpaces(s, value):
         old_uri = None
-        if value == '':
-            for row in s.getBlock():
-                name, uri = row
-                if uri == "": uri=old_uri
-                s.sink.otherNameSpace(name, uri)
-                old_uri = uri
-        else:
+        
+        if value != "":
             u = urllib.urlopen(value)
             while 1: 
                 line = u.readline()
@@ -152,16 +148,19 @@ class Parser:
                 name, uri = parseMapping(line)
                 s.sink.otherNameSpace(name, uri)
             u.close()
+            
+        for row in s.getBlock():
+            name, uri = row
+            if uri == "": uri=old_uri
+            s.sink.otherNameSpace(name, uri)
+            old_uri = uri
 
     def keyValue( s, value ):
         key, value = parseMapping( value )
         s.sink.meta(key,value)
 
     def defaultNameSpaces( s, value ):
-        if value == '':
-            for line in s.getBlock():
-                s.sink.defaultNameSpaces(line[0])
-        else:
+        if value != "":
             u = urllib.urlopen(value)
             while 1: 
                 line = u.readline()
@@ -170,6 +169,9 @@ class Parser:
                 if not line.strip(): continue
                 s.sink.defaultNameSpaces(line)
             u.close()
+            
+        for line in s.getBlock():
+            s.sink.defaultNameSpaces(line[0])
 
     def lastResortNamePattern( s, value ):
         s.sink.lastResortNamePattern( value )
