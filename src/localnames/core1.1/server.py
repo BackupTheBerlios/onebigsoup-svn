@@ -100,24 +100,35 @@ def un_unicode_dict(d):
 class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     """Handles GET, POST, and interprets ULI, GTF, XML-RPC."""
-    
+
+    def respond(self, code, key, val):
+        self.send_response(code)
+        self.send_header(key, val)
+        self.end_headers()
+
     def do_GET(self):
         if self.path.startswith("/?"):
             args = cgi.parse_qs( self.path[2:] )
         else:
             args = {}
 
-        if args.get("action") == ["redir"] and \
-           args.get("namespace") != None and \
-           (args.get("lookup") != None or args.get("path") != None):
-            if args.has_key("path") and not args.has_key("lookup"):
-                args["lookup"] = args["path"][0].split("/")
-            url = localnames.lookup(args["lookup"],
-                                    args["namespace"][0],
+        if args.get("action") in [["redirect"],["lookup"]] and \
+               args.get("namespace") != None and \
+               args.get("lookup") != None:
+            lookup = args["lookup"]
+            if args.has_key("separator"):
+                lookup = args["lookup"][0].split(args["separator"][0])
+            url = localnames.lookup(lookup, args["namespace"][0],
                                     redir_lookup_flags)
-            self.send_response(301)
-            self.send_header("Location", url)
-            self.end_headers()
+            if args["action"] == ["redirect"]:
+                self.respond(301, u'Location', url)
+                return
+            if args.has_key("html"):
+                self.respond(200, u'Content-type', 'text/html; charset=utf-8')
+                self.wfile.write('<a href="%s">%s</a>' % (url, url))
+            else:
+                self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
+                self.wfile.write(url)
             return
 
         if args.get("action") == ["cached"]:
@@ -130,17 +141,25 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     row = u'%50s | %15s | %d'
                 draw.append(row % (url.ljust(50),
                                    preferred_name.ljust(15), ttl))
-            self.send_response(200)
-            self.send_header("Content-type", {True:"text/html",
-                                              False:"text/plain"}[html])
-            self.end_headers()
+            if html:
+                self.respond(200, u'Content-type', 'text/html; charset=utf-8')
+            else:
+                self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
             self.wfile.write(u'\n'.join(draw))
             return
-        
-        self.send_response(200)
-        self.send_header("Content-type", "text/html")
-        self.end_headers()
 
+        if args.get("action") == ["dump-cache"] and \
+               args.get("namespace") != None:
+            dumped = []
+            for url in args["namespace"]:
+                if localnames.dump_cache(url):
+                    dumped.append(url)
+            self.wfile.write(u'Dumped cache:\n')
+            self.wfile.write(u'\n'.join(dumped))
+            return
+
+        self.respond(200, u'Content-type', 'text/html; charset=utf-8')
+        
         if args.get("action") == "xmlrpc":
             self.wfile.write(xmlrpc_documentation)
             return
@@ -168,9 +187,7 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                            "render": self.xmlrpc_render}
         try:
             result = xmlrpc_bindings[funct](*args)
-            self.send_response(200)
-            self.send_header("Content-type", "text/html")
-            self.end_headers()
+            self.respond(200, u'Content-type', 'text/html; charset=utf-8')
             self.wfile.write(xmlrpclib.dumps((result,)))
         except IndexError:
             pass
