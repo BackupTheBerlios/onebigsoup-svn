@@ -17,6 +17,20 @@ class LocalNamesSyntaxError(Exception):
         Exception.__init__(self, 'Local Names v1.1 Syntax Error: %s" % msg')
 
 
+def escape(text):
+    r'''Replace \ with \\, replace " with \".'''
+    text = text.replace('\\', '\\\\')
+    text = text.replace('"', '\\"')
+    return text
+
+
+def unescape(text):
+    r'''Replace \\ with \, replace \" with ".'''
+    text = text.replace('\\"', '"')
+    text = text.replace('\\\\', '\\')
+    return text
+
+
 def parse_text(text):
     """
     Parse Local Names v1.1 description, and return results and errors.
