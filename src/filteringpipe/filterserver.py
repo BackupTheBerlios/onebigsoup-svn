@@ -29,9 +29,13 @@ class FiltersHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         print funct
         print args
         if funct in ["filterData", "wiki.filterData"]:
-            if self.path.lower() == "/markdown/":
+            # users SHOULD put a slash at the end,
+            # server MUST accept it if it doesn't
+            if self.path.endswith("/"):
+                self.path = self.path[:-1]
+            if self.path.lower() == "/markdown":
                 result = self.xmlrpc_markdown(*args)
-            elif self.path.lower() == "/smartypants/":
+            elif self.path.lower() == "/smartypants":
                 result = self.xmlrpc_smartypants(*args)
             else:
                 result = "the path URL tells what filter to use: ex: http://services.taoriver.net:9001/markdown/"
