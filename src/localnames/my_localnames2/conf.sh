@@ -32,6 +32,12 @@ URL_DOMAIN_NAME="127.0.0.1"
 URL_DIRECTORY_BASE="/"
 
 
+# TMP:  Safe directory for temporary data;
+#       "Safe" defined as "nukable, but usable for a few
+#       seconds here and there."
+TMP="/tmp"
+
+
 ###########################################
 #  DO NOT CHANGE anything below this line #
 ###########################################

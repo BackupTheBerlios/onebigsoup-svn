@@ -18,7 +18,7 @@
 #   * relies on "conf.sh"
 #
 #
-# environment variables:
+# optional environment variables:
 #   * MY_LOCALNAMES_CONF_FILE,
 #       - default: "./conf.sh"
 #       - can set to say where to find configuration file
@@ -40,6 +40,8 @@ ERROR_NEEDED_FILE_NOT_FOUND="4"
 ERROR_NO_TARGET="5"
 ERROR_CANNOT_WRITE_IN_TARGET="6"
 ERROR_CANNOT_DELETE_IN_TARGET="7"
+ERROR_CANNOT_WRITE_IN_TMP="8"
+ERROR_CANNOT_DELETE_IN_TMP="9"
 
 
 ########################################
@@ -76,6 +78,7 @@ fi
 
 if [[ "$READY_TO_INSTALL" == "0" ]] ; then
     echo ":error: you must edit **conf.sh**, before installing"
+    echo ":error:   - conf.sh: $CONF_FILE"
     exit $ERROR_UNCONFIGURED
 fi
 
@@ -91,6 +94,7 @@ do
   # if the file doesn't exist, quit
   if [[ ! -e $FILENAME ]] ; then
       echo ":error: $FILENAME not found"
+      echo ":error:   - conf.sh: $CONF_FILE"
       exit $ERROR_NEEDED_FILE_NOT_FOUND
   fi
 done
@@ -99,6 +103,7 @@ done
 
 if [[ ! -d "$TARGET" ]] ; then
     echo ":error: $TARGET directory does not exist"
+    echo ":error:   - conf.sh: $CONF_FILE"
     exit $ERROR_NO_TARGET
 fi
 
@@ -108,6 +113,7 @@ touch "$TARGET/testing-write-access"
 
 if [[ "$?" -ne "0" ]] ; then
     echo ":error: bash process does not have write permissions to $TARGET directory"
+    echo ":error:   - conf.sh: $CONF_FILE"
     rm -f "$TARGET/testing-write-access"
     exit $ERROR_CANNOT_WRITE_IN_TARGET
 fi
@@ -118,6 +124,28 @@ rm -f "$TARGET/testing-write-access"
 
 if [[ "$?" -ne "0" ]] ; then
     echo ":error: bash process does not have delete permissions to $TARGET directory"
+    echo ":error:   - conf.sh: $CONF_FILE"
+    exit $ERROR_CANNOT_DELETE_IN_TARGET
+fi
+
+# do we write access to the tmp directory?
+
+touch "$TMP/testing-write-access"
+
+if [[ "$?" -ne "0" ]] ; then
+    echo ":error: bash process does not have write permissions to TMP $TMP directory"
+    echo ":error:   - conf.sh: $CONF_FILE"
+    rm -f "$TARGET/testing-write-access"
+    exit $ERROR_CANNOT_WRITE_IN_TARGET
+fi
+
+# do we have delete access to the tmp directory?
+
+rm -f "$TMP/testing-write-access"
+
+if [[ "$?" -ne "0" ]] ; then
+    echo ":error: bash process does not have delete permissions to TMP $TMP directory"
+    echo ":error:   - conf.sh: $CONF_FILE"
     exit $ERROR_CANNOT_DELETE_IN_TARGET
 fi
 
