@@ -45,10 +45,12 @@
 	</table>
       </form>
 
-      <h4>Names:</h4>
+      <h4>Change / Delete Names:</h4>
       <form method="post" action="index.cgi">
+      <p><input type="submit" value="Submit Changes"/></p>
         <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
           <tbody>
+
             <tr>
               <th style="text-align: center;">delete<br>
               </th>
@@ -59,19 +61,17 @@
               <th>URL<br>
               </th>
             </tr>
+
+#for $X in $NAMES
             <tr>
-              <td style="text-align: center;"><input name="del0" value="del0" type="checkbox"> </td>
-              <td align="undefined" valign="undefined"><input size="6" name="order0" value="0"><br>
-              </td>
-              <td align="undefined" valign="undefined"><input size="25" name="name0"> </td>
-              <td align="undefined" valign="undefined"><input size="50" value="http://" name="url0"> </td>
+              <td style="text-align: center;"> <input name="DEL$X.INDEX" type="checkbox"/> </td>
+              <td> <input size="6" name="ORDER$X.INDEX" value="$X.INDEX"/> </td>
+              <td> <input size="25" name="NAME$X.INDEX" value="$X.NAME"/> </td>
+              <td> <input size="50" name="URL$X.INDEX" value="$X.URL"/> </td>
             </tr>
-            <tr>
-              <td style="text-align: center;" valign="undefined"><input name="del1" value="del1" type="checkbox"> </td>
-              <td align="undefined" valign="undefined"><input size="6" name="order1" value="1"> </td>
-              <td align="undefined" valign="undefined"><input size="25" name="name1"> </td>
-              <td align="undefined" valign="undefined"><input size="50" value="http://" name="url1"> </td>
-            </tr>
+#end for
+
           </tbody>
         </table>
+      <p><input type="submit" value="Submit Changes"/></p>
       </form>

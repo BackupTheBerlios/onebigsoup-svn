@@ -24,6 +24,20 @@ def response():
     register_new_names()
 
     code_info.inform_template(t)
+
+    name_of_space = code_info.space()
+    space_file=code_old.hub.namespace_files.get_space( name_of_space )
+    names_in_order=space_file.get_names_in_order()
+
+    t.NAMES=[]
+    for (index, kv) in enumerate( names_in_order ):
+        (name,url) = kv
+        t.NAMES.append( { "INDEX": index,
+                          "NAME": name,
+                          "URL": url, } )
+
     return str(t)
+#    return repr( space_file )
+
 
 
