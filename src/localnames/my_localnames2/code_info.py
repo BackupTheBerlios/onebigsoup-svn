@@ -4,6 +4,7 @@ PAGE_FRONT = "front"
 PAGE_EDITSPACES = "editspaces"
 PAGE_EDITNAMES = "editnames"
 PAGE_EDITOPTS = "editopts"
+PAGE_DESCRIPTION = "desc"
 
 SPACE_KEY = "space"
 # key: name of the user's space to work with
@@ -16,7 +17,7 @@ def query_string():
 
 def query_dict():
     import os, cgi
-    _dict = cgi.parse_qs( os.environ.get( "QUERY_STRING", "" ) )
+    _dict = cgi.parse_qs( query_string() )
     for (k,v) in _dict.items():
         if type(v) == type([]) and len(v)==1:
             _dict[k]=v[0]

@@ -18,6 +18,19 @@ import xmlrpclib
 import time
 
 
+def edit_key( space_name ):
+    import code_info
+    return "index.cgi?%s=%s&%s=%s" % ( code_info.PAGE_KEY, code_info.PAGE_EDITNAMES,
+                                       code_info.SPACE_KEY, space_name )
+
+def description_key( space_name ):
+    import code_info
+    return "index.cgi?%s=%s&%s=%s" % ( code_info.PAGE_KEY, code_info.PAGE_DESCRIPTION,
+                                       code_info.SPACE_KEY, space_name )
+
+def uli_xmlrpc( url, line ):
+    return xmlrpclib.ServerProxy( url ).uli( line )
+
 
 class PickleData:
     def __init__( s, hub, filename ):
