@@ -22,7 +22,7 @@ import localnames,time,socket
 
 
 HOST_NAME    = "services.taoriver.net"
-PORT_NUMBER = 9090
+PORT_NUMBER = 9089
 
 PASSWORD    = "password" # client password for receiving ding-ding events
 
@@ -74,13 +74,16 @@ class Server:
             return "Set namespace to: %s\n" % s.uli_ns
 
         elif cmd == "DUMP-CACHE":
-            url = rest[0]
+            if len(rest) > 0:
+                url = rest[0]
+            else:
+                url = s.uli_ns
             if not ULI_ALLOW_DUMP:
-                return "Dumping cache by ULI has been turned off."
+                return "dumping cache prohibited (by ULI)"
             if not s.store.namespaces.has_key( url ):
                 return "%s wasn't cached." % url
             del s.store.namespaces[ url ]
-            return "Cache dumped for namespace by URL %s" % url
+            return "dumped %s" % url
 
         elif cmd == "LIST-CACHE":
             return " ".join( s.store.namespaces.keys() ) + "\n"
