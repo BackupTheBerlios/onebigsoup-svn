@@ -37,7 +37,7 @@ This web server exists only for <a href="http://onebigsoup.wiki.taoriver.net/moi
 </p>
 
 <p>
-Please communicate with the wiki by HTTP-POST-ULI.
+Please communicate with this by HTTP-POST-ULI.
 </p>
 </body></html>
 """
