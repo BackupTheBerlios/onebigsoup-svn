@@ -87,7 +87,7 @@ def as_text( logs ):
         print timestamp, str(type(timestamp))
         l.append( timestamp + " " + log.get("TransparencyText",
                                             "(no self-description)")+"\n" )
-    return "".join(l)
+    return "".join(l).encode("UTF-8","replace")
 
 def as_raw( logs ):
     """
@@ -96,7 +96,7 @@ def as_raw( logs ):
     l=[]
     for log in logs:
         l.append( pprint.pformat( log )+"\n" )
-    return "".join(l)
+    return "".join(l).encode( "UTF-8", "replace" )
 
 
 
@@ -121,7 +121,7 @@ def as_rss( logs, title, link, description, language="en-us" ):
         l.append( "</item>\n" )
     l.append( "</channel>\n" )
     l.append( "</rss>\n" )
-    return "".join( l )
+    return "".join( l ).encode( "UTF-8", "replace" )
 
 
 def row_in_html( row ):
@@ -207,7 +207,7 @@ def as_html(logs):
             tables.add_row( [log["TransparencyText"]], None )
         else:
             tables.add_row( ["(no self-description)"], None )
-    return tables.as_html()
+    return tables.as_html().encode( "UTF-8", "replace" )
 
 def as_html_with_day_display(logs):
     tables = MultiTableWriter()
@@ -239,4 +239,4 @@ def as_html_with_day_display(logs):
             escaped_headers.append( "data" )
             row_data.append( "(no self-description)" )
         tables.add_row( row_data, escaped_headers )
-    return tables.as_html()
+    return tables.as_html().encode( "UTF-8", "replace" )
