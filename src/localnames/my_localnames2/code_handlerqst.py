@@ -20,7 +20,7 @@ elif (code_info.page() == code_info.PAGE_FRONT) or (code_info.blank_request()):
     import cmp_frontpage
     print text_html()
     print cmp_frontpage.response()
-elif code_info.page() == code_info.PAGE_EDITNAMES:
+elif code_info.page() in [code_info.PAGE_EDITNAMES, code_info.PAGE_EDITSPACES]:
     import cmp_editframe
     print text_html()
     print cmp_editframe.response()

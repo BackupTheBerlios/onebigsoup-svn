@@ -65,10 +65,13 @@ def inform_template( t ):
 
 
 # control code - may want to move into code_old
-def add_new_names( space, names, url ):
+def add_new_names( space, names, url, LN_or_NS="LN" ):
     import code_old
     nsf = code_old.hub.namespace_files.get_space( space )
-    nsf.add_names( names, url )
+    if LN_or_NS == "LN":
+        nsf.add_names( names, url )
+    elif LN_or_NS == "NS":
+        nsf.add_namespaces( names, url )
     code_old.hub.event_namesadded( space, names, url )
     nsf.save()
 

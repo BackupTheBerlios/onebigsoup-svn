@@ -161,9 +161,9 @@ class NameSpaceFile:
         file.seek(0)
         return file.read()
 
-    def replace_names(s, in_order, to_urls ):
-        s.data["LN-list"] = in_order
-        s.data["LN"] = to_urls
+    def replace_names(s, in_order, to_urls, LN_or_NS="LN" ):
+        s.data[LN_or_NS+"-list"] = in_order
+        s.data[LN_or_NS] = to_urls
 
     def get_names(s):
         return s.data["LN"]

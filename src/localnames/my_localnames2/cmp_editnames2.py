@@ -46,6 +46,7 @@ def get_order_and_bindings():
 def register_changes_deletes_reorders():
     (in_order,to_urls) = get_order_and_bindings()
     space_file.replace_names( in_order, to_urls )
+    space_file.save()
 
 def response():
     register_new_names()
@@ -65,7 +66,7 @@ def response():
     t.NUM_ENTRIES = len( t.NAMES )
 
     return str(t)
-#    return repr( space_file )
+
 
 
 
