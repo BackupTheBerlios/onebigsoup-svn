@@ -23,6 +23,8 @@ import BaseHTTPServer
 import sys
 import cgi
 import pprint
+import xmlrpclib
+import xml.parsers.expat
 
 # In the event get_func is not defined,
 # (that is, this has no ULI definition,)
@@ -112,16 +114,25 @@ class UliHttpHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
         print "content-length", clen
         print "---- CONTENT ------"
         print body
+        try:
+            call_data = xmlrpclib.loads( body )
+        except xml.parsers.expat.ExpatError:
+            call_data = None
+        
         print "---- DECODED ------"
         d = cgi.parse_qs( body )
         pprint.pprint(d)
         print "--- ULI DECODED ---"
-        try:
-            uli_string = d.get("ULI",d.get("uli",d.get("Uli","(NO ULI PARAMETER!)")))[0]
-        except KeyError:
-            uli_string = "(NO ULI PARAMETER - can't figure out how to decode input)"
-        print ">>>", uli_string
+        uli_string = d.get("ULI",d.get("uli",d.get("Uli",[None,])))[0]
+        print ">>>", repr(uli_string)
         print "-------------------"
+
+        if uli_string == None and call_data != None:
+            (args, funct) = call_data
+            if funct.upper()=="ULI":
+                uli_string = args[0]
+        
+        print uli_string
         
         msg = None
 
@@ -138,7 +149,12 @@ class UliHttpHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
             #   the basic response didn't kick in
             msg = THERE_IS_NO_ULI % s.server.display_data
 
-        s.wfile.write( msg )
+        if call_data == None:
+            s.wfile.write( msg )
+        else:
+            print xmlrpclib.dumps( (msg,) )
+            s.wfile.write( xmlrpclib.dumps( (msg,) ))
+        
 
 class UliHttpServer( BaseHTTPServer.HTTPServer ):
     def __init__( s, server_addr,
