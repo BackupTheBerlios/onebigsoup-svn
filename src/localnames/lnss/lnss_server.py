@@ -97,7 +97,7 @@ class Server:
 		f = open(WEB_DIR + email + "-" + namespace_name, 'w')
 		f.write("X VERSION 1.1\n")
 		for entry in s.userlist[email][namespace_name]:
-			f.write(entry[0] + " " + entry[1]  + " " + entry[2] + "\n")
+			f.write(entry[0] + " \"" + entry[1]  + "\" \"" + entry[2] + "\"\n")
 				
 		f.close()
 
@@ -280,7 +280,7 @@ class Server:
 				f = open(WEB_DIR + email + "-" + namespace_name, 'w')
 				f.write("X VERSION 1.1\n")
 				for entry in s.userlist[email][namespace_name]:
-					f.write(entry[0] + " " + entry[1]  + " " + entry[2] + "\n")
+					f.write(entry[0] + " \"" + entry[1]  + "\" \"" + entry[2] + "\"\n")
 				f.close()
 				#s.save_namespace(s, email, namespace_name)
 				s._savedb()
