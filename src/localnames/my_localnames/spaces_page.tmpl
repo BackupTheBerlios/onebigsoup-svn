@@ -1,0 +1,26 @@
+<html>
+
+<head>
+<title>My Local Names</title>
+</head>
+
+<body>
+<center><h1>My Local Names</h1></center>
+
+<center>
+<table><tr>
+<td><a href="$new_page">new</a></td>
+<td><a href="$activity_page">activity</a></td>
+<td><b>spaces</b></td>
+</tr></table>
+</center>
+
+<center><table>
+#for $data in $space_data
+<tr><td><a href="$data.url">$data.title</a></td></tr>
+#end for
+</table></center>
+
+</body>
+
+</html>

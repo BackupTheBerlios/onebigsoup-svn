@@ -1,0 +1,69 @@
+
+
+
+<html>
+
+<head>
+<title>My Local Names</title>
+</head>
+
+<body>
+<center><h1>My Local Names</h1></center>
+
+<center>
+<table><tr>
+<td><a href="$new_page">new</a></td>
+<td><a href="$activity_page">activity</a></td>
+<td><a href="$spaces_page">spaces</a></td>
+</tr></table>
+
+<table><tr>
+<td><b>$space_name:</b></td>
+<td><a href="$edit_page">edit</a></td>
+<td><b>protect</b></td>
+<td><a href="$import_page">import</a></td>
+<td><a href="$description_page">description</a></td>
+</tr></table>
+</center>
+
+#if $debug
+$debug
+#end if
+
+<form method="post" action="$protect_page">
+<center>
+<table>
+#if $has_password
+<tr><td>Old password:</td><td><input type="password" name="password" size=40/></td></tr>
+#end if
+<tr><td>New password:</td><td><input type="password" name="password1" size=40/></td></tr>
+<tr><td>Repeat:</td><td><input type="password" name="password2" size=40/></td></tr>
+#if $has_password
+<tr><td></td><td><button type="submit" name="action" value="Submit">Change Password</button></td></tr>
+#else
+<tr><td></td><td><button type="submit" name="action" value="Submit">Set Password</button></td></tr>
+#end if
+</table>
+</center>
+</form>
+
+#if $processing
+<center><p><b>
+#if $passed
+#if $password_match
+Password set!
+#else
+Sorry, the two fields for the new password did not match.
+#end if
+#else
+Incorrect Password.
+#end if
+</b></p></center>
+#end if
+
+
+</body>
+
+</html>
+
+

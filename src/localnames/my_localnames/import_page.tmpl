@@ -1,0 +1,64 @@
+
+
+
+<html>
+
+<head>
+<title>My Local Names</title>
+</head>
+
+<body>
+<center><h1>My Local Names</h1></center>
+
+<center>
+<table><tr>
+<td><a href="$new_page">new</a></td>
+<td><a href="$activity_page">activity</a></td>
+<td><a href="$spaces_page">spaces</a></td>
+</tr></table>
+
+<table><tr>
+<td><b>$space_name:</b></td>
+<td><a href="$edit_page">edit</a></td>
+<td><a href="$protect_page">protect</a></td>
+<td><b>import</b></td>
+<td><a href="$description_page">description</a></td>
+</tr></table>
+</center>
+
+#if $debug
+$debug
+#end if
+
+#if $say_invalid_pw
+<center><p><b>Invalid Password</b></p></center>
+#end if
+
+#if not $processing
+<form method="post" action="$import_page">
+<center>
+<table>
+<tr><td>URL:</td><td><input type="text" name="nameurl" size=40 value="http://"/></td></tr>
+<tr><td>import all names</td><td><input type="checkbox" name="allnames"></td></tr>
+<tr><td>import all namespaces</td><td><input type="checkbox" name="allnamespaces"></td></tr>
+<tr><td>overwrite names I already define</td><td><input type="checkbox" name="overwrite"></td></tr>
+#if $has_password
+<tr><td>password:</td><td><input type="password" name="password" size=40/></td></tr>
+#end if
+<tr><td></td><td><button type="submit" name="action" value="import">Import</button></td></tr>
+</table>
+</center>
+</form>
+#else
+#if not $say_invalid_pw
+<center>
+<p>import complete</p>
+</center>
+#end if
+#end if
+
+</body>
+
+</html>
+
+

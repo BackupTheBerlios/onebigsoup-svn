@@ -1,0 +1,110 @@
+
+
+
+<html>
+
+<head>
+<title>My Local Names</title>
+
+<script>
+function seturl(url, target)
+{
+  var nameurl = document.getElementsByName('nameurl')[0];
+  var namestoaddlist = document.getElementsByName('namestoaddlist')[0];
+  var nameorspace = document.getElementsByName('nameorspace')[0];
+  nameurl.value = url;
+  namestoaddlist.focus();
+  if(target=='name')
+  {
+    nameorspace.selectedIndex = 0;
+  }
+  else if(target=='namespace')
+  {
+    nameorspace.selectedIndex = 1;
+  }
+
+}
+</script>
+
+</head>
+
+<body>
+<center><h1>My Local Names</h1></center>
+
+<center>
+<table><tr>
+<td><a href="$new_page">new</a></td>
+<td><a href="$activity_page">activity</a></td>
+<td><a href="$spaces_page">spaces</a></td>
+</tr></table>
+
+<table><tr>
+<td><b>$space_name:</b></td>
+<td><b>edit</b></td>
+<td><a href="$protect_page">protect</a></td>
+<td><a href="$import_page">import</a></td>
+<td><a href="$description_page">description</a></td>
+</tr></table>
+</center>
+
+#if $debug
+$debug
+#end if
+
+#if $say_invalid_pw
+<center><p><b>Invalid Password</b></p></center>
+#end if
+
+<form method="post" action="$edit_page">
+<center><table>
+<tr><td colspan=2><b>Add/Reset Names</b></td><td></td></tr>
+<tr><td valign="top">Names:</td><td><textarea name="namestoaddlist" rows=3 cols=40></textarea></td></tr>
+<tr><td>URL:</td><td><input type="text" name="nameurl" size=40 value="http://"/></td></tr>
+#if $has_password
+<tr><td>password:</td><td><input type="password" name="password" size=40/></td></tr>
+#end if
+<tr><td></td><td><select name="nameorspace" size="1"><option selected="selected" value="addnames">Local Name</option><option value="addnamespaces">Name Space</option></select>
+<input type="submit" name="action" value="Submit"></input></td></tr>
+</table></center>
+
+
+
+<center><table cellspacing="2">
+
+#if $names
+<tr><td colspan="3"><b>Names</b></td></tr>
+<tr><td>check</td><td>name</td><td>URL</td></tr>
+#for $name in $names
+<tr><td align="center"><input type="checkbox" name="ln-$name.name"></td><td>$name.name</td><td><a href="$name.url">$name.url</a> <button type="button" onClick="seturl('$name.url', 'name')">Use URL</button></td></tr>
+#end for
+<tr><td colspan="2"><input type="submit" name="action" value="Delete"/>
+#if $has_password
+password:</td><td><input type="password" name="password" size=40/>
+#end if
+</td></tr>
+#end if
+
+#if $namespaces
+<tr/>
+<tr/>
+<tr><td colspan="3"><b>Namespaces</b></td></tr>
+<tr><td>check</td><td>namespace</td><td>URL</td></tr>
+#for $namespace in $namespaces
+<tr><td align="center"><input type="checkbox" name="ns-$namespace.name"></td><td>$namespace.name</td><td><a href="$namespace.url">$namespace.url</a> <button type="button" onClick="seturl('$namespace.url', 'namespace')">Use URL</button></td></tr>
+#end for
+<tr><td colspan="2"><input type="submit" name="action" value="Delete"/>
+#if $has_password
+password:</td><td><input type="password" name="password" size=40/>
+#end if
+</td></tr>
+#end if
+
+</table></center>
+</form>
+
+
+</body>
+
+</html>
+
+

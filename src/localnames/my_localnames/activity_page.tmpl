@@ -1,0 +1,27 @@
+<html>
+
+<head>
+<title>My Local Names</title>
+</head>
+
+<body>
+<center><h1>My Local Names</h1></center>
+
+<center>
+<table><tr>
+<td><a href="$new_page">new</a></td>
+<td><b>activity</b></td>
+<td><a href="$spaces_page">spaces</a></td>
+</tr></table>
+</center>
+
+<center><table>
+<tr><td><a href="http://en.wikipedia.org/wiki/Utc">UTC</a></td><td>activity</td></tr>
+#for $log in $logs
+<tr><td>$log.humantime</td><td>$log.msg</td></tr>
+#end for
+</table></center>
+
+</body>
+
+</html>
