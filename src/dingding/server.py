@@ -279,6 +279,9 @@ class Server:
 
         Returns newest to oldest.
         """
+        if not LOGS_PUBLIC:
+            return 0
+        
         to_return = []
 
         try:
@@ -308,6 +311,7 @@ class Server:
             server.serve_forever()
         except KeyboardInterrupt:
             pass
+        server.close() # might work..?
         print time.asctime(), "Event Server Stops - %s:%s" % (s.host_name,
                                                               s.port_number)
 
