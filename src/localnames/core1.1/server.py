@@ -26,7 +26,7 @@ xmlrpc_documentation = '''
 
 filterData_p = '''Replaces marked up text with HTML links.
 
-filterData is an implementation of Les Orchard's
+filterData is an implementation of Les Orchard\'s
 XmlRpcFilteringPipe. It can be called as either
 "filterData", or in the traditional "wiki" namespace
 ("wiki.filterData".)
@@ -120,6 +120,23 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.end_headers()
             return
 
+        if args.get("action") == ["cached"]:
+            draw = []
+            html = args.get("html") != None
+            for url, preferred_name, ttl in self.xmlrpc_cached():
+                if html:
+                    row = u'<tr><td><a href="%s">%s</a></td><td>%d</td></tr>'
+                else:
+                    row = u'%50s | %15s | %d'
+                draw.append(row % (url.ljust(50),
+                                   preferred_name.ljust(15), ttl))
+            self.send_response(200)
+            self.send_header("Content-type", {True:"text/html",
+                                              False:"text/plain"}[html])
+            self.end_headers()
+            self.wfile.write(u'\n'.join(draw))
+            return
+        
         self.send_response(200)
         self.send_header("Content-type", "text/html")
         self.end_headers()
@@ -166,7 +183,7 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def xmlrpc_cached(self):
         results = []
         for url, ns in localnames.store.items():
-            preferred_name = ns["X"].get("PREFERRED-NAME", [None])[0]
+            preferred_name = ns["X"].get("PREFERRED-NAME", ["(none)"])[0]
             ttl = int(ns["TIME"] + localnames.time_to_live - time.time())
             results.append((url, preferred_name, ttl))
         return results
