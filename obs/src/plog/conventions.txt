@@ -1,0 +1,41 @@
+
+|| "InterWikiName" || Preferred inter-wiki name of the wiki. ||
+|| "WikiURL" || URL of the wiki. ||
+|| "PageName" || Name of the page edited on the wiki. ||
+|| "PageURL" || URL of the page on the wiki. ||
+|| "Comment" || Comment attached to change. ||
+|| "time" || Time of post in seconds from the epoch by UTC (aka GMT.) ||
+|| "type" || wikipost ||
+
+|| "URL" || URL of page reading. ||
+|| "time" || Time page read in seconds from the epoch by UTC (aka GMT.) ||
+|| "type" || pageview ||
+
+|| ''log type'' || ''description'' ||
+|| "wikipost" || "Posting to Wiki." ||
+|| "pageview" || "Reading a web page." ||
+
+
+
+wikipost = [
+    ( "InterWikiName", "Preferred inter-wiki name of the wiki.", ),
+    ( "WikiURL",       "URL of the wiki.", ),
+    ( "PageName",      "Name of the page edited on the wiki.", ),
+    ( "PageURL",       "URL of the page on the wiki.", ),
+    ( "Comment",       "Comment attached to change.", ),
+    ( "time",      "Time of post in seconds from the epoch by UTC (aka GMT.)", ),
+    ( "type",      "wikipost" ),
+    ]
+
+pageview = [
+    ( "URL",       "URL of page reading." ),
+    ( "time",  "Time page read in seconds from the epoch by UTC (aka GMT.)", ),
+    ( "type",  "pageview" ),
+    ]
+
+log_types = [
+    ( "wikipost", wikipost, "Posting to Wiki." ),
+    ( "pageview", pageview, "Reading a web page." ),
+    ]
+
+
