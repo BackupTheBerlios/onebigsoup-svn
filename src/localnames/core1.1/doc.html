@@ -1,0 +1,490 @@
+<h1>Local Names Server Manual</h1>
+
+<ul>
+<li><a href="#panicbutton">Panic Button</a> &#8212; when you need help</li>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#interfaces">Interfaces</a></li>
+<li><a href="#api">API</a></li>
+<ul>
+<li><a href="#browserredirection">Browser Redirection</a></li>
+<li><a href="#localnameslookup">Local Names Lookup</a></li>
+<li><a href="#renderingaggregation">Rendering &amp; Aggregation</a></li>
+<li><a href="#cacherecords">Cache Records</a></li>
+<li><a href="#dumpthecache">Dump the Cache</a></li>
+<li><a href="#validate">Validate</a></li>
+<li><a href="#indexofnames">Index of Names</a></li>
+<li><a href="#filtertext">Filter Text</a></li>
+</ul>
+</ul>
+
+
+<h2><a name="panicbutton">PANIC BUTTON</a></h2>
+
+<p><strong>CALL LION AT 206.427.2545 IF YOU HAVE THE SLIGHTEST BIT OF TROUBLE.</strong></p>
+
+<p>If it&#8217;s the year 2006 or greater, don&#8217;t bother. e-mail instead. But
+2005? Definitely call me.</p>
+
+<p><strong>CALL LION AT 206.427.2545 IF YOU HAVE THE SLIGHTEST BIT OF TROUBLE.</strong></p>
+
+<p>Believe me: It&#8217;s no bother. What&#8217;s <strong>far more</strong> bothersome to me is
+the idea that someone, somewhere, is having trouble getting their
+Local Names server started.</p>
+
+<p><strong>CALL LION AT 206.427.2545 IF YOU HAVE THE SLIGHTEST BIT OF TROUBLE.</strong></p>
+
+<p>To make this a little more attractive, I promise a free card,
+AT LEAST, and perhaps roses (for females) or a free video game
+(for males) should you call me, and I help you set up your Local Names
+server.</p>
+
+<p><strong>CALL LION AT 206.427.2545 IF YOU HAVE THE SLIGHTEST BIT OF TROUBLE.</strong></p>
+
+<p>Call me. I mean it.</p>
+
+<p><strong>CALL LION AT 206.427.2545 IF YOU HAVE THE SLIGHTEST BIT OF TROUBLE.</strong></p>
+
+<p>Dude, this is the 2000's.</p>
+
+<h2><a name="installation">Installation</a></h2>
+
+<p>You need:</p>
+
+<ul>
+<li>python2.3</li>
+<li>server.py &#8212;  HTTP &amp; XML-RPC interface to the world</li>
+<li>localnames.py &#8212;  internal logic</li>
+<li>lnparser.py &#8212;  parsing</li>
+</ul>
+
+<p>At the bottom of server.py, change &#8220;localhost&#8221; to the host name you&#8217;ll
+be running under, and change &#8220;9001&#8221; to the port number you&#8217;ll be
+running under.</p>
+
+<p>Then, just type &#8220;python2.3 server.py&#8221;, and it should be running!</p>
+
+<p>Test it by hitting it with a web server. You should get a brief note
+telling you that a Local Names server is running.</p>
+
+<p>Try resolving some lookups. Don&#8217;t worry, if it takes a few moments for
+it to start loading in it&#8217;s first namespaces, that&#8217;s perfectly normal.</p>
+
+<h2><a name="interfaces">Interfaces</a></h2>
+
+<p>The server supports two interfaces:</p>
+
+<ul>
+<li><a href="http://www.ietf.org/rfc/rfc2616.txt">HTTP</a> (<a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.3">GET</a> &amp; <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.5">POST</a>)</li>
+<li><a href="http://www.xml-rpc.com/">XML-RPC</a></li>
+</ul>
+
+<h3>HTTP Interface Documentation</h3>
+
+<p>Each <a href="http://www.ietf.org/rfc/rfc2616.txt">HTTP</a> interface is documented something like so</p>
+
+<pre><code>  ?action=foo
+[ &amp;namespace=(url) ]+
+  &amp;lookup=(lookup term)
+  &amp;separator=(character)
+</code></pre>
+
+<p>This means that if the server was served at &#8220;http://foo.bar&#8221;, then the
+following URL would meet this interface:</p>
+
+<pre><code>http://foo.bar/?action=foo&amp;namespace=http://bar.baz/
+               &amp;lookup=overthere|robots are neat
+               &amp;separator=|
+</code></pre>
+
+<p>Key:</p>
+
+<pre><code>[   ...   ]    optional, one allowed
+[   ...   ]*   optional, many allowed
+[   ...   ]+   1 required, many allowed
+   (foo)       variable, put your data here
+</code></pre>
+
+<h3>XML-RPC Interface Documentation</h3>
+
+<p>The same thing might be documented as follows, for the <a href="http://www.xml-rpc.com/">XML-RPC</a>
+interface:</p>
+
+<pre><code>foo( "url" or ["url", ...],
+     "lookup string",
+     "separator" )
+</code></pre>
+
+<p>&#8220;foo&#8221; here is the name of the XML-RPC method.</p>
+
+<p>The first argument can either be a string url (&#8220;url&#8221;), or it can be a
+list of string urls ([&#8220;url&#8221;, &#8230;]).</p>
+
+<p>The second argument is a string, and the third argument is a string.</p>
+
+<p>Do try and follow along.</p>
+
+<p>If you have questions, e-mail <a href="http://www.speakeasy.org/~lion/">Lion</a> (lion at speakeasy.org),
+or call him on his cell phone (206.427.2545).</p>
+
+<p>(Feel free to call me on my cell phone, if the year is 2005.
+ I don&#8217;t care what time it is, just call me, dammit!)</p>
+
+<h2><a name="api">API</a></h2>
+
+<h3><a name="browserredirection">Browser Redirection</a></h3>
+
+<p>Redirect the web browser with a 301 Location response.</p>
+
+<p>GET:</p>
+
+<pre><code>  ?action=redirect
+  &amp;namespace=http://...
+  &amp;lookup=(lookup term)
+[ &amp;separator=(character) ]
+</code></pre>
+
+<p>XML-RPC:</p>
+
+<pre><code>  (none)
+</code></pre>
+
+<p>The separator tells how to cut the lookup into <a href="http://ln.taoriver.net/glossary.html#ns">NS</a> or <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/regex/Pattern.html">PATTERN</a>
+lookups, and the final <a href="http://ln.taoriver.net/glossary.html#ln">LN</a> lookup.</p>
+
+<p>Lookups for redirection are performed with the &#8220;loose&#8221; and
+&#8220;check-neighboring-spaces&#8221; flags set. (See Local Names Lookup
+description for more on lookup flags.)</p>
+
+<p>examples:</p>
+
+<pre><code>http://services.taoriver.net:9090/
+    ?action=redirect
+    &amp;namespace=http://taoriver.net/data/namespaces/theprophet/
+    &amp;lookup=reason
+
+http://services.taoriver.net:9090/
+    ?action=redirect
+    &amp;namespace=http://ln.taoriver.net/localnames.txt
+    &amp;lookup=S/WP/Kahlil_Gibran
+    &amp;separator=/
+</code></pre>
+
+<h3><a name="localnameslookup">Local Names Lookup</a></h3>
+
+<p>Lookup the URL that 1 or more local names are bound to.</p>
+
+<p>GET:</p>
+
+<pre><code>  ?action=lookup
+  &amp;namespace=http://...
+[ &amp;lookup=(lookup term) ]+
+[ &amp;seperator=(character) ]
+</code></pre>
+
+<p>XML-RPC:</p>
+
+<pre><code>lookup( "name" or ["path", "to", "name"]
+        or [ ["path", "to", "name"],... ],
+        "url",
+        ["list", "of", "flags"] )
+</code></pre>
+
+<p>Note: There&#8217;s a hole in the <a href="http://www.ietf.org/rfc/rfc2616.txt">HTTP</a> API; You can only specify lookup
+flags in the <a href="http://www.xml-rpc.com/">XML-RPC</a> interface, so far.</p>
+
+<p>The GET interface returns one line per lookup.</p>
+
+<p>The XML-RPC interface returns either a string or a list, to match
+whether you requested a single, or multiple, names.</p>
+
+<p>Upon failure, the XML-RPC interface will return a 4-tuple:</p>
+
+<ul>
+<li>(list) successfully resolved URLS &amp; NS names</li>
+<li>(string) &#8220;NS&#8221;, &#8220;LN&#8221;, or &#8220;LOAD&#8221; - indicating the failure point</li>
+<li>(string) name of failed <a href="http://ln.taoriver.net/glossary.html#ns">NS lookup</a> or <a href="http://ln.taoriver.net/glossary.html#ln">LN lookup failure</a>, or <a href="http://ln.taoriver.net/glossary.html#hop">URL of failed LOAD</a></li>
+<li>(string) human readable error string</li>
+</ul>
+
+<p>The HTTP interface only gives you the human readable error string.</p>
+
+<p>Flags:</p>
+
+<ul>
+<li>&#8220;loose&#8221;: ignore case, punctuation, and white space</li>
+<li>&#8220;check-neighboring-spaces&#8221;: if the LN is not found in the last NS, check all neighboring namespaces as well.</li>
+<li>&#8220;reverse&#8221;: reverse lookup (URL, not name, at end of path)</li>
+<li>&#8220;NS&#8221;: namespace-lookup; (NS, not LN, at end of path)</li>
+<li>&#8220;suppress-final&#8221;: don&#8217;t use &#8220;X <a href="http://ln.taoriver.net/glossary.html#final">FINAL</a>&#8221;</li>
+</ul>
+
+<p>examples:</p>
+
+<pre><code>http://services.taoriver.net:9090/
+  ?action=lookup
+  &amp;namespace=http://taoriver.net/tmp/gmail.txt
+  &amp;lookup=robotic nation
+  &amp;lookup=Marshall Brain
+  &amp;lookup=S/WP/robot
+  &amp;lookup=vinge
+  &amp;separator=/
+
+lookup( [ ["robotic nation"],
+          ["Marshall Brain"],
+          ["S", "WP", "robot"] ],
+        "http://taoriver.net/tmp/gmail.txt",
+        ["loose", "check-neighboring-spaces"] )
+</code></pre>
+
+<h3><a name="renderingaggregation">Rendering &amp; Aggregation</a></h3>
+
+<p>Render a namespace in a different form, and/or aggregate namespaces
+together.</p>
+
+<p>GET:</p>
+
+<pre><code>  ?action=render
+[ &amp;namespace=(url) ]+
+[ &amp;format=(format) ]
+</code></pre>
+
+<p>XML-RPC:</p>
+
+<pre><code>render( "format",
+        "url" or ["url", ...] )
+</code></pre>
+
+<p>If you list multiple namespaces, that means &#8220;aggregate these
+namespaces.&#8221; They are returned in the chosen format.</p>
+
+<p>Formats:</p>
+
+<ul>
+<li>&#8220;version1.1&#8221; &#8212;  cleaned up <a href="http://ln.taoriver.net/spec-1.1.html">Local Names v1.1</a> text</li>
+<li>&#8220;original&#8221; &#8212;  as cached, by the server</li>
+<li>&#8220;XML-RPC&#8221; &#8212;  as a dictionary with keys LN, NS, X, and PATTERN.</li>
+<li>&#8220;XML-RPC-text&#8221; &#8212;  the raw text of such an XML-RPC response</li>
+<li>&#8220;python&#8221; &#8212;  extremely useful for understanding the server&#8217;sthoughts</li>
+</ul>
+
+<p>In the HTTP interface, &#8220;XML-RPC&#8221; is the same as &#8220;XML-RPC-text&#8221;.</p>
+
+<p>examples:</p>
+
+<pre><code>http://services.taoriver.net:9090/
+    ?action=render
+    &amp;format=version1.1
+    &amp;namespace=http://taoriver.net/tmp/gmail.txt
+
+render( "version1.1",
+        "http://taoriver.net/tmp/gmail.txt" )
+
+
+http://services.taoriver.net:9090/
+    ?action=render
+    &amp;format=version1.1
+    &amp;namespace=http://taoriver.net/tmp/gmail.txt
+    &amp;namespace=http://www.ludism.org/~rwhe/localnames.txt
+    &amp;namespace=http://greg.vario.us/ln/description
+
+render( "XML-RPC",
+        [ "http://taoriver.net/tmp/gmail.txt",
+          "http://www.ludism.org/~rwhe/localnames.txt",
+          "http://greg.vario.us/ln/description" ] )
+</code></pre>
+
+<h3><a name="cacherecords">Cache Records</a></h3>
+
+<p>What&#8217;s cached? What people been looking at? Let&#8217;s see!</p>
+
+<p>GET:</p>
+
+<pre><code>  ?action=cached
+</code></pre>
+
+<p>XML-RPC:</p>
+
+<pre><code>  cached()
+</code></pre>
+
+<p>GET returns a neat visual 3-column layout. The first column is the
+URL, the second column is the friendly X PREFERRED-NAME for the
+namespace, and the third column is the number of seconds until the
+cache entry runs out.</p>
+
+<p>The XML-RPC interface returns a list of lists. The sublists feature
+the same information, just in a nice pre-parsed form.</p>
+
+<p>It&#8217;s near impossible to parse the GET version; if you really need the
+info, use the XML-RPC form.</p>
+
+<p>examples:</p>
+
+<pre><code>http://services.taoriver.net:9090/?action=cached
+
+cached()
+</code></pre>
+
+<h3><a name="dumpthecache">Dump the Cache</a></h3>
+
+<p>Dump a namespace cache. Call this when you change your namespace, and
+want to try it out.</p>
+
+<p>GET:</p>
+
+<pre><code>  ?action=dump-cache
+[ &amp;namespace=(url) ]+
+</code></pre>
+
+<p>XML-RPC:</p>
+
+<pre><code>  dump_cache( "url" )
+</code></pre>
+
+<p>For some strange reason, you can only dump one cache entry at a time
+by the XML-RPC API. Oh well! Gotta ship this thing <em>some</em> time.</p>
+
+<p>examples:</p>
+
+<pre><code>http://services.taoriver.net:9090/
+  ?action=dump-cache
+  &amp;namespace=http://foo.bar/baz.txt
+  &amp;namespace=http://foo.bar/boz.txt
+
+dump_cache( "http://taoriver.net/tmp/gmail.txt" )
+</code></pre>
+
+<h3><a name="validate">Validate</a></h3>
+
+<p>Return a list of errors in a <a href="http://ln.taoriver.net/glossary.html#namespacedescription">namespace description</a>.</p>
+
+<p>GET:</p>
+
+<pre><code>  ?action=validate
+  &amp;namespace=(url)
+</code></pre>
+
+<p>XML-RPC:</p>
+
+<pre><code>  validate( "url" )
+</code></pre>
+
+<p>GET returns either &#8220;No Errors. OK!&#8221; on one line, or the errors, one
+per line. Each line is prefixed with the line number the error was
+found on.</p>
+
+<p>XML-RPC is similar: a list of errors, each error represented by a
+2-tuple: (line#, &#8220;error message.&#8221;)</p>
+
+<p>examples:</p>
+
+<pre><code>http://services.taoriver.net:9090/
+    ?action=validate
+    &amp;namespace=http://taoriver.net/tmp/gmail.txt
+
+validate( "http://taoriver.net/tmp/gmail.txt" )
+</code></pre>
+
+<h3><a name="indexofnames">Index Of Names</a></h3>
+
+<p>Return a list of JUST the names, or JUST the namespaces,&#8230;</p>
+
+<p>GET:</p>
+
+<pre><code>  ?action=index
+[ &amp;namespace=(url) ]+
+[ &amp;record-type=(LN,NS,X, or PATTERN) ]
+</code></pre>
+
+<p>XML-RPC:</p>
+
+<pre><code>  index( "url" or [ "url", ... ],
+         record_type )
+</code></pre>
+
+<p>In the GET interface, if you don&#8217;t specify a record-type, it&#8217;s assumed
+to be &#8220;LN.&#8221; In the XML-RPC interface, you MUST specify a record-type.</p>
+
+<p>In both interfaces, you can specify multiple namespaces. They will be
+considered in order.</p>
+
+<p>The XML-RPC interface returns a list of matching keys; The GET
+interface returns them one per line.</p>
+
+<p>examples:</p>
+
+<pre><code>http://services.taoriver.net:9090/
+    ?action=index
+    &amp;namespace=http://ln.taoriver.net/servicenames.txt
+    &amp;record-type=PATTERN
+
+index( "http://ln.taoriver.net/servicenames.txt", "PATTERN" )
+</code></pre>
+
+<h3><a name="filtertext">Filter Text</a></h3>
+
+<p>Text filtering is very useful, but somewhat complicated.</p>
+
+<h4>HTTP POST: HttpPipe</h4>
+
+<p>There is no <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.3">GET</a> interface. Instead, there is a <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.5">POST</a> interface.
+In particular, it is the &#8220;HttpPipe&#8221; interface, recently minted.</p>
+
+<p>POST to the URL of the server. Form encode your data, in standard
+application/x-www-form-urlencoded format. UTF-8 charset your
+characters. You must define two FORM keys: &#8220;namespace&#8221;, and &#8220;body&#8221;.
+The text to be filtered goes in &#8220;body&#8221;, the namespace to use goes in
+&#8220;namespace&#8221;.</p>
+
+<p>The following website is sufficient in most web browsers:</p>
+
+<pre><code>&lt;html&gt;&lt;head&gt;&lt;title&gt;HttpPipe&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;form action="http://services.taoriver.net:9090/" method="post" accept-charset="utf-8"&gt;
+  &lt;p&gt;&lt;textarea name="body" rows="5" cols="80"&gt;[ [ Local Names ] ] are fun!&lt;/textarea&gt;&lt;/p&gt;
+  &lt;p&gt;Namespace: &lt;input type="text" name="namespace" size="30" value="http://taoriver.net/tmp/gmail.txt" /&gt;&lt;/p&gt;
+  &lt;p&gt;&lt;input type="submit"/&gt;&lt;/p&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>Most languages allow you to do the same thing.</p>
+
+<h4>XML-RPC: XmlRpcFilteringPipe</h4>
+
+<p>The XML-RPC interface instead uses the <a href="http://www.decafbad.com/twiki/bin/view/Main/XmlRpcFilteringPipe">XmlRpcFilteringPipe</a>
+interface.</p>
+
+<p>See <a href="http://www.decafbad.com/twiki/bin/view/Main/XmlRpcFilteringPipe">the documentation</a> on <a href="http://www.decafbad.com/">Les Orchards</a> site for more information.</p>
+
+<h4>Text Format</h4>
+
+<p>Links and images are denoted by [[foo]].</p>
+
+<p>Links are A HREF&#8217;ed, images are IMG SRC&#8217;ed.</p>
+
+<p>Examples:
+<pre><code>
+    [[some name]]
+    [[NS link][NS link][LN name]]
+    [[some name] some other text covering it]
+    [[NS link][LN name]some other text]
+    [[:)]]
+</code></pre>
+
+<p>Softlinks have the form:</p>
+
+<pre><code>  ((foo)(bar))
+</code></pre>
+
+<p>&#8230;which becomes a link to:</p>
+
+<pre><code>  (SOFTLINK_BASE)?action=redirect&amp;url=(URL)&amp;lookup=foo&amp;lookup=bar
+</code></pre>
+
+<p>Images (.png, .gif, .jpeg, .jpg) are made into
+&lt;IMG SRC=&#8221;http://&#8230;&#8221;/&gt;, unless there is cover text,
+in which case it&#8217;s linked text.  Only applies to
+hard lookups.</p>
+

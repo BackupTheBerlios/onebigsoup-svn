@@ -1,0 +1,456 @@
+
+
+# Local Names Server Manual #
+
+
+## PANIC BUTTON ##
+
+**CALL LION AT 206.427.2545 IF YOU HAVE THE SLIGHTEST BIT OF TROUBLE.**
+
+If it's the year 2006 or greater, don't bother. e-mail instead. But
+2005? Definitely call me.
+
+**CALL LION AT 206.427.2545 IF YOU HAVE THE SLIGHTEST BIT OF TROUBLE.**
+
+Believe me: It's no bother. What's **far more** bothersome to me is
+the idea that someone, somewhere, is having trouble getting their
+Local Names server started.
+
+**CALL LION AT 206.427.2545 IF YOU HAVE THE SLIGHTEST BIT OF TROUBLE.**
+
+To make this a little more attractive, I promise a free card,
+AT LEAST, and perhaps roses (for females) or a free video game
+(for males) should you call me, and I help you set up your Local Names
+server.
+
+**CALL LION AT 206.427.2545 IF YOU HAVE THE SLIGHTEST BIT OF TROUBLE.**
+
+Call me. I mean it.
+
+**CALL LION AT 206.427.2545 IF YOU HAVE THE SLIGHTEST BIT OF TROUBLE.**
+
+Dude, this is the 2000's.
+
+## Installation ##
+
+You need:
+* python2.3
+* server.py --  HTTP & XML-RPC interface to the world
+* localnames.py --  internal logic
+* lnparser.py --  parsing
+
+At the bottom of server.py, change "localhost" to the host name you'll
+be running under, and change "9001" to the port number you'll be
+running under.
+
+Then, just type "python2.3 server.py", and it should be running!
+
+Test it by hitting it with a web server. You should get a brief note
+telling you that a Local Names server is running.
+
+Try resolving some lookups. Don't worry, if it takes a few moments for
+it to start loading in it's first namespaces, that's perfectly normal.
+
+## Interfaces ##
+
+The server supports two interfaces:
+
+* [[HTTP]] ([[GET]] & [[POST]])
+* [[XML-RPC]]
+
+### HTTP Interface Documentation ###
+
+Each [[HTTP]] interface is documented something like so
+
+      ?action=foo
+    [ &namespace=(url) ]+
+      &lookup=(lookup term)
+      &separator=(character)
+
+This means that if the server was served at "http://foo.bar", then the
+following URL would meet this interface:
+
+    http://foo.bar/?action=foo&namespace=http://bar.baz/
+                   &lookup=overthere|robots are neat
+                   &separator=|
+
+Key:
+
+    [   ...   ]    optional, one allowed
+    [   ...   ]*   optional, many allowed
+    [   ...   ]+   1 required, many allowed
+       (foo)       variable, put your data here
+
+
+### XML-RPC Interface Documentation ###
+
+The same thing might be documented as follows, for the [[XML-RPC]]
+interface:
+
+    foo( "url" or ["url", ...],
+         "lookup string",
+         "separator" )
+
+"foo" here is the name of the XML-RPC method.
+
+The first argument can either be a string url ("url"), or it can be a
+list of string urls (["url", ...]).
+
+The second argument is a string, and the third argument is a string.
+
+Do try and follow along.
+
+If you have questions, e-mail [[Lion]] (lion at speakeasy.org),
+or call him on his cell phone (206.427.2545).
+
+(Feel free to call me on my cell phone, if the year is 2005.
+ I don't care what time it is, just call me, dammit!)
+
+
+## API ##
+
+### Browser Redirection ###
+
+Redirect the web browser with a 301 Location response.
+
+GET:
+
+      ?action=redirect
+      &namespace=http://...
+      &lookup=(lookup term)
+    [ &separator=(character) ]
+
+XML-RPC:
+
+      (none)
+
+The separator tells how to cut the lookup into [[NS]] or [[PATTERN]]
+lookups, and the final [[LN]] lookup.
+
+Lookups for redirection are performed with the "loose" and
+"check-neighboring-spaces" flags set. (See Local Names Lookup
+description for more on lookup flags.)
+
+
+examples:
+
+    http://services.taoriver.net:9090/
+        ?action=redirect
+        &namespace=http://taoriver.net/data/namespaces/theprophet/
+        &lookup=reason
+
+    http://services.taoriver.net:9090/
+        ?action=redirect
+        &namespace=http://ln.taoriver.net/localnames.txt
+        &lookup=S/WP/Kahlil_Gibran
+        &separator=/
+
+
+### Local Names Lookup ###
+
+Lookup the URL that 1 or more local names are bound to.
+
+GET:
+
+      ?action=lookup
+      &namespace=http://...
+    [ &lookup=(lookup term) ]+
+    [ &seperator=(character) ]
+
+XML-RPC:
+
+    lookup( "name" or ["path", "to", "name"]
+            or [ ["path", "to", "name"],... ],
+            "url",
+            ["list", "of", "flags"] )
+
+
+Note: There's a hole in the [[HTTP]] API; You can only specify lookup
+flags in the [[XML-RPC]] interface, so far.
+
+The GET interface returns one line per lookup.
+
+The XML-RPC interface returns either a string or a list, to match
+whether you requested a single, or multiple, names.
+
+Upon failure, the XML-RPC interface will return a 4-tuple:
+
+* (list) successfully resolved URLS & NS names
+* (string) "NS", "LN", or "LOAD" - indicating the failure point
+* (string) name of failed [[NS]NS lookup] or [[LN]LN lookup failure], or [[hop]URL of failed LOAD]
+* (string) human readable error string
+
+The HTTP interface only gives you the human readable error string.
+
+Flags:
+
+* "loose": ignore case, punctuation, and white space
+* "check-neighboring-spaces": if the LN is not found in the last NS, check all neighboring namespaces as well.
+* "reverse": reverse lookup (URL, not name, at end of path)
+* "NS": namespace-lookup; (NS, not LN, at end of path)
+* "suppress-final": don't use "X [[FINAL]]"
+
+
+examples:
+
+    http://services.taoriver.net:9090/
+      ?action=lookup
+      &namespace=http://taoriver.net/tmp/gmail.txt
+      &lookup=robotic nation
+      &lookup=Marshall Brain
+      &lookup=S/WP/robot
+      &lookup=vinge
+      &separator=/
+
+    lookup( [ ["robotic nation"],
+              ["Marshall Brain"],
+              ["S", "WP", "robot"] ],
+            "http://taoriver.net/tmp/gmail.txt",
+            ["loose", "check-neighboring-spaces"] )
+
+
+### Rendering & Aggregation ###
+
+Render a namespace in a different form, and/or aggregate namespaces
+together.
+
+
+GET:
+
+      ?action=render
+    [ &namespace=(url) ]+
+    [ &format=(format) ]
+
+XML-RPC:
+
+    render( "format",
+            "url" or ["url", ...] )
+
+If you list multiple namespaces, that means "aggregate these
+namespaces." They are returned in the chosen format.
+
+Formats:
+
+* "version1.1" --  cleaned up [[spec1.1]Local Names v1.1] text
+* "original" --  as cached, by the server
+* "XML-RPC" --  as a dictionary with keys LN, NS, X, and PATTERN.
+* "XML-RPC-text" --  the raw text of such an XML-RPC response
+* "python" --  extremely useful for understanding the server'sthoughts
+
+In the HTTP interface, "XML-RPC" is the same as "XML-RPC-text".
+
+
+examples:
+
+    http://services.taoriver.net:9090/
+        ?action=render
+        &format=version1.1
+        &namespace=http://taoriver.net/tmp/gmail.txt
+
+    render( "version1.1",
+            "http://taoriver.net/tmp/gmail.txt" )
+
+
+    http://services.taoriver.net:9090/
+        ?action=render
+        &format=version1.1
+        &namespace=http://taoriver.net/tmp/gmail.txt
+        &namespace=http://www.ludism.org/~rwhe/localnames.txt
+        &namespace=http://greg.vario.us/ln/description
+
+    render( "XML-RPC",
+            [ "http://taoriver.net/tmp/gmail.txt",
+              "http://www.ludism.org/~rwhe/localnames.txt",
+              "http://greg.vario.us/ln/description" ] )
+
+
+### Cache Records ###
+
+What's cached? What people been looking at? Let's see!
+
+GET:
+
+      ?action=cached
+
+XML-RPC:
+
+      cached()
+
+
+GET returns a neat visual 3-column layout. The first column is the
+URL, the second column is the friendly X PREFERRED-NAME for the
+namespace, and the third column is the number of seconds until the
+cache entry runs out.
+
+The XML-RPC interface returns a list of lists. The sublists feature
+the same information, just in a nice pre-parsed form.
+
+It's near impossible to parse the GET version; if you really need the
+info, use the XML-RPC form.
+
+examples:
+
+    http://services.taoriver.net:9090/?action=cached
+
+    cached()
+
+
+### Dump the Cache ###
+
+Dump a namespace cache. Call this when you change your namespace, and
+want to try it out.
+
+GET:
+
+      ?action=dump-cache
+    [ &namespace=(url) ]+
+
+XML-RPC:
+
+      dump_cache( "url" )
+
+For some strange reason, you can only dump one cache entry at a time
+by the XML-RPC API. Oh well! Gotta ship this thing *some* time.
+
+examples:
+
+    http://services.taoriver.net:9090/
+      ?action=dump-cache
+      &namespace=http://foo.bar/baz.txt
+      &namespace=http://foo.bar/boz.txt
+
+    dump_cache( "http://taoriver.net/tmp/gmail.txt" )
+
+
+### Validate ###
+
+Return a list of errors in a [[namespace description]].
+
+GET:
+
+      ?action=validate
+      &namespace=(url)
+
+XML-RPC:
+
+      validate( "url" )
+
+GET returns either "No Errors. OK!" on one line, or the errors, one
+per line. Each line is prefixed with the line number the error was
+found on.
+
+XML-RPC is similar: a list of errors, each error represented by a
+2-tuple: (line#, "error message.")
+
+
+examples:
+
+    http://services.taoriver.net:9090/
+        ?action=validate
+        &namespace=http://taoriver.net/tmp/gmail.txt
+
+    validate( "http://taoriver.net/tmp/gmail.txt" )
+
+
+### Index Of Names ###
+
+Return a list of JUST the names, or JUST the namespaces,...
+
+GET:
+
+      ?action=index
+    [ &namespace=(url) ]+
+    [ &record-type=(LN,NS,X, or PATTERN) ]
+
+XML-RPC:
+
+      index( "url" or [ "url", ... ],
+             record_type )
+
+In the GET interface, if you don't specify a record-type, it's assumed
+to be "LN." In the XML-RPC interface, you MUST specify a record-type.
+
+In both interfaces, you can specify multiple namespaces. They will be
+considered in order.
+
+The XML-RPC interface returns a list of matching keys; The GET
+interface returns them one per line.
+
+examples:
+
+    http://services.taoriver.net:9090/
+        ?action=index
+        &namespace=http://ln.taoriver.net/servicenames.txt
+        &record-type=PATTERN
+
+    index( "http://ln.taoriver.net/servicenames.txt", "PATTERN" )
+
+
+### Filter Text ###
+
+Text filtering is very useful, but somewhat complicated.
+
+#### HTTP POST: HttpPipe ####
+
+There is no [[GET]] interface. Instead, there is a [[POST]] interface.
+In particular, it is the "HttpPipe" interface, recently minted.
+
+POST to the URL of the server. Form encode your data, in standard
+application/x-www-form-urlencoded format. UTF-8 charset your
+characters. You must define two FORM keys: "namespace", and "body".
+The text to be filtered goes in "body", the namespace to use goes in
+"namespace".
+
+The following website is sufficient in most web browsers:
+
+    <html><head><title>HttpPipe</title></head>
+    <body>
+    <form action="http://services.taoriver.net:9090/" method="post" accept-charset="utf-8">
+      <p><textarea name="body" rows="5" cols="80">[ [ Local Names ] ] are fun!</textarea></p>
+      <p>Namespace: <input type="text" name="namespace" size="30" value="http://taoriver.net/tmp/gmail.txt" /></p>
+      <p><input type="submit"/></p>
+    </form>
+    </body>
+    </html>
+
+Most languages allow you to do the same thing.
+
+#### XML-RPC: XmlRpcFilteringPipe ####
+
+The XML-RPC interface instead uses the [[XmlRpcFilteringPipe]]
+interface.
+
+See [[XmlRpcFilteringPipe]the documentation] on [[Les Orchard]Les Orchards] site for more information.
+
+#### Text Format ####
+
+WARNING! We're adding extra spaces around the "[" and "]" characters,
+because we don't yet have escaping, and we're using the tool itself
+to render this documentation.
+
+So, in all these examples and instructions, imagine NO white space
+around the brackets and parenthesis!
+
+Links and images are denoted by [ [ foo ] ].
+
+Links are A HREF'ed, images are IMG SRC'ed.
+
+Examples:
+     [ [ some name ] ]
+     [ [ NS link ][ NS link ][ LN name ] ]
+     [ [ some name ] some other text covering it ]
+     [ [ NS link ][ LN name ] some other text ]
+     [ [ :) ] ]
+
+Softlinks have the form:
+
+      ( ( foo ) ( bar ) )
+
+...which becomes a link to:
+
+      (SOFTLINK_BASE)?action=redirect&url=(URL)&lookup=foo&lookup=bar
+
+Images (.png, .gif, .jpeg, .jpg) are made into
+&lt;IMG SRC="http://..."/&gt;, unless there is cover text,
+in which case it's linked text.  Only applies to
+hard lookups.
