@@ -59,6 +59,7 @@ root_page = """
     <li><a href="http://%(HOST_NAME)s:%(PORT_NUMBER)s/text/">text logs</a></li>
     <li><a href="http://%(HOST_NAME)s:%(PORT_NUMBER)s/html/">HTML logs</a></li>
     <li><a href="http://%(HOST_NAME)s:%(PORT_NUMBER)s/raw/">raw logs</a></li>
+    <li><a href="http://%(HOST_NAME)s:%(PORT_NUMBER)s/rss/">rss 0.91 logs</a></li>
     </ul>
     
     <p>
