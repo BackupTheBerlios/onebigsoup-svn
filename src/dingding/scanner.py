@@ -2,14 +2,22 @@ import time
 import feedparser
 import xmlrpclib
 import pickle
+import socket
 
 class DingDing:
    def __init__(s, URL, pw):
      s.URL=URL
      s.pw=pw
    def notify(s, load):
-     xmlrpclib.ServerProxy(s.URL).notify(load, s.pw)
-     
+      notified = 0
+      while not notified:
+         try:
+            xmlrpclib.ServerProxy(s.URL).notify(load, s.pw)
+            notified=1
+            print time.asctime(), "notified", load
+         except socket.timeout:
+            print time.asctime(), "wasn't able to notify... sleeping 5 seconds."
+            time.sleep(5) # wait five seconds...
 
 class Scanner:
    def __init__(s, rss_URL, period, dingding, state_filename):
@@ -39,12 +47,15 @@ class Scanner:
              "PageUrl":entry["link"],
              "TimeEventHappened":entry["date"][:19],
             }
-
+       
        load["TransparencyText"] = """Posted to %(InterWikiName)s:%(PageName)s - %(Comment)s""" % load
        load["TransparencyXhtml"] = """Posted to <a href="%(WikiUrl)s">%(InterWikiName)s</a>:<a href="%(PageUrl)s">%(PageName)s</a> - %(Comment)s""" % load
        load["TransparencyXhtmlColumnHeaders"] = [ "Wiki", "Page", "Comment" ]
        load["TransparencyXhtmlRow"] = [ """<a href="%(WikiUrl)s">%(InterWikiName)s</a>""" % load, """<a href="%(PageUrl)s">%(PageName)s</a>""" % load, "%(Comment)s" % load ]
 
+       if entry.get( "dc_contributor" ) == "LionKimbro":
+          load["UserName"] = entry["dc_contributor"]
+       
        s.dingding.notify(load)
 
      s.lastseen = feed["entries"][0]["link"]
