@@ -28,7 +28,7 @@ import sys
 import uli
 
 if __name__ == "__main__":
-    usage = 'usage: %prog [-f xmlrpc] (URL) "string message to send to service"'
+    usage = 'usage: %prog [-f xmlrpc or get or http] (URL) "string message to send to service"'
     parser = optparse.OptionParser(usage)
     parser.add_option( "-f", "--form", dest="form", default="http",
                        type="string", help = "one of " + ", ".join(uli.form_names.values()) )
