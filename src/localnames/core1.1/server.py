@@ -229,7 +229,7 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def xmlrpc_filterData(self, data, contentType, params):
         data = data.decode("utf-8", "replace")
         url = params["namespace"]
-        return ({"data": xmlrpclib.Binary(localnames.replace_text(data.encode("utf-8"), url)),
+        return ({"data": xmlrpclib.Binary(localnames.replace_text(data, url).encode("utf-8")),
                  "contentType": contentType})
 
     def xmlrpc_cached(self):
