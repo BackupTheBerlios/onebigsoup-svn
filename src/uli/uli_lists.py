@@ -1,5 +1,4 @@
 """
-Create web access
 Publish nLSD graph
 """
 
@@ -8,6 +7,7 @@ import pickle
 
 all_lists = []
 LISTS_PICKLE_FILENAME = "lists.p"
+WEB_SERVICE_URL = "http://services.taoriver.net:9303/"
 
 PermReadWrite = 1
 PermReadOnly = 0
@@ -18,6 +18,9 @@ class InvalidParameter(Exception):
         Exception.__init__(self, "Paramater is invalid: %s" % self.param_name)
 
 class AbstractListClass:
+    def __init__(s):
+        s.title = "(Programming error, Abstract list Class)"
+        s.local_name = None
     def __len__(s):
         raise "Need to define in subclass."
     def filter_out_outofbounds_indexes(s, given_indexes ):
@@ -33,6 +36,13 @@ class AbstractListClass:
     def show_lines(s, indexes):
         response=[str(s[i])+"\n" for i in indexes]
         return "".join(response)
+    def get_localnames(s):
+        results = []
+        if s.title:
+            results.append(s.title)
+        if s.local_name:
+            results.append(s.local_name)
+        return results
     
 class MasterList(AbstractListClass):
     """
@@ -42,7 +52,8 @@ class MasterList(AbstractListClass):
     show, head, tail, all, 
     """
     def __init__(s):
-        pass
+        AbstractListClass.__init__(s)
+        s.title = "List of Lists"
     def __len__(s):
         return len(all_lists)
     def __getitem__(s, i):
@@ -53,6 +64,7 @@ class ListObject(AbstractListClass):
     This is a list that the user has created.
     """
     def __init__(s, title=None):
+        AbstractListClass.__init__(s)
         s.id=len(all_lists)
         all_lists.append(s)
         s.title=title
@@ -174,6 +186,38 @@ class TestData:
         for ld in range(0,15):
             entry = Entry(lo, "Test"+str(ld))
 
+def get(path):
+    response = []
+    if path == ["localnames"]:
+        response.append("# This is an uli_list local names description file")
+        response.append("# visit http://purl.net/net/localnames/ to learn more about local names")
+        mlo = MasterList()
+        for ln in mlo.get_localnames():
+            if " " in ln:
+                ln = '"%s"' % ln
+            response.append("LN %s %s" % (ln, WEB_SERVICE_URL))
+        for lo in mlo:
+            for ln in lo.get_localnames():
+                if " " in ln:
+                    ln = '"%s"' % ln
+                response.append("LN %s %s" % (ln, WEB_SERVICE_URL+str(lo.id)+"/"))
+        return "\n".join(response)+"\n"
+
+    response.append("<html><head><title>Uli Lists</title></head>")
+    response.append("<body>")
+    if len(path) == 1:
+        lo = all_lists[int(path[0])]
+        response.append('<a href="%s">List of Lists</a>  ---  <a href="%s%s">LocalNames</a>\n<h3>List %s</h3>(local name: %s)<ul>' % (WEB_SERVICE_URL, WEB_SERVICE_URL, "localnames/", str(lo), lo.local_name or "no local name"))
+        for item in lo:
+            response.append("<li>%s</li>" % str(item))
+    else:
+        mlo = MasterList()
+        response.append('<a href="%s%s">Local Names</a><h3>List of Lists</h3>\n<ul>' % (WEB_SERVICE_URL, "localnames/"))
+        for lo in mlo:
+            response.append('<li><a href="%s%d/">%d - %s </a></li>' % (WEB_SERVICE_URL, lo.id, lo.id, lo.title))
+    response.append("</ul></body></html>")
+    return "\n".join(response)+"\n"
+
 
 def uli(line):
     def get_lo_or_master():
@@ -188,7 +232,11 @@ def uli(line):
     if tok.rest()==None: return "Just hitting enter won't get you anywhere ;)"
     msg = "I don't know how to handle %s" % line
     if cmd=="help":
-        msg = "DON'T PANIC!!"
+        msg = "help, localname lst# word, show lst# indexes, new, rename lst# name, cap/uncap lst#, head lst#, tail lst#, all lst#, add lst# line, add# lst# num, check/uncheck lst# indexes -- lst# can be 'lists', indexes of form 3, 7, 9:19"
+    elif cmd=="localname":
+        lo = get_lo_or_master()
+        lo.local_name = tok.rest()
+        msg = "Local name set to %s" % lo.local_name
     elif cmd=="show":
         """
         Will allow a user to show a list item or a list of list items,
@@ -270,12 +318,17 @@ def uli(line):
     pickle.dump(all_lists, open(LISTS_PICKLE_FILENAME, "w"))
     return msg
 
-def main():
+def load_pickle():
     global all_lists
     try:
         all_lists = pickle.load( open( LISTS_PICKLE_FILENAME ) )
     except IOError:
         all_lists = []
+    
+
+def main():
+    load_pickle()
+    if all_lists == []:
         TestData()
     while True:
         input = raw_input("ULILIST> ")
@@ -287,7 +340,8 @@ def main():
 if __name__ == "__main__":
 #    main()
     import http_server
+    load_pickle()
     
     http_server.run( "ULI List Server",
                      "services.taoriver.net", 9303,
-                     uli_func=uli )
+                     uli_func=uli, get_func=get )
