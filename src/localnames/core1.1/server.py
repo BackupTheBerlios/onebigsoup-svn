@@ -14,7 +14,7 @@ import time
 import localnames
 
 
-redir_lookup_flags = sets.ImmutableSet(["loose", "check-neighboring-spaces"])
+redirect_lookup_flags = sets.ImmutableSet(["loose", "check-neighboring-spaces"])
 
 xmlrpc_documentation = '''
 <html>
@@ -119,8 +119,10 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             if args.has_key("separator"):
                 lookup = args["lookup"][0].split(args["separator"][0])
             url = localnames.lookup(lookup, args["namespace"][0],
-                                    redir_lookup_flags)
+                                    redirect_lookup_flags)
             if args["action"] == ["redirect"]:
+                #self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
+                #self.wfile.write(url)
                 self.respond(301, u'Location', url)
                 return
             if args.has_key("html"):
@@ -176,7 +178,7 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             if format == "XML-RPC":
                 format = "XML-RPC-text"
             self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
-            if len(args["namespace"] == 1):
+            if len(args["namespace"]) == 1:
                 url=args["namespace"][0] # get_namespace
             else:
                 url=args["namespace"] # aggregate
