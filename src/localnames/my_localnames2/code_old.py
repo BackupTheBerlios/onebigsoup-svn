@@ -125,6 +125,12 @@ class NameSpaceFile:
         s.name = name
         s.filename = "data/" + name + ".p"
         s.data = {"LN":{}, "NS":{}, "X":{}, "FINAL":None, "LN-list":[], "NS-list":[] }
+        # LN: mapping from LN to URL
+        # NS: mapping from NS to URL
+        # X: mapping from X to value
+        # FINAL: value of final item
+        # LN-list: list of LN keys, in order
+        # NS-list: list of NS keys, in order
 
     def load(s):
         try:
