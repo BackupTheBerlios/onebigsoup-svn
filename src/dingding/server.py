@@ -3,6 +3,14 @@ DingDing XML-RPC Event Server
 
 In some cases, this may actually be-
   Wiki:TheSimplestThingThatCouldPossiblyWork.
+
+----
+
+ + (./) get_logs( pattern )
+ + "IN-LAST-N-SECONDS"
+ + (./) standard received time stamp format (ISO8601 DateTime)
+     - *./) screw standards. We'll just claim RECEIVED-TIME as reserved.
+ + update conventions doc
 """
 
 import time
@@ -14,10 +22,14 @@ from DocXMLRPCServer import DocXMLRPCServer
 
 
 HOST_NAME    = "services.taoriver.net"
-PORT_NUMBER = 9012
+PORT_NUMBER = 9011
 PASSWORD    = "password"
 
-PICKLE_FILE = "registry.p"
+SUBSCRIPTIONS_PICKLE = "registry.p"
+LOGS_PICKLE = "log.py"
+LOGS_PUBLIC = True
+MAX_LOGS_KEPT = 1000
+MAX_LOGS_RETURNED = 50
 
 
 
@@ -84,15 +96,15 @@ class Server:
 
     def _load(s):
         try:
-            s.registry = pickle.load( open( PICKLE_FILE, "r" ) )
-            print time.asctime(), "-- Loaded Registry: %s" % PICKLE_FILE
+            s.registry = pickle.load( open( SUBSCRIPTIONS_PICKLE, "r" ) )
+            print time.asctime(), "-- Loaded Registry: %s" % SUBSCRIPTIONS_PICKLE
         except IOError:
             s.registry = []
             print time.asctime(),
-            print "-- Clear Registry (%s nonexistant)" % PICKLE_FILE
+            print "-- Clear Registry (%s nonexistant)" % SUBSCRIPTIONS_PICKLE
 
     def _save(s):
-        pickle.dump( s.registry, open( PICKLE_FILE, "w" ) )
+        pickle.dump( s.registry, open( SUBSCRIPTIONS_PICKLE, "w" ) )
         
     def _custom_reduce(s, foo, list_, early_exit, load):
         if type(list_[0]) == type([]):
@@ -131,6 +143,12 @@ class Server:
             if not load.has_key( var_name ):
                 return False
             return load[var_name].find(test_val) != -1
+        elif op == "IN-LAST-N-SECONDS":
+            seconds_ago = pattern[1]
+            time_ago = time.time()-seconds_ago
+            if not load.has_key( "RECEIVED-TIME" ):
+                return False
+            return load["RECEIVED-TIME"] > time_ago
         raise "Bad op: " + str(op)
 
     def _ding(s, client_info, Cpw, load):
@@ -148,6 +166,22 @@ class Server:
         print time.asctime(), "-- notice failed"
         return False # failure
 
+    def _stampload(s,load):
+        """
+        Timestamp a load, with whatever value we like.
+        (Reserved for server use.)
+        """
+        load["RECEIVED-TIME"] = time.time()
+    def _log(s, load):
+        try:
+            log = pickle.load( open( LOGS_PICKLE,"r" ) )
+        except IOError:
+            log = []
+        log.append(load)
+        if len( log ) > MAX_LOGS_KEPT:
+            log = log[-MAX_LOGS_KEPT:]
+        pickle.dump( log, open( LOGS_PICKLE,"w" ) )
+
     def notify(s, load, Spw ):
         """
         Notify the event server that an event has occurred.
@@ -160,6 +194,9 @@ class Server:
         if Spw != s.password:
             return 0
 
+        # time-stamp the received message
+        s._stampload( load )
+        
         # build list of target servers to notify
         to_notify = []
         for (ptrn, rcpnt, Cpw) in s.registry:
@@ -176,6 +213,9 @@ class Server:
             if result == False:
                 print time.asctime(), "-- removing %s" % str(target)
                 s.registry.remove(target)
+
+        # append to logs
+        s._log( load )
         
         return 1
 
@@ -218,6 +258,28 @@ class Server:
 
         return found_one
 
+    def get_logs( s, pattern ):
+        """
+        The server is not obligated to keep logs
+        for any set period of time.
+
+        The server is not obligated to return all
+        the logs that match.
+
+        Returns newest to oldest.
+        """
+        to_return = []
+
+        log = pickle.load( open( LOGS_PICKLE, "r" ) )
+        
+        for load in logs:
+            if s._match( load, ptrn ):
+                to_return.append( load )
+
+        to_return.reverse() # newest first
+        if len( to_return ) > MAX_LOGS_RETURNED:
+            to_return = to_return[:MAX_LOGS_RETURNED]
+        return to_return
 
     def run( s ):
         server = DocXMLRPCServer( (s.host_name, s.port_number),
@@ -225,6 +287,7 @@ class Server:
         server.register_function( s.notify )
         server.register_function( s.subscribe )
         server.register_function( s.unsubscribe )
+        server.register_function( s.get_logs )
         print time.asctime(), "Event Server Starts - %s:%s" % (s.host_name,
                                                                s.port_number)
         try:
