@@ -176,8 +176,8 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         """Called by do_POST when body looks like a form post."""
         
         self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
-        if not form_dict.has_key("body"):
-            self.wfile.write('Error: no form entry with key "body"')
+        if not form_dict.has_key("text"):
+            self.wfile.write('Error: no form entry with key "text"')
             return
         if not form_dict.has_key("namespace"):
             self.wfile.write('Error: no form entry with key "namespace"')
