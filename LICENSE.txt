@@ -1,0 +1,52 @@
+
+Most of our code is PUBLIC DOMAIN.
+
+Some code follows from other licenses. We would like
+to replace that code with PUBLIC DOMAIN code.
+However, this is not always possible.
+
+We are in the process of placing proper notes atop
+all files. Here is the boilerplate text we'll be
+placing at the top of our original code:
+
+"""
+  This version of this file has been contributed to by
+  the following people.
+
+    LION KIMBRO  -- King County, WA, USA, 2004
+
+  Each and every contributor has placed his or her own
+  name above. Each and every contributor, doing so,
+  places their contributors into the Public Domain.
+  That is, they release any copyrights that had,
+  they release any rights to their contributions,
+  they allow anyone and everyone to do whatever they
+  like with their contributions, etc., etc., etc.,.
+  They certify that their contributions were original
+  to themselves.
+
+  If you make changes to this file, you need to
+  either add your name to this public domain
+  declaration, or remove the declaration.
+  However, you can keep the list of contributors,
+  with a note saying "these are people who
+  contributed to this file, and released their
+  contributions to the public domain" (or something
+  basically like that), so that people can later
+  verify that they did in fact contribute what they
+  said they contributed.
+"""
+
+I would personally like to add the following text
+to the public domain dedication, which anyone
+can remove if they like:
+
+"""
+  LION KIMBRO notes: "I don't like proprietary
+  licenses. I request, but do not require, that this
+  not be used in properietary software. In particular,
+  I request, but do not require, that Microsoft not
+  use this software in their own.
+"""
+
+Of course, it's not required.
