@@ -295,7 +295,7 @@ def lookup(path, url, flags):
             urls = sets.Set()
             for num, neighborname, url in namespace["NS-raw"]:
                 if url not in urls:
-                    result = lookup(path[0], url, wo_neighboring)
+                    result = lookup([path[0]], url, wo_neighboring)
                     if result:
                         return result
                     urls.add(url)
