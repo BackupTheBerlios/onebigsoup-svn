@@ -1,0 +1,43 @@
+
+ * core              -- core parser, resolver, XML-RPC server
+ * redirect_server   -- web browser redirection server
+ * wrapper_server    -- wiki names list -> LocalNames wrapper
+ * my_localnames     -- friendly LocalNames management server
+ * wordpress-1.2-plugin -- use LocalNames in your WP-1.2 blog
+
+
+core:
+
+  lnparser.py      -- parses LN descriptions
+  localnames.py    -- resolves Local Names,
+                      keeps a cache store
+  xmlrpc_server.py -- XML-RPC, XML-RPC/DingDing,
+                      and XML-RPC/ULI interface to
+                      the resolver and interpreter.
+
+
+redirect_server:
+
+  index.cgi        -- redirection server
+  *.tmpl           -- Cheetah templates, web page HTML
+
+
+wrapper_server:
+
+  index.cgi        -- wiki wrapper server
+  *.tmpl           -- Cheetah templates, web page HTML
+
+
+my_localnames:
+
+  index.cgi        -- my.localnames service
+  *.tmpl           -- Cheetah templates, web page HTML
+  data/            -- where users' data files will be stored
+
+
+wordpress-1.2-plugin:
+
+  lookup-local-names.php   -- MooKitty's LocalNames lookup
+                              & linking code
+  Inutio-XML-RPC-lib.php   -- required PHP XML-RPC library
+

@@ -1,0 +1,190 @@
+
+
+
+               Welcome to Local Names!
+
+
+
+  A brief description of how this is laid out-
+
+  First we talk about general requirements-
+  Python 2.3, Cheetah Templates, PHP, WordPress.
+
+
+        PYTHON                             /- MooKitty's
+         2.3                              /   Blog plugin
+          |                              /
+          |                         How to
+     REQUIREMENTS ----------------- Install
+      ,        .                    Local Names
+     /          \                   /   \ 
+    PHP        Cheetah             /     \--- my.localnames
+ WordPress    Templates        .--/-.     \-- redirection
+  (blog)     (web tools)      ( CORE )     \- wrapper
+                               `----'
+
+
+  Then how to install the core. And then how to install
+  the various services, and some notes on how to install
+  MooKitty's blog plug-in.
+
+
+
+  REQUIREMENTS
+------------------------------------------------------------
+
+  For BASIC LocalNames, you must have:
+
+  * Python2.3
+
+
+  To run the additional servers, (web browser redirection,
+  my.localnames, wiki wrapping,) you must ALSO install:
+
+  * Cheetah Templates    (more on this in a moment)
+
+
+  To use MooKitty's *SUPER-COOL* blogging support for
+  LocalNames, you need:
+
+  * PHP            (version #?)
+  * WordPress 1.2  (the blogging system)
+
+
+  CHEETAH TEMPLATES
+============================================================
+
+  Installing Cheetah Templates is basic.
+  It works like this:
+
+  * Download    (I use v.0.9.15 -- Lion, Sep 2004)
+
+     http://www.cheetahtemplate.org/download.html
+
+  * untar
+
+     $ tar xvzf Cheetah-0.9.15.tar.gz
+
+  * install
+
+     # python setup.py install
+
+  For more information:
+
+    http://www.cheetahtemplate.org/
+
+
+  CORE Installation
+------------------------------------------------------------
+
+  The MOST IMPORTANT install is the CORE code.
+
+
+  Enter the "core" directory.
+
+  Edit xmlrpc_server.py.
+
+  * change HOST_NAME to your host name, or "localhost"
+
+  * change PORT_NUMBER to the port number you want to
+    run the XML-RPC server from
+
+  * change PASSWORD to something screwy - you probably
+    wont' be using this, unless you also run DingDing
+
+  * ULI_ALLOW_DUMP = True is useful while testing,
+    but could potentially be abused. What it does, is it
+    allows you to dump the cache for a particular
+    namespace description. If someone hated you, they
+    could force your computer to continuously dump cache.
+    So you know.
+
+  After that, you should be able to just run
+  the server in the background, and everything
+  work fine.
+
+    $ python xmlrpc_server.py &
+
+
+  To test that it's working, just hit
+
+    http://your-domain:chosen-port/
+
+  ...and you should see the function documentation
+  for the XML-RPC server.
+
+
+  Sorry about the inconsistent names of functions,
+  it's been patched and repatched so many times.
+  We'll fix it.
+
+
+  To actually take the resolver for a spin,...
+
+ ----------------------------------------
+  $ python
+  Python 2.3.3 (#1, May  7 2004, 10:31:40) 
+  [GCC 3.3.3 20040412 (Red Hat Linux 3.3.3-7)] on linux2
+  Type "help", "copyright", "credits" or "license" for more information.
+
+  >>> import xmlrpclib
+
+  >>> s = xmlrpclib.ServerProxy( "http://your-domain:chosen-port" )
+
+  [  for example:                                                    ]
+  [  s=xmlrpclib.ServerProxy( "http://services.taoriver.net:9089" )  ]
+
+  >>> s.lookup( "http://my.localnames.taoriver.net/spaces/lion/description",
+                ["OneBigSoup", "LocalNames"], 1 )
+  'http://onebigsoup.wiki.taoriver.net/moin.cgi/LocalNames'
+
+  >>> 
+ ----------------------------------------
+
+  Ho ho!
+
+  You're resolving Local Names!
+
+
+  Okay, this is all that you need to REALLY use LocalNames.
+  This is enough to program to it, and resolve names locally,
+  and stuff like that.
+
+  But there's a bunch of fun stuff that, if you install Cheetah,
+  you can play use as well.
+
+
+  Sadly, it's very late, and I'm going to sleep now.
+
+  But some hints before I go:
+
+  * The servers are CGI. Use them with Apache.
+
+  * You MAY need to copy the "localnames.py" and "lnparser.py"
+    files to the place where you install the CGI.
+
+  * The servers require Cheetah Templates be installed.
+    It's easy to install- I've never had problems installing them.
+    Instructions near the top of this document.
+
+  * The servers probably point to an existing XML-RPC install.
+    This is referring to the CORE LocalNames server- the one
+    I just told you how to install. (It's really really important.
+    Install it, and test that it works.) You'll need to edit
+    the tops of the files to tell it where the core XML-RPC
+    server is installed.
+
+  When we have Rendezvous, it'll all just magically auto-discover,
+  I am sure. But for now, you have to actually say where you
+  put the LocalNames server, on which host, on which port.
+
+  Theoretically, you can just say "localhost." But, I've had
+  problems doing that- for some reason Apache didn't like it.
+  For some reason, Apache required that I say
+  "services.taoriver.net" on my computer. YMMV.
+
+
+  Feel free to call me on the cell phone for help.
+    Lion Kimbro -- 206.427.2545 (PST)
+  You can even wake me up from deep slumber. {:)}=
+
