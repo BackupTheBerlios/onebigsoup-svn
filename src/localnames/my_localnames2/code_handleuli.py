@@ -1,4 +1,4 @@
-LN_HELP="ln (space) (name) (url)"
+LN_HELP="ln (space) (name) (url), pickle"
 
 
 def uli_ln( msg ):
