@@ -111,9 +111,13 @@ class ActivityLog:
 class NameSpaceFiles:
     def __init__( s, datahub ):
         s.datahub = datahub
+        s.cache = {}
     def get_space( s, name ):
+        if s.cache.has_key( name ):
+            return s.cache[ name ]
         nsf = NameSpaceFile( s.datahub, name )
         nsf.load()
+        s.cache[ name ] = nsf
         return nsf
     def event_newspace( s, space_name ):
         nsf = NameSpaceFile( s.datahub, space_name )
@@ -122,6 +126,7 @@ class NameSpaceFiles:
         nsf.add_name( "my.localnames", WEBSERVICE_PREFIX + "/" )
         nsf.add_name( "dump", DUMP_ADDRESS )
         nsf.save()
+        s.cache[ name ] = nsf
 
 class NameSpaceFile:
     def __init__( s, datahub, name ):

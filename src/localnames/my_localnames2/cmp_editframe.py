@@ -23,13 +23,15 @@ def response():
     t.OTHER_OPEN = ahref( code_info.PAGE_EDITOPTS )
     t.OTHER_CLOSE = "</a>"
     if code_info.page() == code_info.PAGE_EDITNAMES:
-        import cmp_editnames2
-        cmp=cmp_editnames2
+        import cmp_editLNNS
+        cmp=cmp_editLNNS
+        cmp.LN_or_NS = "LN"
         t.NAMES_OPEN=BOLD_SPAN
         t.NAMES_CLOSE=SPAN_CLOSE
     elif code_info.page() == code_info.PAGE_EDITSPACES:
         import cmp_editLNNS
         cmp=cmp_editLNNS
+        cmp.LN_or_NS = "NS"
         t.SPACES_OPEN=BOLD_SPAN
         t.SPACES_CLOSE=SPAN_CLOSE
     elif code_info.page() == code_info.PAGE_EDITOPTS:
@@ -37,8 +39,6 @@ def response():
         t.OTHER_CLOSE=SPAN_CLOSE
     else:
         pass # illegal
-    if code_info.page() == code_info.PAGE_EDITSPACES:
-        cmp.LN_or_NS = "NS"
     t.EDIT_SECTION_NAME = cmp.subtitle()
     t.EDIT_SECTION = cmp.response()
 

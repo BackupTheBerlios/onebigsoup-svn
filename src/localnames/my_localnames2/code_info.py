@@ -35,6 +35,12 @@ def query_dict():
             _dict[k]=v[0]
     return _dict
 
+def query_keys_found( keys ):
+    for k in keys:
+        if not query_dict().has_key( k ):
+            return False
+    return True
+
 def uli_string():
     return query_dict().get( ULI_KEY )
 
@@ -66,6 +72,7 @@ def inform_template( t ):
 
 # control code - may want to move into code_old
 def add_new_names( space, names, url, LN_or_NS="LN" ):
+    space = space.upper()
     import code_old
     nsf = code_old.hub.namespace_files.get_space( space )
     if LN_or_NS == "LN":

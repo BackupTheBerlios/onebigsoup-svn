@@ -2,29 +2,53 @@ from Cheetah.Template import Template
 import code_info
 import code_old
 
+LN_or_NS = "unconfigured" # invoking module sets to "LN" or "NS"
+
+
 t = Template( file="cmp_editLNNS.html" )
 
-space_file=code_old.hub.namespace_files.get_space( code_info.space() )
+space_file=code_old.hub.namespace_files.get_space( code_info.space().upper() )
+qd = code_info.query_dict()
 
-LN_or_NS = "unconfigured" # invoking module sets to "LN" or "NS"
 
 def subtitle():
     return { "LN": "Names",
              "NS": "Spaces" }[ LN_or_NS ]
 
+def alts():
+    if qd.has_key( "alt" ):
+        if type( qd[ "alt" ] ) == type( "" ):
+            return [ qd[ "alt" ] ]
+        elif type( qd[ "alt" ] ) == type( [] ):
+            return qd[ "alt" ]
+    else:
+        return []
+
+def names():
+    if qd.has_key( "name" ):
+        n = [ qd["name"] ] # names
+    else:
+        n = []
+    n.extend( alts() )
+    return n
+
+def url():
+    if qd.has_key( "url" ):
+        return qd["url"]
+    else:
+        return None
+
 
 def register_new_names():
-    qd = code_info.query_dict()
-    if qd.has_key( "url" ) and qd.has_key( "name" ) and qd.has_key( code_info.SPACE_KEY ):
-        space = qd[ code_info.SPACE_KEY ]
-        url = qd[ "url" ]
-        names = [ qd[ "name" ] ]
-        if qd.has_key( "alt" ):
-            if type( qd[ "alt" ] ) == type( "" ):
-                names.append( qd[ "alt" ] )
-            elif type( qd[ "alt" ] ) == type( [] ):
-                names.extend( qd[ "alt" ] )
-        code_info.add_new_names( space, names, url, LN_or_NS )
+    if code_info.query_keys_found( ["url", "name", code_info.SPACE_KEY ] ):
+        if LN_or_NS == "LN":
+            space_file.add_names( names(), url() )
+        elif LN_or_NS == "NS":
+            space_file.add_namespaces( names(), url() )
+        else:
+            raise "this should never happen"
+        code_old.hub.event_namesadded( code_info.space(), names(), url() )
+        space_file.save()
 
 def gval( k,i ):
     if code_info.form.has_key( k+str(i) ):
