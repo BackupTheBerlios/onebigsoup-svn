@@ -27,7 +27,7 @@ class Parser(object):
    def feedURI(self, uri): 
       self.file = urllib.urlopen(uri)
 
-   def feedString(self, s): 
+   def feedString(self, s):
       import StringIO
       f = StringIO.StringIO(s)
       f.seek(0)
@@ -41,7 +41,7 @@ class Parser(object):
       else: self.feedURI(obj)
 
    def parse(self): 
-      while 1: 
+      while 1:
          line = self.file.readline()
          if not line: break
          if not line.strip(): continue

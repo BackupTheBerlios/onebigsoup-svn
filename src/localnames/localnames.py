@@ -5,6 +5,9 @@ import urllib
 
 import lnparser # Sean Palmer's Parser
 
+# TODO: FIX NameSpaceStore.save,
+#       which doesn't know how to marshal objects, I guess.
+
 
 class NameSpaceStore:
     """
@@ -132,7 +135,7 @@ class Resolver:
                 pass
         
     def save(s):
-        s.store.save(store_filename)
+        s.store.save(s.store_filename)
 
     def lookup_tuple( s, tup ):
         """
@@ -186,15 +189,24 @@ def test():
     print space.lookup( "FirstName" )
 
 def test_resolver():
-    resolver = Resolver( "http://taoriver.net/tmp/nstest.txt",
+##     resolver = Resolver( "http://onebigsoup.wiki.taoriver.net/moin.cgi/LocalNamesDescription?action=raw",
+##                          "localnames_cache" )
+##     print resolver.lookup_tuple( ["FrontPage"] )
+##     print resolver.lookup_tuple( ["Robots"] )
+##     print resolver.lookup_tuple( ["PublicEmail"] )
+##     print resolver.lookup_tuple( ["IntComm", "OneBigSoup"] )
+##     print resolver.lookup_tuple( ["IntComm", "CommunityWiki", "OneBigSoup"] )
+##     print resolver.lookup_tuple( ["CommunityWiki", "OneBigSoup"] )
+##     print resolver.lookup_tuple( ["ThePublicWeb"] )
+    resolver = Resolver( "http://lion.taoriver.net/localnames.txt",
                          "localnames_cache" )
-    print resolver.lookup_tuple( ["FirstName"] )
-    print resolver.lookup_tuple( ["SecondName"] )
-    print resolver.lookup_tuple( ["World Wide Web Consortium"] )
-    print resolver.lookup_tuple( ["SomethingElse"] )
-    print resolver.lookup_tuple( ["OneBigSoup"] )
-    print resolver.lookup_tuple( ["CommunityWiki","Bogus"] )
-    print resolver.lookup_tuple( ["Bogus"] )
+    print resolver.lookup_tuple( ["WeirdFile"] )
+    print resolver.lookup_tuple( ["Kitty"] )
+    print resolver.lookup_tuple( ["MarshallBrain"] )
+    print resolver.lookup_tuple( ["/."] )
+    print resolver.lookup_tuple( ["OneBigSoup","FrontPage"] )
+    print resolver.lookup_tuple( ["OneBigSoup","DingDing"] )
+    print resolver.lookup_tuple( ["LocalNames"] )
     
     
 if __name__=="__main__": 
