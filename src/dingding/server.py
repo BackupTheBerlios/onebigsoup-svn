@@ -279,7 +279,7 @@ class Server:
         
         return found_one
     
-    def get_logs( s, ptrn ):
+    def get_logs( s, ptrn, max_entries_to_return ):
         """
         The server is not obligated to keep logs
         for any set period of time.
@@ -304,6 +304,8 @@ class Server:
                 to_return.append( shared.stripped_copy(load) )
 
         to_return.reverse() # newest first
+        if len( to_return ) > max_entries_to_return:
+            to_return = to_return[:max_entries_to_return]
         if len( to_return ) > MAX_LOGS_RETURNED:
             to_return = to_return[:MAX_LOGS_RETURNED]
         return to_return
