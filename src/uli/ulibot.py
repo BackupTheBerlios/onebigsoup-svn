@@ -11,7 +11,7 @@ Requirements:
    http://inamidst.com/proj/suwbot/ircbot.py
 """
 
-import ircbot, urllib, xmlrpclib, pickle, sys
+import ircbot, urllib, xmlrpclib, pickle, sys, uli
 
 nickname = 'UliBot'
 ircserver = 'irc.freenode.net'
@@ -20,33 +20,6 @@ picklefile = 'ulibot.p'
 
 aliaslist = { }
 debug = False
-
-def http( url, line ):
-   # urllib.urlopen ignores HTTP errors and doesn't tell us about them
-   uo = urllib.URLopener()
-   response = uo.open( url, urllib.urlencode( {"ULI":line} ) )
-   ctype = response.info()["Content-Type"]
-   if ctype == "text/plain":
-      return response.read()
-   else:
-      raise IOError, "Wrong Content-Type for ULI response: %s" % ctype
-
-def xmlrpc( url, line ):
-   return xmlrpclib.ServerProxy( url ).uli( line )
-
-def prompt( prompt_string, uli_url, call_func ):
-   """
-   prompt_string: ex: "<uli-9095> "
-   uli_url:       ex: "http://services.taoriver.net:9095/"
-   call_func:     uli.http or uli.xmlrpc
-   """
-   input = ""
-   while input.upper() != "QUIT":
-       input = raw_input( prompt_string )
-       if input.upper() != "QUIT":
-           print call_func( uli_url, input )
-
-funcnames = { http: "http", xmlrpc: "xml-rpc"}
 
 def ulibot(host, port, channels, nick=nickname):
    p = ircbot.Bot(nick=nick, channels=channels)
@@ -58,7 +31,7 @@ def ulibot(host, port, channels, nick=nickname):
    def f_uliHTTPalias(m, origin, (cmd, channel), text, p=p):
       if debug: p.msg(origin.sender, 'alias accepted')
       allsplitup = text.split()
-      aliaslist[allsplitup[1]] = (http, allsplitup[2])
+      aliaslist[allsplitup[1]] = (uli.http, allsplitup[2])
       pickle.dump( aliaslist, open( picklefile, "w" ) )
    p.rule(f_uliHTTPalias, 'ulihttpalias',
           "uli-http [a-zA-Z]+ http://.+$" )
@@ -66,7 +39,7 @@ def ulibot(host, port, channels, nick=nickname):
    def f_uliXMLRPCalias(m, origin, (cmd, channel), text, p=p):
       if debug: p.msg(origin.sender, 'alias accepted')
       allsplitup = text.split()
-      aliaslist[allsplitup[1]] = (xmlrpc, allsplitup[2])
+      aliaslist[allsplitup[1]] = (uli.xmlrpc, allsplitup[2])
       pickle.dump( aliaslist, open( picklefile, "w" ) )
    p.rule(f_uliXMLRPCalias, 'ulixmlrpcalias',
           "uli-xmlrpc [a-zA-Z]+ http://.+$" )
