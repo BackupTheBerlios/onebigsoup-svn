@@ -86,6 +86,7 @@ class NameSpace:
     def _parse_from_url(s):
         parser = lnparser.Parser( LocalNamesSink(s) )
         parser.feedString( urllib.urlopen( s.ns_url ).read() )
+        parser.parse()
         s.loaded_time = time.time()
 
 class LocalNamesSink:
