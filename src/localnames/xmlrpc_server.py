@@ -42,6 +42,29 @@ class Server:
 
         s.uli_ns = ""
 
+    def parse_description( s, URL ):
+        """
+        Parse a LocalNames namespace description, and return the results.
+
+        Results are returned in a gigantic dictionary:
+
+        {
+          "LN": { dictionary from "name" to "URL" },
+          "NS": { dictionary from "namespace" to "URL" },
+          "X": { dictionary from "name" to "string" },
+          "FINAL": "final pattern", or "" if there is none
+          "NS-list": [ list of the names of the namespaces,
+                       in the order they appeared ]
+        }
+        """
+        ns = s.store.get( URL )
+        parsed = { "LN": ns.names_dictionary(),
+                   "NS": ns.namespaces_dictionary(),
+                   "X": ns.keyvalues_dictionary(),
+                   "FINAL": ns.default_pattern(),
+                   "NS-list": ns.namespaces_list(), }
+        return parsed
+    
     def uli(s, message ):
         """
         ULI port:
@@ -268,6 +291,7 @@ class Server:
                 print "   %s %s" % (code,name)
                 time.sleep(15)
 
+        server.register_function( s.parse_description )
         server.register_function( s.lookup )
         server.register_function( s.lookup_many )
         server.register_function( s.locate_list )

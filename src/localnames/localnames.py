@@ -183,6 +183,17 @@ class LinkStore:
     def canonical_name_for_url(s, url):
         link = s.urls[url]
         return link.get_canonical_name()
+    def names_to_urls(s):
+        """
+        Returns a dictionary of the form:
+        { "name": "URL", ... }
+        """
+        d={}
+        for url in s.urls:
+            link = s.urls[url]
+            for name in link.get_names():
+                d[ name ] = url
+        return d
 
 class NameSpace:
     """
@@ -213,7 +224,7 @@ class NameSpace:
 
         s.names = LinkStore() # names table
         s.spaces = LinkStore() # spaces table
-        s.defaults = [] # list of names, in any form
+        s.defaults = [] # list of namespaces, in the order of recommended resolution
         
         s.key_values = {} # metadata about the name space
         
@@ -222,7 +233,29 @@ class NameSpace:
         s.loaded_time = None # filled with time.time() after parse
         
         s._parse_from_url()
-        
+    def names_dictionary( s ):
+        """
+        return a dictionary { "local name" : "URL", ... }
+        """
+        return s.names.names_to_urls()
+    def namespaces_dictionary( s ):
+        """
+        return a dictionary { "name space" : "URL", ... }
+        """
+        return s.spaces.names_to_urls()
+    def namespaces_list( s ):
+        """
+        return a list of namespace names,
+        in order from first to last that they
+        are meant to be checked in
+        """
+        return s.defaults
+    def keyvalues_dictionary( s ):
+        """
+        return a dictionary { "key" : "value",... }
+        of namespace metadata
+        """
+        return s.key_values
     def lookup_name(s, name):
         """
         returns resolved URL
@@ -233,6 +266,16 @@ class NameSpace:
         returns resolved URL of name space description
         """
         return s.spaces.lookup( name )
+    def default_pattern(s):
+        """
+        returns default pattern,
+        including $NAME for the substitution
+        point(s), if any.
+        """
+        if s.last_resort_name_pattern != None:
+            return s.last_resort_name_pattern
+        else:
+            return ""
     def default_for_name(s, name):
         """
         returns a name, made to fit the default page pattern
@@ -276,8 +319,8 @@ class LocalNamesSink:
     """
     Sinks data from the parser into a NameSpace object.
     """
-    def __init__(self, namespace):
-        self.namespace = namespace
+    def __init__(s, namespace):
+        s.namespace = namespace
 
     def X(s, key, val ):
         s.namespace.key_values[key] = val
