@@ -22,7 +22,14 @@ aliaslist = { }
 debug = False
 
 def http( url, line ):
-   return urllib.urlopen( url, urllib.urlencode( {"ULI":line} ) ).read()
+   # urllib.urlopen ignores HTTP errors and doesn't tell us about them
+   uo = urllib.URLopener()
+   response = uo.open( url, urllib.urlencode( {"ULI":line} ) )
+   ctype = response.info()["Content-Type"]
+   if ctype == "text/plain":
+      return response.read()
+   else:
+      raise IOError, "Wrong Content-Type for ULI response: %s" % ctype
 
 def xmlrpc( url, line ):
    return xmlrpclib.ServerProxy( url ).uli( line )
