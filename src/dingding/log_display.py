@@ -57,8 +57,8 @@ def sort_logs( logs ):
 def tuple_from_iso8601( iso8601 ):
     return time.strptime( iso8601.replace("-",""), "%Y%m%dT%H:%M:%S" )
 
-def iso8601_from_tuple( tuple ):
-    return time.strftime( "%Y-%m-%dT%H:%M:%S", tuple )
+def iso8601_from_tuple( tuple_time ):
+    return time.strftime( "%Y-%m-%dT%H:%M:%S", tuple_time )
 
 def hour_and_ampm( tuple_time ):
     return time.strftime("%I %p", tuple_time)
@@ -217,6 +217,10 @@ def as_html_with_day_display(logs):
     for log in logs:
         time_event_happened = log.get( "TimeEventHappened",
                                        NULL_TIME )
+        tuple_time = tuple_from_iso8601( time_event_happened )
+        
+        day_string = dayname( tuple_time )
+        hour_ampm_string = hour_and_ampm( tuple_time )
         
         escaped_headers = ["time"] # will be extended
         row_data = [time_event_happened] # will be extended
