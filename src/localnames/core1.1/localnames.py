@@ -46,8 +46,9 @@ def dump_cache(url):
     """Dump cache entry for a particular url."""
     try:
         del store[url]
+        return True
     except KeyError:
-        pass
+        return False
 
 
 def preferred_names():
