@@ -50,10 +50,7 @@ class PickleData:
         d = pickle.load( open(s.filename) )
         if msg.startswith( "keys" ):
             return "keys: " + ", ".join( d.keys() )
-        elif msg.startswith( "data" ):
-            import pprint
-            return pprint.pformat( d )
-        return "%s pickle data understands: keys, data" % s.filename
+        return "%s pickle data understands: keys" % s.filename
 
 class DataHub:
     def __init__( s ):
