@@ -14,10 +14,12 @@ time_to_live = 24*60*60  # one day
 
 punctuation_re = re.compile(r'[^A-Za-z0-9\s]+', re.UNICODE)
 ws_re = re.compile(r'\s+', re.UNICODE)
-the_re = re.compile(r'\b(?:the|a|an|in|for)\b', re.UNICODE | re.IGNORECASE)
+the_re = re.compile(r'\b(?:the|a|an|in|for)\b', re.UNICODE|re.IGNORECASE)
+link_re = re.compile(r'\[((?:\[.+?\])+)([^\]]+?)?\]',
+                     re.MULTILINE|re.IGNORECASE|re.UNICODE|re.DOTALL)
 
 loose_flags = sets.ImmutableSet(["no-case", "no-punctuation",
-                                  "no-space", "forgive-spelling"])
+                                 "no-space", "forgive-spelling"])
 
 
 def dump_cache(url):
@@ -289,6 +291,29 @@ def display_namespace_errors(namespace):
         print "        %s" % lines[num].encode("ascii","replace")
 
 
+def replace_text(text,namespace_url):
+    """
+    Replace links denoted by [[foo]] with A HREFs.
+
+    Examples:
+        [[some name]]
+        [[NS link][NS link][LN name]]
+        [[some name]some other text covering it]
+        [[NS link][LN name]some other text]
+    """
+
+    def replace_match(match):
+        flags = sets.Set(["loose", "check-neighboring-spaces"])
+        path = match.group(1)[1:-1].split('][')
+        url = lookup(path, namespace_url, flags)
+        title = match.group(2)
+        if title == None:
+            title = path[-1]
+        return '<a href="%s">%s</a>' % (url, title)
+
+    return link_re.sub(replace_match, text)
+
+
 if __name__ == '__main__':
     url = "http://ln.taoriver.net/localnames.txt"
     namespace = get_namespace(url)
@@ -309,4 +334,12 @@ if __name__ == '__main__':
     get_namespace("http://taoriver.net/tmp/gmail.txt")
     print "Preferred Names:",
     print preferred_names()
-
+    text = '[[Local Names]] is a project that [[Lion]] is working on.'
+    print text
+    print replace_text(text, "http://ln.taoriver.net/localnames.txt")
+    text = 'I really like [[Local Names]this project.]'
+    print text
+    print replace_text(text, "http://ln.taoriver.net/localnames.txt")
+    text = 'You need to use [[X]an X record] to do that.'
+    print text
+    print replace_text(text, "http://ln.taoriver.net/localnames.txt")
