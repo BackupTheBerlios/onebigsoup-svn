@@ -12,9 +12,12 @@ import shared # event system shared code
 
 HOST_NAME = 'services.taoriver.net'
 PORT_NUMBER = 9010
+WEBSERVER_URL = 'http://%s:%s/' % (HOST_NAME,PORT_NUMBER)
 
 EVENTSERVER_HOST_NAME = 'services.taoriver.net'
 EVENTSERVER_PORT_NUMBER = 9011
+EVENTSERVER_URL = 'http://%s:%s/' % (EVENTSERVER_HOST_NAME,
+                                     EVENTSERVER_PORT_NUMBER)
 
 # import server
 # LOGS_PICKLE = server.LOGS_PICKLE
@@ -94,6 +97,29 @@ class ShowLogsHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
                                     "(no self-description)" ) )
             s.wfile.write( "\n" )
 
+    def draw_rss(s):
+        s.wfile.write( """
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+ <rss version="0.91">
+
+ <channel>
+ <title>%(HOST_NAME)s:%(PORT_NUMBER)s - Event Server - Recent Logs by RSS</title>
+ <link>%(WEBSERVER_URL)s</link>
+ <description>Event System Observation</description>
+ <language>en-us</language>
+        """ % globals() )
+        for log in s.logs():
+            s.wfile.write( "<item>" )
+            s.wfile.write( "<title>%s</title>" %
+                           log.get( "TransparencyText",
+                                    "(no self-description)" ) )
+            s.wfile.write( "<description>" )
+            s.wfile.write( cgi.escape(pprint.pformat(shared.stripped_copy(log))) )
+            s.wfile.write( "</description>" )
+            s.wfile.write( "</item>" )
+        s.wfile.write( "</channel>" )
+        s.wfile.write( "</rss>" )
+
     def draw_html(s):
         s.write_head( "HTML logs" )
         
@@ -155,6 +181,10 @@ class ShowLogsHandler( BaseHTTPServer.BaseHTTPRequestHandler ):
             s.draw_html()
         elif s.path == "/raw/":
             s.draw_raw()
+        elif s.path == "/rss/":
+            s.draw_rss()
+        else:
+            s.wfile.write( root_page )
 
     def logs(s):
         try:
