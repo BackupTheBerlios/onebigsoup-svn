@@ -38,7 +38,7 @@ class Parser:
         s.sanitizeLines( file(fn,"r").readlines() )
     def feedUrl( s, url ):
         s.feed_name = "(url: %s)" % url
-        s.sanitizeLines( urllib.urlopen(uri).readlines() )
+        s.sanitizeLines( urllib.urlopen(url).readlines() )
     def feedString( s, a_string ):
         s.feed_name = "(some string)"
         s.sanitizeLines( a_string.split("\n") )
