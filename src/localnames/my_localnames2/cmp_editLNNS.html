@@ -1,0 +1,81 @@
+
+  <tr>
+    <td style="width: 650px;" class="darker">
+
+      <h4>Add a $NAME_OR_NAMESPACE:</h4>
+      <form method="get" action="index.cgi">
+        <input type="hidden" name="$PAGE_KEY" value="$PAGE_VALUE"/>
+	<input type="hidden" name="$SPACE_KEY" value="$SPACE"/>
+        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <td style="text-align: right;">Name:</td>
+              <td><input size="40" name="name"></td>
+            </tr>
+            <tr>
+              <td style="text-align: right;">URL:</td>
+              <td><input size="60" value="http://" name="url"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <td style="white-space: nowrap;">Alternate Name:</td>
+              <td><input size="40" name="alt"></td>
+            </tr>
+            <tr>
+              <td style="white-space: nowrap;">Alternate Name:</td>
+              <td><input size="40" name="alt"></td>
+            </tr>
+          </tbody>
+        </table>
+        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+	  <tbody>
+	    <tr>
+	      <td>
+	      <input type="submit" value="Add Name"></input>
+	      </td>
+	    </tr>
+	  </tbody>
+	</table>
+      </form>
+
+    </td>
+  </tr>
+
+  <tr>
+    <td style="width: 650px;" class="darker">
+
+      <h4>Change / Delete $NAME_OR_NAMESPACE:</h4>
+      <form method="post" action="index.cgi?$PAGE_KEY=$PAGE_VALUE&$SPACE_KEY=$SPACE">
+      <input type="hidden" name="NUM_ENTRIES0" value="$NUM_ENTRIES"/>
+      <p><input type="submit" value="Submit Changes"/></p>
+        <table style="width: 100px; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+          <tbody>
+            <tr>
+              <th style="text-align: center;">delete<br>
+              </th>
+              <th style="text-align: center;">order<br>
+              </th>
+              <th>name<br>
+              </th>
+              <th>URL<br>
+              </th>
+            </tr>
+#for $X in $NAMES
+            <tr>
+              <td style="text-align: center;"> <input name="DEL$X.INDEX" type="checkbox"/> </td>
+              <td> <input size="6" name="ORDER$X.INDEX" value="$X.INDEX"/> </td>
+              <td> <input size="25" name="NAME$X.INDEX" value="$X.NAME"/> </td>
+              <td> <input size="50" name="URL$X.INDEX" value="$X.URL"/> </td>
+            </tr>
+#end for
+          </tbody>
+        </table>
+      <p><input type="submit" value="Submit Changes"/></p>
+      </form>
+
+    </td>
+  </tr>
+
