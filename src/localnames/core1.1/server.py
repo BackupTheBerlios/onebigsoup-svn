@@ -176,7 +176,11 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             if format == "XML-RPC":
                 format = "XML-RPC-text"
             self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
-            self.wfile.write(self.xmlrpc_render(format, args["namespace"]))
+            if len(args["namespace"] == 1):
+                url=args["namespace"][0] # get_namespace
+            else:
+                url=args["namespace"] # aggregate
+            self.wfile.write(self.xmlrpc_render(format, url))
             return
         
         self.respond(200, u'Content-type', 'text/html; charset=utf-8')
