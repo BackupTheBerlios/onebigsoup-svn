@@ -79,3 +79,20 @@
     </td>
   </tr>
 
+#if len($EXTRA)>0
+  <tr>
+    <td style="width: 650px;" class="darker">
+    <form method="post" action="index.cgi?$PAGE_KEY=$PAGE_VALUE&$SPACE_KEY=$SPACE">
+      <p>Pre-defined $(NAME_OR_NAMESPACE)s, add by checking.</p>
+      <table style="width: 100%; text-align: left;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+#for $X in $EXTRA
+          <tr> <td> <input name="EXTRA-$X.NAME" type="checkbox"/> <a href="$X.URL">$X.NAME</a> </td> </tr>
+#end for
+        </tbody>
+      </table>
+      <p><input value="Add Checked $(NAME_OR_NAMESPACE)s" type="submit"></p>
+    </form>
+    </td>
+  </tr>
+#end if
