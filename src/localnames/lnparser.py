@@ -66,7 +66,7 @@ class Parser:
             if spaces == 0:
                 continue # comment line
             if spaces != s.indent:
-                raise "Indentation on line %d should be %d spaces, presently %d spaces." % (linenum,s.indent,spaces)
+                raise "Indentation on line %d of %s should be %d spaces, presently %d spaces." % (linenum,s.feed_name,s.indent,spaces)
 
             linedata = line.split(' ', 1)
             if len(linedata)==1: (key,value) = linedata[0],""
