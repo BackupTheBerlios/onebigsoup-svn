@@ -32,7 +32,7 @@ class Scanner:
        ents=ents[:matches[0]]
      for entry in ents:
        load={"Action":"wikipost2",
-             "Comment":entry["description"],
+             "Comment":entry.get("description", "(no comment)"),
              "InterWikiName":feed["feed"]["wiki_interwiki"],
              "WikiUrl":feed["feed"]["link"],
              "PageName":entry["title"],
