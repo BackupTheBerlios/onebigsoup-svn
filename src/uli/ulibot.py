@@ -2,21 +2,24 @@
 """
 UliBot - A Basic Uli-Oriented IRC Bot
 License: GPL 2; share and enjoy!
-Authors: 
-   Sean B. Palmer, inamidst.com
+Authors:
+Sean B. Palmer, inamidst.com
    Suw Charman, chocnvodka.blogware.com
 Augmented by:
    Dave Menninger
-Requirements: 
+Requirements:
    http://inamidst.com/proj/suwbot/ircbot.py
 """
 
-import ircbot
-import urllib, xmlrpclib
+import ircbot, urllib, xmlrpclib, pickle, sys
 
 nickname = 'UliBot'
+ircserver = 'irc.freenode.net'
+room = '#onebigsoup'
+picklefile = 'ulibot.p'
+
 aliaslist = { }
-debug = True
+debug = False
 
 def http( url, line ):
    return urllib.urlopen( url, urllib.urlencode( {"ULI":line} ) ).read()
@@ -36,11 +39,9 @@ def prompt( prompt_string, uli_url, call_func ):
        if input.upper() != "QUIT":
            print call_func( uli_url, input )
 
-
-
 funcnames = { http: "http", xmlrpc: "xml-rpc"}
 
-def suwbot(host, port, channels, nick=nickname):
+def ulibot(host, port, channels, nick=nickname):
    p = ircbot.Bot(nick=nick, channels=channels)
 
    def f_hi(m, origin, (cmd, channel), text, p=p):
@@ -51,25 +52,33 @@ def suwbot(host, port, channels, nick=nickname):
       if debug: p.msg(origin.sender, 'alias accepted')
       allsplitup = text.split()
       aliaslist[allsplitup[1]] = (http, allsplitup[2])
-   p.rule(f_uliHTTPalias, 'ulihttpalias', "uli-http [a-zA-Z]+ http://.+$" )
+      pickle.dump( aliaslist, open( picklefile, "w" ) )
+   p.rule(f_uliHTTPalias, 'ulihttpalias',
+          "uli-http [a-zA-Z]+ http://.+$" )
 
    def f_uliXMLRPCalias(m, origin, (cmd, channel), text, p=p):
       if debug: p.msg(origin.sender, 'alias accepted')
       allsplitup = text.split()
       aliaslist[allsplitup[1]] = (xmlrpc, allsplitup[2])
-   p.rule(f_uliXMLRPCalias, 'ulixmlrpcalias', "uli-xmlrpc [a-zA-Z]+ http://.+$" )
+      pickle.dump( aliaslist, open( picklefile, "w" ) )
+   p.rule(f_uliXMLRPCalias, 'ulixmlrpcalias',
+          "uli-xmlrpc [a-zA-Z]+ http://.+$" )
 
    def f_uliListAliases(m,origin, (cmd, channel), text, p=p):
       p.msg(origin.sender, "the current list of bindings:")
       for binding in aliaslist:
-         p.msg(origin.sender, "Alias: %s  Function: %s  Url: %s" % (binding,funcnames[aliaslist[binding][0]],aliaslist[binding][1]) )
+         p.msg(origin.sender, "Alias: %s  Function: %s  Url: %s" %
+               (binding,funcnames[aliaslist[binding][0]],
+                aliaslist[binding][1]) )
    p.rule(f_uliListAliases, 'ulilistaliases', "uli-list-aliases")
 
    def f_uliAliasCommand(m, origin, (cmd, channel), text, p=p):
       allsplitup = text.split(None,1)
       alias = allsplitup[0]
       if aliaslist.has_key(alias):
-         if debug: p.msg(origin.sender, "interpreting %s as an alias.  sending %s as command..." % (alias,allsplitup[1]))
+         if debug: p.msg(origin.sender, "interpreting %s as an alias."
+                         "sending %s as command..." % (alias,
+                                                       allsplitup[1]))
          f_uliCommand(alias, allsplitup[1], origin)
    p.rule(f_uliAliasCommand, 'ulialiascommand', "[a-zA-Z]+ ([a-zA-Z]+)*" )
 
@@ -82,7 +91,9 @@ def suwbot(host, port, channels, nick=nickname):
 
    def f_uliBotHelp(m, origin, (cmd, channel), text, p=p):
       p.msg(origin.sender, "Commands I understand:")
-      p.msg(origin.sender, "uli-list-aliases , uli-http <alias> <url>, uli-xmlrpc <alias> <url>, <existing-alias> <command-string>, help %s, debug toggle %s, remove alias <alias>" % (p.nick,p.nick))
+      p.msg(origin.sender, "uli-list-aliases, uli-http <alias> <url>, "
+            "uli-xmlrpc <alias> <url>, <existing-alias> <command-string>, help %s, "
+            "debug toggle %s, remove alias <alias>" % (p.nick,p.nick))
    p.rule(f_uliBotHelp, 'ulibothelp', "help %s" % p.nick )
 
    def f_uliBotDebugMode(m, origin, (cmd, channel), text, p=p):
@@ -107,10 +118,14 @@ def suwbot(host, port, channels, nick=nickname):
 
    p.run(host, port)
 
-def main():
-   # ircbot.doubleFork()
-   suwbot('irc.freenode.net', 6667, ['#onebigsoup'])
+def main(args):
+   global aliaslist
+   try:
+      aliaslist = pickle.load( open( picklefile ) )
+   except IOError:
+      pass
+   ulibot(ircserver, 6667, [room])
 
 if __name__=='__main__':
-   main()
+   main(sys.argv[1:])
 
