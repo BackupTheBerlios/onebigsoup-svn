@@ -58,6 +58,7 @@ class NameSpace:
         s.ns_url = ns_url
         s.names = {}
         s.connections = {}
+        s.meta = {}
         s.defaults = []
         s.pattern = None
         s.loaded_time = None # filled with time.time() after parse
@@ -84,7 +85,7 @@ class NameSpace:
         """
         if s.pattern == None:
             return None
-        return s.pattern.replace( "$PAGE", name )
+        return s.pattern.replace( "$NAME", name )
 
     def _parse_from_url(s):
         parser = lnparser.Parser( LocalNamesSink(s) )
@@ -100,7 +101,7 @@ class LocalNamesSink:
         self.namespace = namespace
 
     def meta(self, key, value):
-        pass
+        self.namespace.meta[key] = value
 
     def map(self, name, uri):
         self.namespace.names[ name ] = uri
