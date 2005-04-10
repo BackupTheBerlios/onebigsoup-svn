@@ -231,9 +231,10 @@ class Server:
             return IncorrectPasswordError
         else:
             namespace_list = ""
-            for user in s.userlist:
-                for namespace in user:
-                    namespace_list = namespace_list + namespace + "\n"
+            for user in s.userlist.keys():
+                for namespace in s.userlist[user].keys():
+                    if not namespace.startswith("_"):
+                        namespace_list = namespace_list + namespace + '\n'
             return namespace_list
 
     def get_server_info(s, username, pw):
