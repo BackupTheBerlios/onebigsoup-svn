@@ -1,1 +1,0 @@
-/home/jroes/onebigsoup/src/localnames/lnss/lnss_server.py

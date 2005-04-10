@@ -3,11 +3,9 @@
 import time
 import socket
 import pprint
-import xmlrpclib
 import os
 import sys
 
-from DocXMLRPCServer import DocXMLRPCServer
 import cPickle as pickle
 
 PATH_PREFIX = "/home/jroes/lnss/"
@@ -19,7 +17,6 @@ USERS_DB = PATH_PREFIX + "users.p"
 WEB_DIR = "/home/jroes/public_html/"
 URL_PREFIX = "http://localnames.sosdg.org/"
 
-sys.path.append(PATH_TO_CHERRYPY)
 from cherrypy import cpg
 import cherrypy.lib.filter.xmlrpcfilter
 
@@ -41,6 +38,8 @@ http://www.cherrypy.org/wiki/CherryPyTutorial
 """
 
 class Server:
+    _cpFilterList = [cherrypy.lib.filter.xmlrpcfilter.XmlRpcFilter()]
+    
     def _log(s, logstring):
         """Log an operation to the screen/logfile."""
         print time.asctime(), logstring
@@ -87,6 +86,19 @@ class Server:
     def __init__( s ):
         s._opendb()
 
+    def _cpOnError(self):
+        import traceback, StringIO
+        bodyFile = StringIO.StringIO()
+        traceback.print_exc(file = bodyFile)
+        errorBody = bodyFile.getvalue()        
+        if cpg.request.isRPC: ## this is set by the filter on xml-rpc requests
+            ## convert the traceback to a dumped Fault object: the XML-RPC exception
+            import xmlrpclib
+            cpg.response.body = [xmlrpclib.dumps(xmlrpclib.Fault(1,errorBody))]
+        else:
+            ## handle regular web errors
+            cpg.response.body = ['<pre>%s</pre>' % errorBody]
+
     def create_user(s, username, email, pw):
         """Create new user."""
         if s.userlist.has_key(username):
@@ -99,6 +111,7 @@ class Server:
         s._log('New user: "%s"' % username)
         s._savedb()
         return True
+    create_user.exposed = True
 
     def delete_user(s, username, pw):
         """Delete user."""
@@ -109,23 +122,25 @@ class Server:
         else:
             del s.userlist[username]
 
-        s._log('Deleted user: "%s"' % email)
+        s._log('Deleted user: "%s"' % username)
         s._savedb()
         return True
+    delete_user.exposed = True
 
     def email_pw(s, username, email):
-            """Email user's password to them"""
+            """Email user's password to them."""
             if not s.userlist.has_key(username):
                 return UserDoesntExistError
             else:
                 message = "To: " + email + "\n"
                 message += "From: localnames\n"
                 message += "Subject: password for localnames " + HOST_NAME + ":" + str(PORT_NUMBER) + "\n\n"
-                message += "Your password is " + s.userlist[email]['password'] + "\n"
+                message += "Your password is " + s.userlist[username]['password'] + "\n"
                 p = os.popen("%s -t" % MAIL, 'w')
                 p.write(message)
                 exitcode = p.close()
                 return True
+    email_pw.exposed = True
 
     def change_password(s, username, old_pw, new_pw):
         """Change user's password."""
@@ -139,7 +154,7 @@ class Server:
             return True
 
     def create_namespace(s, username, pw, namespace_name):
-        """Create namespace"""
+        """Create namespace."""
         if not s.userlist.has_key(username):
             return UserDoesntExistError
         elif s.userlist[username]['_password'] != pw:
@@ -147,14 +162,14 @@ class Server:
         elif s.userlist[username].has_key(namespace_name):
             return NamespaceExistsError
         else:
-            s.userlist[username][namespace_name] = { }
+            s.userlist[username][namespace_name] = [ ]
             return True
 
     def delete_namespace(s, username, pw, namespace_name):
-        """Delete namespace"""
+        """Delete namespace."""
         if not s.userlist.has_key(username):
             return UserDoesntExistError
-        elif s.userlist[email]['_password'] != pw:
+        elif s.userlist[username]['_password'] != pw:
             return IncorrectPasswordError
         elif namespace_name == "_password":
             return AccessDeniedError
@@ -166,7 +181,7 @@ class Server:
             return NamespaceDoesntExistError
 
     def set(s, username, pw, namespace_name, entry_type, key, value):
-        """Bind name to URL"""
+        """Bind name to URL."""
         if not s.userlist.has_key(username):
             return UserDoesntExistError
         elif s.userlist[username]['_password'] != pw:
@@ -186,7 +201,7 @@ class Server:
             return NamespaceDoesntExistError
 
     def unset(s, username, pw, namespace_name, entry_type, key, value):
-        """Unset namespace entry"""
+        """Unset namespace entry."""
         if not s.userlist.has_key(username):
             return UserDoesntExistError
         elif s.userlist[username]['_password'] != pw:
@@ -209,7 +224,7 @@ class Server:
             return NamespaceDoesntExistError
 
     def get_namespaces(s, username, pw):
-        """Return list of namespaces"""
+        """Return list of namespaces."""
         if not s.userlist.has_key(username):
             return UserDoesntExistError
         elif s.userlist[username]['_password'] != pw:
@@ -226,7 +241,7 @@ class Server:
         return { 'INTERFACE': 'v1 Local Names Store Interface', 'IMPLEMENTATION': 'JROES-LNS-D3-V1', 'SUPPORTS_PRIVATE_NAMESPACES': 0, 'URL_NAME_PATTERN': '' }
 
     def get_namespace_url(s, username, pw, namespace_name):
-        """Retrieve user's namespace"""
+        """Retrieve user's namespace."""
         if not s.userlist.has_key(username):
             return UserDoesntExistError
         elif s.userlist[username]['_password'] != pw:
@@ -239,28 +254,25 @@ class Server:
             return NamespaceDoesntExistError
 
     def default(s, username, function, password, *args):
-        default.exposed = True
-
-        if not s.userlist.has_key(username):
-            return UserDoesntExistError
-        elif (function == "get_server_info"):
-            return get_server_info(username, password)
+        if (function == "get_server_info"):
+            return s.get_server_info(username, password)
         elif (function == "change_password"):
-            return change_password(username, password, args[0])
+            return s.change_password(username, password, args[0])
         elif (function == "create_namespace"):
-            return create_namespace(username, password, args[0])
+            return s.create_namespace(username, password, args[0])
         elif (function == "delete_namespace"):
-            return delete_namespace(username, password, args[0])
+            return s.delete_namespace(username, password, args[0])
         elif (function == "get_namespace_url"):
-            return get_namespace_url(username, password, args[0])
+            return s.get_namespace_url(username, password, args[0])
         elif (function == "get_namespaces"):
-            return get_namespace(username, password)
+            return s.get_namespaces(username, password)
         elif (function == "set"):
-            return set(username, password, args[0], args[1], args[2], args[3])
+            return s.set(username, password, args[0], args[1], args[2], args[3])
         elif (function == "unset"):
-            return unset(username, password, args[0], args[1], args[2], args[3])
+            return s.unset(username, password, args[0], args[1], args[2], args[3])
         else:
             return "What happened?"
+    default.exposed = True
 
 
 cpg.root = Server()
