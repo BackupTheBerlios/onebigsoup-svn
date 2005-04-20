@@ -1,0 +1,33 @@
+
+# shorthand
+SOUPDIR="/home/lion/my/src/onebigsoup"
+OUTERDIR="/home/lion/my/src/obs_outside" # private user data
+TESTSITE="/var/www/testing"
+
+MYLN="$SOUPDIR/src/localnames/my_localnames2"
+
+
+# logging into OneBigSoup SVN server
+export SVN_SSH="ssh -l lionkimbro"
+
+
+# my.localnames conf
+export MY_LOCALNAMES_CONF_FILE="$SOUPDIR/tmp/lion/my.localnames.conf.sh"
+
+
+# going places
+alias myln="cd $MYLN"
+alias src="cd $SOUPDIR/src"
+alias lion="cd $SOUPDIR/tmp/lion"
+alias testing="cd $TESTSITE"
+alias testsite="cd $TESTSITE"
+
+
+# testing scripts
+alias run="lynx http://127.0.0.1/testing/index.cgi --dump"
+alias cpdata="cp -r $OUTERDIR/data.p $OUTERDIR/data $TESTSITE"
+alias reset="cd $MYLN ; $MYLN/sh_uninstall.sh ; $MYLN/sh_install.sh ; cpdata ; run"
+alias err="tail -30 /var/log/httpd/error_log"
+
+alias send="cp $MYLN/*.py $MYLN/*.html $TESTSITE"
+alias ship="send"
