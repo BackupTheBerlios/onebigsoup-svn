@@ -1,0 +1,30 @@
+
+  ===========================
+  |  Local Names v1.1 Core  |
+  ===========================
+
+
+  We use these modules to interpret, store, and resolve Local Names.
+
+      lnparser.py  --  Local Names description parser
+      localnames.py  --  Local Names storage, utilities, and resolution
+
+
+  You should install both of them on your system.
+
+
+  lnparser
+  --------
+
+    * very reusable
+    * simple parser
+    * easy to figure out
+
+  localnames
+  ----------
+
+    * may not be reusable for your project
+    * started life as a back-end for the XML-RPC server
+    * goal: to generalize a bit more
+
+
