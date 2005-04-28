@@ -14,11 +14,11 @@
  o   / 	o-'o  o	\.                 store, implements the Local Names
 .|.  |  /o	'o                 XML-RPC store interface spec
   \o \./ 
-  o|. |	 
-   .\ |	 o.o. 
+  o|. |	               lndelicious  -- Generates Local Names 
+   .\ |	 o.o.                          descriptions from del.icio.us
      \| ._---_.o
       | /.o.o o.     Other Stuff
-      |/      ' o
+      |/      ' o    ===========
+      |	
       |	               old  -- Abandon All Hope, Ye Who Enter Here
-      |	     
 

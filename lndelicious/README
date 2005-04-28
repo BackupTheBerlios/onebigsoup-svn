@@ -1,0 +1,11 @@
+
+  =====================
+  |  Delicious Names  |
+  =====================
+
+
+  This script reads a del.icio.us XML file, and outputs a Local Names
+  description. The field named "extension" is taken to be the Local
+  Name of a URL.
+
+
