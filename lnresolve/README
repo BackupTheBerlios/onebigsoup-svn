@@ -1,0 +1,13 @@
+
+  ======================================
+  |  Local Names v1.1 Resolver Server  |
+  ======================================
+
+
+  This is a Local Names resolver server. Read the server.py module
+  docstring for more information.
+
+  REQUIREMENTS:
+   * core Local Names libraries (found in /lncore)
+   * configure server.py -- variables commented with "# CONFIGURE"
+

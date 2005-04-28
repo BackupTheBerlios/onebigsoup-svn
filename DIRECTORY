@@ -1,18 +1,18 @@
 
      o
-    .|.	   . 
-    o\o.  o.--.                                        DIRECTORY 
-     .'-o./o
-      o. \.          Local Names
-     	  |o         
+    .|.	   .                                           DIRECTORY
+    o\o.  o.--.
+     .'-o./o         Local Names
+      o. \.          ===========
+     	  |o 
   o__o	  |.           lncore  -- Local Names core libraries
  ."o.\o   |o
- o   o"o /.            lnresolve -- Lion's basic XML-RPC resolver
-      o\/                           (aka "the Local Names server.")
+ o   o"o /.            lnresolve  -- Lion's basic XML-RPC resolver
+      o\/                            (aka "the Local Names server.")
        /   ._.o. 
-      |  .o/.o-_o
- o   / 	o-'o  o	\.
-.|.  |  /o	'o
+      |  .o/.o-_o      lnstore  -- Jonathan Roes' multi-user namespace
+ o   / 	o-'o  o	\.                 store, implements the Local Names
+.|.  |  /o	'o                 XML-RPC store interface spec
   \o \./ 
   o|. |	 
    .\ |	 o.o. 

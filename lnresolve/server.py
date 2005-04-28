@@ -1,11 +1,16 @@
 #!/usr/bin/python2.3
-"""Python2.3 Local Names Resolver by XML-RPC.
+"""Python2.3 Local Names Resolver by XML-RPC and GET.
 
 This scripts starts a Local Names Resolver. It interprets v1.1 Local
-Names descriptions.
+Names descriptions. Not only can it resolve names, but it can re-render
+and aggregate namespaces, and perform various other useful tasks as
+well.
 
-The interface is *not according to spec.*
-
+The interface is *NOT ACCORDING TO SPEC.* This is because, at this date,
+there IS no spec. When we build an XML-RPC specification, the code will
+be updated to meet the new specification. GET support will likely be
+dropped in the interest of maintaining and documenting only ONE
+interface.  -- Lion Kimbro, Wed Apr 27 23:34:13 PDT 2005
 """
 
 import BaseHTTPServer
@@ -17,6 +22,9 @@ import time
 
 import localnames
 
+
+HOST = "localhost"  # CONFIGURE THIS
+PORT = 9001  # CONFIGURE THIS
 
 redirect_lookup_flags = sets.ImmutableSet(["loose", "check-neighboring-spaces"])
 
@@ -178,7 +186,6 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def handle_httppipe(self, form_dict):
         """Called by do_POST when body looks like a form post."""
-        
         self.respond(200, u'Content-type', 'text/plain; charset=utf-8')
         if not form_dict.has_key("text"):
             self.wfile.write('Error: no form entry with key "text"')
@@ -263,6 +270,6 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    httpd = BaseHTTPServer.HTTPServer(("localhost", 9001), LocalNamesHandler)
+    httpd = BaseHTTPServer.HTTPServer((HOST, PORT), LocalNamesHandler)
     httpd.serve_forever()
 

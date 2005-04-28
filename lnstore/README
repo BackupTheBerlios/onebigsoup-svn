@@ -1,0 +1,12 @@
+
+  =================================================
+  |  Local Names Multi-User Namespace Data Store  |
+  =================================================
+
+
+  This server implements the Local Names XML-RPC Store Interface.
+  Use it to bind names to URLs in namespaces via XML-RPC.
+
+  This code isn't documented yet.
+
+
