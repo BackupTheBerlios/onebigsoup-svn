@@ -1,24 +1,24 @@
 
-     o
-    .|.	   .                                           DIRECTORY
-    o\o.  o.--.
-     .'-o./o         Local Names
-      o. \.          ===========
-     	  |o 
-  o__o	  |.           lncore  -- Local Names core libraries
- ."o.\o   |o
- o   o"o /.            lnresolve  -- Lion's basic XML-RPC resolver
-      o\/                            (aka "the Local Names server.")
-       /   ._.o. 
-      |  .o/.o-_o      lnstore  -- Jonathan Roes' multi-user namespace
- o   / 	o-'o  o	\.                 store, implements the Local Names
-.|.  |  /o	'o                 XML-RPC store interface spec
-  \o \./ 
-  o|. |	               lndelicious  -- Generates Local Names 
-   .\ |	 o.o.                          descriptions from del.icio.us
+     o                                                 DIRECTORY
+    .|.	   .
+    o\o.  o.--.     lncore -- Local Names core libraries
+     .'-o./o       
+      o. \.         lnresolve -- Basic Local Names resolver
+     	  |o       
+  o__o	  |.        lnstore -- Jonathan Roes' multi-user namespace store
+ ."o.\o   |o      
+ o   o"o /.         lndelicious -- Brian Templeton's del.icio.us to
+      o\/                          Local Names converter
+       /   ._.o.
+      |  .o/.o-_o   lnlink -- XHTML Local Names linker
+ o   / 	o-'o  o	\.
+.|.  |  /o	'o
+  \o \./
+  o|. |
+   .\ |	 o.o.
      \| ._---_.o
-      | /.o.o o.     Other Stuff
-      |/      ' o    ===========
-      |	
-      |	               old  -- Abandon All Hope, Ye Who Enter Here
+      | /.o.o o.
+      |/      ' o   old  -- Abandon All Hope, Ye Who Enter Here
+      |
+      |
 
