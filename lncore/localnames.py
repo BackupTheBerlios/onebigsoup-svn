@@ -52,12 +52,13 @@ def dump_cache(url):
 
 
 def preferred_names():
-    """
-    Dictionary linking cached namespace preferred name to url.
+    """Get namespace URLs by PREFERRED-NAME.
+    
+    Returns a dictionary linking cached namespace preferred name to the
+    namespace's url.
 
-    Old cache entries discarded, then
-    names assigned first come first serve.
-
+    Old cache entries are discarded, and then names are assigned on a
+    first come first serve basis.
     """
     decorated = [(ns["TIME"], ns) for ns in store.values()]
     decorated.sort()
@@ -151,13 +152,15 @@ def _namespace_from_text(text):
 
 
 def get_namespace(url):
-    """
+    
+    """Retrieve a namespace.
+    
     Returns a namespace dictionary.
 
-    Returns a cached version if possible,
-    retrieves fresh from the web otherwise.
-
+    Returns a cached version if possible, retrieves fresh from the web
+    otherwise.
     """
+    
     now = time.time()
     try:
         if now < store[url]["TIME"] + time_to_live:
@@ -165,7 +168,7 @@ def get_namespace(url):
     except KeyError:
         pass
 
-    text = urllib.urlopen( url ).read().decode("utf-8", "replace")
+    text = urllib.urlopen(url).read().decode("utf-8", "replace")
     namespace = _namespace_from_text(text)
     namespace["URL"] = url
 
@@ -188,7 +191,6 @@ def aggregate(urls):
       X AGGREGATES "URL"
       X AGGREGATES "URL"
       ...
-
     """
     super_text = []
     super_text.append(u'X PREFERRED-NAME "aggregate"\n')
@@ -208,7 +210,6 @@ def clean(namespace):
     Within blocks, original order is preserved.
     Standard X keys are handled particularly and intelligently.
     X LAST-CHANGED is updated to the present time.
-    
     """
     text = []
 

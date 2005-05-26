@@ -3,7 +3,7 @@
     .|.	   .
     o\o.  o.--.     lncore -- Local Names core libraries
      .'-o./o       
-      o. \.         lnresolve -- Basic Local Names resolver
+      o. \.         lnresolve -- Basic Local Names resolving server
      	  |o       
   o__o	  |.        lnstore -- Jonathan Roes' multi-user namespace store
  ."o.\o   |o      
@@ -16,7 +16,7 @@
   \o \./
   o|. |
    .\ |	 o.o.
-     \| ._---_.o
+     \| ._---_.o    website -- project website builder
       | /.o.o o.
       |/      ' o   old  -- Abandon All Hope, Ye Who Enter Here
       |
