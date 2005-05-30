@@ -2,6 +2,7 @@
 
 dump_cache -- dump cache entry
 preferred_names -- list names of cached namespaces
+namespace_from_text -- render namespace dictionary from text
 get_namespace -- cache a namespace
 aggregate -- form a namespace from several namespaces
 clean -- render a "clean" description of a namespace
@@ -88,7 +89,7 @@ def preferred_names():
     return bindings
 
 
-def _namespace_from_text(text):
+def namespace_from_text(text):
     """
     Returns namespace dictionary given some UTF-8 text.
     
@@ -169,7 +170,7 @@ def get_namespace(url):
         pass
 
     text = urllib.urlopen(url).read().decode("utf-8", "replace")
-    namespace = _namespace_from_text(text)
+    namespace = namespace_from_text(text)
     namespace["URL"] = url
 
     store[url] = namespace
@@ -199,7 +200,7 @@ def aggregate(urls):
         super_text.append(u'X AGGREGATES "%s"\n' % url)
     for url in urls:
         super_text.append(get_namespace(url)["TEXT"])
-    return _namespace_from_text("".join(super_text))
+    return namespace_from_text("".join(super_text))
 
 
 def clean(namespace):
