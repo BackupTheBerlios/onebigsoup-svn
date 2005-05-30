@@ -1,0 +1,396 @@
+2005-05-26
+
+Originally contributed to the PythonInfo wiki.
+
+This is written in current MoinMoin, *NOT* SinghText!
+
+
+-----------------
+
+Here's a way to make simple wiki-like syntaxes in Python.
+
+[[TableOfContents()]]
+
+
+= Lines as Tokens =
+
+Usually, you tokenize input word-by-word.
+
+For a wiki-like syntax, it can be easier to go ''line by line.''
+
+
+== Data Flow ==
+
+We start with:
+
+{{{
+= Hello, world! =
+THis is an example.
+
+We want to demonstrate how you take text with
+multiple lines, and turn it into one paragraph.
+}}}
+
+...turn it into...
+
+{{{
+#!python
+[("HEADER", ("=", " Hello, world! ")),
+ ("TEXT", ("This is an example.",)),
+ ("BLANK", ()),
+ ("TEXT", ("We want to demonstrate how you take text with",)),
+ ("TEXT", ("multiple lines, and turn it into one paragraph.",)),
+]
+}}}
+
+...and from there into...
+
+{{{
+#!python
+[("HEADER", ("=", " Hello, world! ")),
+ ("PARAGRAPH", ["This is an example."]),
+ ("BLANK", ()),
+ ("PARAGRAPH", ["We want to demonstrate how you take text with",
+                "multiple lines, and turn it into one paragraph."]),
+]
+}}}
+
+...and finally into:
+
+{{{
+<h1> Hello, world! </h1>
+<p>This is an example.</p>
+<p>We want to demonstrate how you take text with multple lines, and turn it into one paragraph.</p>
+}}}
+
+
+== Spec out Types of Lines ==
+
+Our first task is to spec out the types of lines that exist.
+
+Use RegularExpressions!
+
+Let's start with just three types of lines. (It'll be clear how to add more.)
+
+We'll have ''header lines,'' (like in wiki,) ''blank lines'' (seperating paragraphs,) and
+''text lines,'' which will be anything that doesn't match the others.
+
+Examples:
+{{{
+== Level 2 Heading ==
+
+Here's paragraph 1.
+Ladee dah dee dah.
+
+Here's paragraph 2.
+
+=== Level 3 Header ===
+Look, a paragraph without a blank line above it!
+No problem, we can parse it!
+}}}
+
+Here are our RegularExpressions:
+{{{
+#!python
+header = re.compile(r"^(=+)(.+?)\1$")
+blank = re.compile(r"^(\s*)$")
+text = re.compile(r"^(.+)$")  # if nothing else matched, use this
+}}}
+
+(Note that we store interesting information in regex groups.
+This is so we can get to it later on.)
+
+This is good to start with. You can add more types now, if you want, though!
+
+
+== Tokenize a Line ==
+
+Now, we'll teach Python how to tokenize a line.
+
+It goes like so:
+
+{{{
+#!python
+
+def tokenize_line(line):
+    """Tokenize a line, returning the token type and recognized groups."""
+    mo = header.match(line)
+    if mo is not None:
+        return ("HEADER", mo.groups())
+    mo = blank.match(line)
+    if mo is not None:
+        return ("BLANK", mo.groups())
+    mo = text.match(line)
+    if mo is not None:
+        return ("TEXT", mo.groups())
+    return ("ERROR", "this should never happen")
+}}}
+
+There's a pattern in the expression above; If you make a lot of line types,
+''exploit it.'' But it's easier for me explaining this to show it all to
+you unrolled.
+
+Okay! We can tokenize a line.
+
+Next up, read all the lines in a string.
+
+
+== Tokenize All Lines ==
+
+{{{
+#!python
+tokens = [tokenize_line(line) for line in text.split_lines()]
+}}}
+
+Uuuuuuunh-hunh!
+
+Well, that about wraps that one up.
+
+Of course, you're going to have to get some text on your own. Not my concern.
+
+
+= Isolating Paragraphs =
+
+== Lines and Paragraphs ==
+
+We've done all the tokenizing. Now comes the trickier part.
+
+We don't want text to just be a series of ''lines.'' If we do that, then
+we can't have anything like the following:
+
+{{{
+This is some text with ''some parts
+italic'' and with '''some parts that
+are bold.'''
+}}}
+
+You see the problem, right? The problem here is that "some parts italic"
+spans ''across lines.'' If you want your nifty bold-izing, italic-izing,
+link-izing, whatever-itizing magic substitutions to work on paragraphs,
+you're going to have to transcend ''the boundary of the line.''
+
+That, and: We want to put paragraph markers around ''paragraphs,'' not
+''every single line they type.''
+
+But we can't just be naive, and just work on blank lines; Because, there
+are headers nestled right against paragraphs, and we want to recognize,
+"No, this is a header, and this is a paragraph, and even thought they are
+sitting right next to one another, they are actually very different things."
+
+What we're going to do is: Whever text lines follow one another in series-
+roll that whole thing up into one big paragraph.
+
+
+== Turn Text into Paragraphs ==
+
+There are probably better ways to do this. Please adjust this text here,
+if you know one. But, this is how I did it.
+
+{{{
+#!python
+def text_to_paragraph(tokens):
+
+    """Group TEXTs into PARAGRAPHs."""
+    
+    result = []
+    texts = []
+
+    for token in tokens:
+        (token_type, token_groups) = token
+        if token_type == "TEXT":
+            texts.append(token_groups[0])
+        else:
+            if len(texts) > 0:
+                result.append("PARAGRAPH", "".join(texts))
+                texts = []
+            result.append(token)
+
+    if len(texts) > 0:
+        result.append("PARAGRAPH", ("".join(texts),))
+        texts = []
+    return result
+
+tokens = text_to_paragraph(tokens)
+}}}
+
+There!
+
+Now you have all your texts together!
+
+== Throw Out the Blanks ==
+
+Now that we've grouped our text, we can huck our blank lines! They've served their purpose.
+
+{{{
+#!python
+tokens = [x for x in tokens if x[0] != "BLANK"]
+}}}
+
+= Render HTML =
+
+Now we can output some nice HTML. :)
+
+{{{
+#!python
+
+def tokens_to_html(tokens):
+    result = []
+    for (token_type, token_groups) in tokens:
+        if token_type == "HEADER":
+            (level, content) = token_contents
+            level = len(level)  # Turn == into the number 2
+            result.append("<h%d>%s</h%d>" % (level, content, level))
+        elif token_type == "PARAGRAPH":
+            (text,) = token_groups
+            result.append("<p>%s</p>" % text)
+    return "\n".join(result) + "\n"
+
+print tokens_to_html(tokens)
+}}}
+
+== Celebrate ==
+
+Ta-da! That's basically it!
+
+...
+
+So, there's some things you might want to do.
+
+= Extensions and Alternatives =
+
+== Escape for HTML ==
+
+You might want to escape < and > and " to &lt; and &gt; and &quot;
+before you output your paragraph text.
+
+There's a page on this wiki about how to do it; The mis-named EscapingHtml,
+or something like that.
+
+== Italics, Bold, Links ==
+
+Regexes, my friend, regexes.
+
+But, it's a little more complicated, because you have to put <i> and </i>
+in the text in matching pairs in your paragraphs, you can't just substitute
+one type in.
+
+The following function may help you, but there ought be a better way.
+
+{{{
+#!python
+def join_by_pairs(lst, start, end):
+    """
+    if   lst = [1,2,3,4,5,6,7,8],
+    and  start = "a" and end = "b",
+    
+    result = [1,"a",2,"b",3,"a",4,"b",5,"a",6,"b",7,8]
+
+    Notice that nothing is started that isn't ended.
+    """
+    num_links = len(lst)-1
+    stops_lst = [start,end]*(num_links/2)
+    result = []
+    while len(stops_lst)>0:
+        # add an item from  lst
+        result.append(lst[0])
+        lst = lst[1:]
+        # add an item from  stops_lst
+        result.append(stops_lst[0])
+        stops_lst = stops_lst[1:]
+    # copy over whatever is left
+    result.extend(lst)
+    return "".join(result)
+}}}
+
+Use it with this:
+
+{{{
+#!python
+def bold_and_italics(text):
+    """Perform '''bold''' and ''italics'' replacements.
+
+    Note that, this assumes you've already called html_escape.
+    """
+    L = text.split("&apos;&apos;&apos;")
+    text = join_by_pairs(L, "<b>", "</b>")
+    L = text.split("&apos;&apos;")
+    text = join_by_pairs(L, "<i>", "</i>")
+    return text
+}}}
+
+== Link Patterns ==
+
+Link patterns are easier than bold or italic.
+
+{{{
+#!python
+def hyperlink(text):
+
+    """Turn links into <a href>'s."""
+
+    all_links = link_re.findall(text)
+
+    def make_ahref(matchobj):
+        link_url, link_text = matchobj.groups()
+        if link_text == "":
+            link_text = link_url
+        return '<a href="%s">%s</a>' % (link_url, link_text)
+    
+    text = link_re.sub(make_ahref, text)
+    return text
+}}}
+
+'Course, you'll need a link pattern.
+
+Here's one:
+
+{{{
+#!python
+link_regex = r"[[(.+?)](.*?)]"  # As we think it
+link_regex = link_regex.replace("[", "\\[")  # [ isn't a character class
+link_regex = link_regex.replace("]", "\\]")  # ] isn't a character class
+link_re = re.compile(link_regex)
+}}}
+
+That let's you write stuff like:
+{{{
+[[http://freshmeat.net/] Fresh Meat:] Don't worry- it's work safe.
+}}}
+
+== Regions ==
+
+By "regions," I mean things like:
+{{{
+ /*   # Region begins
+ ...
+ ...
+ */   # Region ends
+}}}
+
+If you want to support ''special regions of text,'' you might not want
+line recognition, since the text within the region will parse as something
+other than "text-within-this-region."
+
+The secret to dealing with regions, by this approach of coding, is to
+tokenize the entire region ''as one line.''
+
+So, make a special regex pattern, and suck up all the lines. This means
+you'll have to go to a positional system of regexing, though, which is a
+little more complicated than this page explains. But you should be able to
+figure it out, if you are so motivated.
+
+Hint: Make your tokens of the form:
+(token_type, token_groups, start_pos, end_pos).
+
+Another alternative is to, in your token, keep track of the original line.
+Then perform a grouping action, like we did when we grouped text lines
+into paragraphs. Only here, you'll ignore whatever type it thought the
+token was originally, when you come across the region.
+
+= Discussion =
+
+This is how I figured out how to do these things. If you know of better
+ways, please- by all means, list them here, point to them, or- probably
+best, just edit this text in-place. :)
+
+@SIG@

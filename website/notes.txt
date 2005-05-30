@@ -1,0 +1,51 @@
+
+
+HEADERS:
+  On front page, add headers, as per:
+  http://academ.hvcc.edu/~kantopet/xhtml/index.php?page=xhtml+meta+content
+  http://academ.hvcc.edu/~kantopet/xhtml/index.php?page=the+xhtml+header&parent=xhtml+basics
+
+  <meta name="keywords" content="local names">
+  <meta name="author" content="Local Names project"/>
+
+
+
+
+Need:
+* pages in format
+* html template
+* build script:
+
+
+       	       	       	        HTML Template
+			    	     |
+       	   Pages     (WikiSyntax)    V
+	    in 	  ------->*--------> * (Cheetah)
+	   Format      	   \   	     |
+       	       	       	   |         |
+			 Names 	     V
+			 Table--*--> * (Linking)
+			  (1)  	^    |
+			        |    |
+			       /     V
+	  Names Table (2)-----'  Final HTML
+			            pages
+
+
+ . o O (We could prefix Local Names with a special sequence,
+        to ease identification,...)
+
+
+Plan of attack?
+* Collect existing content onto Sakura's computer.
+* Choose a wiki-like syntax. (AsciiDoc?!?)
+** Require: Ability to export key-value pairs.
+** Require: Ability to output fragments.
+** Require: Ability to put Local Names as link output.
+* Convert content to wiki-like syntax.
+* Build an HTML Template.
+* Make wiki-like syntax export names list.
+* Make a build script.
+* Try it out!
+* YAY! We have an easy-to-build site!
+

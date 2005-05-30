@@ -1,0 +1,78 @@
+= 2005-05-30 =
+
+== 2:23 PM ==
+
+Uploading everything in the SVN tree. Arranging files, folders, text, ...
+
+Renaming and repositioning some stuff, it'll be broken for a bit.
+
+
+= 2005-05-25 =
+
+== 9:56 AM ==
+
+kw: todo
+
+I need to make it so that localnames.txt is copied to the final
+directory..!
+
+== 9:53 AM ==
+
+I need to make it an official part of the query spec, that names can be
+relative addresses.
+
+If a name does not begin with a protocol, then it is a relative address.
+
+I need to figure out the formal basis for relative addressing off of
+URLs, though, if there even is one.
+
+== ~9:30 AM ==
+
+lnlink and singhtext are now in the onebigsoup tree.
+
+I want this whole space into there, with time.
+
+I've been thinking: I can use a dictionary to store the names
+binding. If something isn't found in the dictionary, THEN defer to the
+network.
+
+Or, read the names binding from the file, using the parser.
+
+At any rate, the basic idea should work.
+
+
+= 2005-05-25 =
+
+PROBLEM:
+
+* You have a program that makes use of several web pages, located
+  all around the Internet.
+
+* You run this program several times in a row. You also make use of
+  other programs that may make use of web pages around the Internet,
+  visiting the same (but also some different) pages.
+
+* You want to cache your pulls- you don't want to keep pulling in
+  the data, over and over and over again.
+
+WHAT DO YOU DO,
+  WHAT ''DO'' YOU DO?!?
+
+SUPERPROBLEM:
+ * I'm trying to resolve localnames from a text file that's not on the
+   Internet.
+
+
+possible solutions:
+* Manually localnames.txt to the Internet before using it.
+* Automaticall post localnames.txt, somehow, to the Internet, before
+  using it.
+* Post localnames.txt using the LN Store interface, before using it.
+* Don't include localnames.txt as part of the website generation code.
+* Write a resolver that works with local files, and can also defer to a
+  remote names server.
+* Extend the query interface to handle "here's a namespace's text" as
+  part of a query.
+
+I think I'll go with the namespace store.
+

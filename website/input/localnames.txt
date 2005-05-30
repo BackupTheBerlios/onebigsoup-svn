@@ -1,0 +1,72 @@
+X VERSION 1.1
+
+# NOT ACTUALLY USED YET!
+# PRESENTLY, THE CODE READS FROM THE LIVE VERSION ON THE WEB.
+#
+# We need code that can use the local text for resolving,
+# and if not found there, or requiring a hop, defer gracefully
+# to a live Local Names Query server.
+#
+# Suggests an interesting use case for the query server:
+# Completing an in-progress name resolve.
+
+LN "this" "http://ln.taoriver.net/localnames.txt"
+
+LN "spec" "http://ln.taoriver.net/spec-1.1.html"
+LN "downloads" "http://ln.taoriver.net/downloads.html"
+LN "index" "http://ln.taoriver.net/index.html"
+LN "about" "http://ln.taoriver.net/about.html"
+LN "news" "http://ln.taoriver.net/news"
+LN "links" "http://ln.taoriver.net/links"
+LN "glossary" "http://ln.taoriver.net/glossary"
+
+LN "services" "http://ln.taoriver.net/servicenames.txt"
+NS . .
+.  "S" .
+
+
+LN "XML-RPC" "http://www.xmlrpc.org/"
+
+LN "One Big Soup" "http://onebigsoup.wiki.taoriver.net"
+NS "OneBigSoup" "http://onebigsoup.wiki.taoriver.net/moin.cgi/?action=localnames"
+.  "OBS" .
+
+# Downloads
+LN "core 1.1" "http://ln.taoriver.net/downloads/core1.1.tgz"
+.  "nameserver 1.1" .
+# set to whatever is most recent:
+.  "core" .
+
+LN "core 1.1 documentation" "http://ln.taoriver.net/server1.1.html"
+.  "nameserver 1.1 documentation" .
+
+LN "core libraries v1.0" "http://ln.taoriver.net/downloads/core.tgz"
+
+
+
+LN "Greg Schueler" "http://greg.vario.us/blog/scrawl/localnames.html"
+.  "Greg" .
+LN "Straun" "http://youarenumber6.blogspot.com/"
+LN "Danny Ayers" "http://dannyayers.com/"
+
+LN "Lion Kimbro" "http://www.speakeasy.org/~lion/
+LN "Lion Kimbro's Blog" "http://live.gnome.org/"
+
+LN "Pet Names Markup Language" "http://www.erights.org/elib/capability/pnml.html"
+.  "Pet Names" .
+LN "Plexnames" "http://logicerror.com/plexnamesPaper"
+
+LN "Sogudi" "http://www.atamadison.com/w/kitzkikz.php?page=Sogudi"
+
+LN "Markdown" "http://daringfireball.net/projects/markdown/
+LN "Textile" "http://textism.com/tools/textile/"
+LN "reStructuredText" "http://docutils.sourceforge.net/rst.html"
+LN "atx" "http://www.aaronsw.com/2002/atx/"
+LN "grutatxt" "http://www.triptico.com/software/grutatxt.html"
+LN "EtText" "http://ettext.taint.org/doc/"
+LN "APT (Augmented Plain Text)" "http://www.altheim.com/specs/NOTE-apt1.html"
+LN "AsciiDoc" "http://www.methods.co.nz/asciidoc/"
+LN "Wiki2xhtml" "http://www.neokraft.net/sottises/wiki2xhtml/"
+LN "BBCode" "http://www.christian-seiler.de/projekte/php/bbcode/index_en.html"
+LN "txt2html" "http://txt2html.sourceforge.net/"
+LN "C2:TextFilter" "http://c2.com/cgi/wiki?TextFilter"

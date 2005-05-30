@@ -1,0 +1,27 @@
+
+OFFICIAL NAMES for things:
+----------------------------------------
+
+Local Names (two words, capitalized)
+
+SERVERS
+-------------------
+Local Names Store Server (LNSS)
+Local Names Query Server (LNQS)
+
+NAMESPACES
+-------------------
+Services names
+Local Names site names
+
+Personal namespaces:
+* Joe Blogg's personal namespace
+
+Subject namespaces:
+* Java namespace
+
+SITES
+-------------------
+my.LocalNames (site)
+Web Browser Redirect (site)
+Local Names Wrap (site)

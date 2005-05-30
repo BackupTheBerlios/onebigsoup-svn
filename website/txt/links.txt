@@ -1,0 +1,74 @@
+$meta SECTION: links
+
+$name Namespaces
+=== Namespaces ===
+
+* [[services] Services names (Google, Wikipedia, Dictionary, Technorati
+  Tags, ...)]
+* [[this] Local Names site names]
+
+* [[http://greg.vario.us/ln/description] Greg's personal namespace]
+* [[http://www.ludism.org/%7Erwhe/localnames.txt] Ron Hale-Evans'
+  personal namespace]
+* [[http://greg.vario.us/names/Java%20Libraries.names] Java namespace]
+* [[http://greg.vario.us/names/jdk1.4.2.names] JDK 1.4.2 classes
+  namespace]
+* [[http://www.python.org/moin/LibraryReferencesNames?action=raw] Python
+  namespace]
+
+See also [[http://wrap.localnames.taoriver.net/spaces/] the list of wiki
+wrapped by namespaces] on [[Local Names Wrap]].
+
+See also the [[http://my.localnames.taoriver.net/spaces/] list of
+personal namespaces] over on [[my.LocalNames]].
+
+$name Web Applications
+=== Web Applications ===
+
+* [[http://services.taoriver.net:9089/] Local Names Query Server] - (via
+  [[XML-RPC]]) - warning: old, will be obsolete by 2006.
+* [[Web Browser Redirect]] - [[OBS:UsingLocalNamesInFirefox] jump to
+  websites] by name from the address bar.
+* [[Local Names Wrap]] - generate a namespace description from a wiki.
+* [[my.LocalNames]] - build and maintain a personal namespace
+  description.
+
+=== Other Peoples' Words ===
+
+* [[http://greg.vario.us/blog/scrawl/localnames.html] LocalNames and a
+  Useful Semantic Web] - by [[Greg]].
+* [[http://youarenumber6.blogspot.com/2004/07/web-web-wiki-wiki-web.html]
+  Web Web Wiki Wiki Web] - by [[Straun]].
+* [[http://dannyayers.com/archives/2004/07/07/dot-meet-dot/]
+  dot-meet-dot] - a [[Danny Ayers]] mention.
+
+=== Development ===
+
+* [[Lion Kimbro] Lion Kimbro's blog] - main developer & coordinator
+* [[One Big Soup]] - wiki used for development
+* [[OneBigSoup:LocalNames]] - wiki page dedicated to Local Names
+* [[OneBigSoup:OneBigSoupTeam]] - people who have involved themselves in
+  Local Names, or other One Big Soup work.
+
+$name Related Work
+=== Related Work ===
+
+$name Local Naming Systems
+Local Naming Systems:
+
+* [[Pet Names Markup Language]]
+* [[Plexnames]]
+
+$name Link Abbreviation
+Link Abbreviation:
+
+* [[Sogudi]]
+
+$name Text Filters
+Text Filters:
+
+[[Markdown]] - [[Textile]] - [[reStructuredText]] - [[atx]] -
+[[grutatxt]] - [[EtText]] - [[APT] APT (Augmented Plain Text)] -
+[[AsciiDoc]] - [[Wiki2xhtml]] - [[BBCode]] - [[txt2html]]
+
+See [[C2:TextFilter]] for a wiki-maintained list of text filters.

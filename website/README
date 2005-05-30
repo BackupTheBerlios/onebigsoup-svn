@@ -1,0 +1,16 @@
+
+  =========================
+  |  Local Names Website  |
+  =========================
+
+
+  site.py  -- Python utility script to render the website.
+              Basically a makefile.
+              RUN IT; it'll explain how it works.
+
+  Inputs come from two folders:
+    txt  -- text files representing web pages
+    input  -- miscellaneous input files
+
+  Output goes to:
+    output  -- HTML, CSS, localnames.txt

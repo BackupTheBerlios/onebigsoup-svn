@@ -1,0 +1,30 @@
+
+=== What is Local Names? ===
+
+Local names is a way to bind ''names'' to ''URLs.''
+
+Local Names is similar to DNS, but with two major differences:
+
+* It's based on ''URLs,'' not IP addresses.
+* Bindings are ''local,'' rather than ''global,'' in scope.
+
+That is, two namespaces may bind "fred" in different ways.
+
+[[about] Read more about Local Names.]
+
+=== Site Contents ===
+
+#LITERAL
+<table>
+<tr><td><a href="spec">Spec</a></td><td>the Local Names specification</td></tr>
+<tr><td><a href="downloads">Downloads</a></td><td>tools, programs, source</td></tr>
+<tr><td><a href="about">About</a></td><td>general Local Names information</td></tr>
+<tr><td><a href="news">News</a></td><td>major updates, RSS feed</td></tr>
+<tr><td><a href="links">Links</a></td><td>direct or tangential</td></tr>
+<tr><td><a href="glossary">Glossary</a></td><td>terminology for Local Names</td></tr>
+</table>
+#LITERAL
+
+Finally we have [[this] a Local Names description,] describing
+the Local Names defined on this site.
+
