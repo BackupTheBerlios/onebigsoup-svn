@@ -36,7 +36,7 @@ import xml.sax.handler
 import xml.sax.saxutils
 
 
-ignore_extensions = [".gif", ".jpg", ".png", "/", ".html"]
+ignore_extensions = [".gif", ".jpg", ".png", "/", ".html", ".txt"]
 
 
 def ignore_url(url):
