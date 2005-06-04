@@ -24,8 +24,13 @@ per name you're resolving.
 
 NamesCollector  -- SAX Handler that collects Local Names
 TagManipulator  -- SAX filter that tweaks attributes
-find_names  -- Find names in XHTML
+collect_names  -- Find names in XHTML
 link_names  -- Link names in XHTML
+collect_names_in_fragment  -- Find names in XHTML fragment
+link_names_in_fragment  -- Link names in XHTML fragment
+ignore_url  -- is string ignored (URL? file?) or not (Local Name)
+.ignore_suffixes  -- URL extensions that are not Local Names
+.ignore_prefixes  -- URL prefixes that are not Local Names
 """
 
 import cStringIO as StringIO
@@ -36,21 +41,25 @@ import xml.sax.handler
 import xml.sax.saxutils
 
 
-ignore_extensions = [".gif", ".jpg", ".png", "/", ".html", ".txt"]
+ignore_suffixes = [".gif", ".jpg", ".png", "/", ".html", ".txt"]
+ignore_prefixes = ["http://", "ftp://"]
 
 
 def ignore_url(url):
     """Return true if this is not interpreted as a Local Name."""
-    for x in ignore_extensions:
+    for x in ignore_suffixes:
         if url.endswith(x):
+            return True
+    for x in ignore_prefixes:
+        if url.startswith(x):
             return True
     return False
 
 
 class NamesCollector(xml.sax.handler.ContentHandler):
-
+    
     """Collect Local Names to resolve from an XML stream."""
-
+    
     def __init__(self, names_collected=sets.Set()):
         """Build a names collector.
 
@@ -124,7 +133,10 @@ class TagManipulator(xml.sax.saxutils.XMLFilterBase):
 
 def collect_names(xhtml):
 
-    """Build a list of names to lookup, given XHTML."""
+    """Build a list of names to lookup, given XHTML.
+
+    The XHTML must be a complete XHTML document, with no errors.
+    """
 
     result = sets.Set()
     
@@ -141,7 +153,10 @@ def collect_names(xhtml):
 
 def link_names(xhtml, dictionary):
     
-    """Link Local Names found in XHTML."""
+    """Link Local Names found in XHTML.
+
+    The XHTML must be a complete XHTML document, with no errors.
+    """
 
     output = StringIO.StringIO()
     
@@ -157,6 +172,34 @@ def link_names(xhtml, dictionary):
     parser.parse(inpsrc)
 
     return output.getvalue()
+
+
+def collect_names_in_fragment(xhtml_fragment):
+    """Build a list of names to lookup, given an XHTML fragment.
+    
+    This is a convenience function.
+
+    The fragment must contain no errors.
+    """
+    return collect_names('<html>' + xhtml_fragment + '</xhtml>')
+
+
+def link_names_in_fragment(xhtml_fragment, dictionary):
+    """Link Local Names found in XHTML fragment.
+    
+    This is a convenience function.
+
+    The fragment must contain no errors.
+
+    It's also something of a hack. If anyone knows the proper solution,
+    I'd love to know it. Mail lion at speakeasy.org. 2006-06-03.
+    """
+    test_string = "<p></p>"
+    test_result = link_names(test_string, {})
+    xml_header_len = test_result.find(test_string)
+    
+    full = link_names('<html>' + xhtml_fragment + '</html>', dictionary)
+    return full[xml_header_len:][len('<html>'):-len('</html>')]
 
 
 def _visual_test():
