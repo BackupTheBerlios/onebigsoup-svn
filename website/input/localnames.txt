@@ -50,7 +50,7 @@ LN "Straun" "http://youarenumber6.blogspot.com/"
 LN "Danny Ayers" "http://dannyayers.com/"
 
 LN "Lion Kimbro" "http://www.speakeasy.org/~lion/
-LN "Lion Kimbro's Blog" "http://live.gnome.org/"
+LN "Lion Kimbro's Blog" "http://lion.taoriver.net/"
 
 LN "Pet Names Markup Language" "http://www.erights.org/elib/capability/pnml.html"
 .  "Pet Names" .
