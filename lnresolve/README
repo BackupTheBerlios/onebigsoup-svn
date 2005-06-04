@@ -11,3 +11,10 @@
    * core Local Names libraries (found in /lncore)
    * configure server.py -- variables commented with "# CONFIGURE"
 
+	       /!\  THIS SERVER DOES NOT FOLLOW A   /!\
+	      /!\  SPECIFIED QUERY SERVER INTERFACE  /!\
+
+  That is, don't build on top of this server too much! We're going to
+  huck it, in exchange for a server that DOES follow a specified query
+  server interface- the "Local Names XML-RPC Query Interface."
+
