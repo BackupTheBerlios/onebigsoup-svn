@@ -1,0 +1,114 @@
+
+= 2005-06-01 =
+
+== 7:59 PM ==
+
+Yokai! It works!
+
+Now the question is, does [[this]] work for linking?
+
+If that does, then I believe we're all done for the time being here.
+
+In the future, we might want to interface off handling of $special lines
+and #region lines.
+
+You could also interface off link resolution. Make a module for doing
+Local Names via dictionary, make a module for doing Local Names from an
+actual Internet lookup.
+
+''Yes, it does work.'' So, now for rendering the website and what not!
+
+== 7:36 PM ==
+
+So it looks like, with $name, ...
+
+Ah, make sure the HTML is right, and check that that sort of HTML is
+actually the HTML we want.
+
+Yes- yes, it does work! Okay, so full speed ahead now, making sure the
+HTML is right. And that the test is right.
+
+== 10:46 AM ==
+
+I need to:
+* test whether $name makes an <a name='foo'/>
+** it's written, just needs testing.
+* test whether naming points like that actually works in HTML.
+
+== 10:43 AM ==
+
+Okay, I've got "$name" list-building done. Now for the HTML.
+
+But, after that- then what?
+
+I think it's back to the tools chain then- building web pages and
+localnames.txt lists from this stuff.
+
+== 10:11 AM ==
+
+* "$set" is done, here I go on $name.
+
+A thought occurs to me: Does it do ''italic'' and '''bold'''
+replacements within list items? We'll have to see.
+
+I now wish that tokens had been in their own class. That way, the "turn
+into HTML" functionality could be part of the token. But is this really
+the right decision? I suppose it could be tried in a future version, or
+something.
+
+Advantages:
+* don't have to keep unpacking the tuple list
+* don't have to keep unpacking the sub-tuple list
+* can attach HTML production intelligence to the token
+* class & component infrastructure possibilities
+** adapter
+
+Disadvantages:
+* harder to communicate external info to token,
+* algorithmic intel not all in same place
+
+Then again, there are wilder things to be done, such as using a parser.
+
+Anyways: $name.
+
+It ($name) produces HTML and a list.
+
+== 9:56 AM ==
+
+* Okay, I'm debugging $set. After this is $name.
+
+
+= 2005-05-31 =
+
+== 9:17 AM ==
+
+Almost done with $set; Just need to debug it now.
+
+I'm sure it's working to the level of tokenization. Now, I need to make
+it make a nice variable list out of that. I suspect the code that
+performs the regex reading and dictionary filling.
+
+So, fix that, Lion.
+
+== ~8:30 AM ==
+
+Working on the title ($set title: foo) and the sections.
+
+Plan:
+
+# $set
+# $name
+
+
+= 2005-05-30 =
+
+I'm putting in:
+* the ability to title a page
+* the abliity to name sections (A NAME)
+
+The A NAME has special rendering considerations, so I'm going to give it
+one "$special" signifier.
+
+But the other, we can make more general metadata. "$set title:
+foo". You'll set ''any'' value with $set.
+
