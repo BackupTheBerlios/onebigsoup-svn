@@ -15,18 +15,27 @@ Further, there are *special lines* and *regions.*
 * Regions: start with a #foo line, end with a repeat #foo line, and
            consist of the text between the two #foo lines.
 
-  /!\ Special Lines, Regions, Only partially supported! /!\
-
+TODO: Test whether you can ''italic'' and '''bold''' & link in list
+items. Make system use the html escape table for most text, but not
+region encoded text. Specificly: HEADER, *ITEM, #ITEM, TEXT, but not the
+other things.
 
 tokenize_one  -- tokenize one line
 tokenize_all  -- tokenize a complete text
 text_to_paragraph  -- group TEXT lines into PARAGRAPHs
 group_list_items  -- group ITEMs into LISTs.
 join_by_pairs  -- place START and END markers in a list
+html_escape  -- &entities;
 bold_and_italics  -- '''bold''', ''italics''
-hyperlink  -- resolve all links
+hyperlink  -- [[links]] to <a hrefs>
+treat  -- &entity;, '''bold''', ''italic'', and [[link]]
 tokens_to_html  -- produce HTML lines
+tokens_to_variables -- produce variables
+tokens_to_names_list -- produce names list
+digest_text  -- fully convert text to tokens
 text_to_html  -- produce HTML
+text_to_variables  -- collect variables from $set lines
+text_to_names_list  -- collect names list from $name lines
 """
 
 import re
@@ -44,10 +53,11 @@ html_escape_table = {
 # column 2:  regular expression
 tokenizing_checks = [
     ("HEADER", re.compile(r"(=+)(.+?)\1\n")),
-    ("*ITEM", re.compile(r"(\*+) (.+?)\n")),  # grouped: LIST
-    ("#ITEM", re.compile(r"(#+) (.+?)\n")),  # grouped: LIST
+    ("*ITEM", re.compile(r"(\*+)\s+(.+?)\n")),  # grouped: LIST
+    ("#ITEM", re.compile(r"(#+)\s+(.+?)\n")),  # grouped: LIST
     ("BLANK", re.compile(r"(\s*?)\n")),
     ("REGION", re.compile(r"#(.+?)\n((?:.*?\n)+?)#\1\n")),
+    ("SPECIAL", re.compile(r"(\$\S+)\s+(.+?)\n")),
     ("TEXT", re.compile(r"(.+?\n)")),  # Last resort, grouped: PARAGRAPH
     ]
 
@@ -56,8 +66,7 @@ link_regex = link_regex.replace("[", "\\[")  # [ isn't a character class
 link_regex = link_regex.replace("]", "\\]")  # ] isn't a character class
 link_re = re.compile(link_regex)
 
-special_line_handlers = {
-    }
+special_set_re = re.compile("(\S+):\s*(\S+)")  # $set (foo): (bar)
 
 
 def tokenize_one(text, pos):
@@ -202,7 +211,10 @@ def join_by_pairs(lst, start, end):
 
 
 def html_escape(text):
-    """Produce entities within text."""
+    """Produce entities within text.
+
+    For example: & to &amp; < to &lt; > to &gt;
+    """
     L = []
     for c in text:
         L.append(html_escape_table.get(c,c))
@@ -237,10 +249,20 @@ def hyperlink(text):
     return text
 
 
+def treat(text):
+    """HTML escape, bold & italic, and link.
+
+    This is a convenience function.
+    """
+    return hyperlink(bold_and_italics(html_escape(text)))
+
+
 def tokens_to_html(tokens):
     """Read the list of tokens, and return a list of resulting HTML.
 
-    The tokens should be fully digested. That is, all the grouping and transformation functions should have been applied.
+    The tokens should be fully digested. That is, list items should have
+    been turned into lists, texts should have been grouped into
+    paragraphs, all transformations should have been applied.
     """
     result = []
     for token in tokens:
@@ -248,7 +270,8 @@ def tokens_to_html(tokens):
         if token_type == "HEADER":
             (level, content) = token_contents
             level = len(level)
-            result.append("<h%d>%s</h%d>" % (level, content, level))
+            result.append("<h%d>%s</h%d>" % (level, treat(content),
+                                             level))
         elif token_type == "REGION":
             (region_type, content) = token_contents
             if region_type.upper() == "CODE":
@@ -276,22 +299,108 @@ def tokens_to_html(tokens):
                     result.append("</" + list_stack.pop() + ">")
                     cur_level = cur_level - 1
                 if text is not None:
-                    result.append("<li>" + text + "</li>")
+                    result.append("<li>" + treat(text) + "</li>")
+        elif token_type == "SPECIAL":
+            (dollar_text, content) = token_contents
+            dollar_text = dollar_text.upper()
+            if dollar_text == "$SET":
+                pass
+            elif dollar_text == "$NAME":
+                result.append("<a name='%s'/>" % content)
         elif token_type == "PARAGRAPH":
-            text = html_escape(token_contents)
-            text = bold_and_italics(text)
-            text = hyperlink(text)
-            result.append("<p>%s</p>" % text)
+            result.append("<p>%s</p>" % treat(token_contents))
     return result
 
 
-def text_to_html(text):
-    """Fully convert text to HTML."""
+def tokens_to_variables(tokens):
+    """Return dictionary and errors produced by $set lines.
+
+    Returns data of the form:
+      (dictionary,
+       [(error-ID-string, error-info, error-info, ...),
+        human-readable-error-string)]
+    
+    You can use this as soon as special lines have been identified in
+    the tokens list.
+    """
+    variables_dictionary = {}
+    errors = []
+    for token in tokens:
+        (token_type, token_contents, start_pos, end_pos) = token
+        if token_type != "SPECIAL":
+            continue
+        (dollar_text, content) = token_contents
+        dollar_text = dollar_text.upper()
+        if dollar_text == "$SET":
+            mo = special_set_re.match(content)
+            if mo is None:
+                errors.append(("BADSET", content))
+                continue
+            (key, val) = mo.groups()
+            variables_dictionary[key] = val
+    return (variables_dictionary, errors)
+
+
+def tokens_to_names_list(tokens):
+    """Return list of names produced by $name lines.
+
+    Returns data of the form:
+      ["name", "name", "name", ...]
+    ... in the order that names appear in the text.
+
+    You can use this as soon as special lines have been identified in
+    the tokens list.
+    """
+    names = []
+    for token in tokens:
+        (token_type, token_contents, start_pos, end_pos) = token        
+        if token_type != "SPECIAL":
+            continue
+        (dollar_text, content) = token_contents
+        dollar_text = dollar_text.upper()
+        if dollar_text == "$NAME":
+            names.append(content)
+    return names
+
+
+def digest_text(text):
+    """Fully convert text to final tokens list.
+
+    Tokenize the text, and then apply all techniques for grouping and
+    processing.
+    """
     tokens = tokenize_all(text)
     tokens = group_list_items(tokens)
     tokens = text_to_paragraph(tokens)
     tokens = [x for x in tokens if x[0] != "BLANK"]
+    return tokens
+
+
+def text_to_html(text):
+    """Fully convert text to HTML.
+
+    This is a convenience function.
+    """
+    tokens = digest_text(text)
     return "\n".join(tokens_to_html(tokens))
+
+
+def text_to_variables(text):
+    """Fully convert text to variables.
+
+    This is a convenience function.
+    """
+    tokens = tokenize_all(text)
+    return tokens_to_variables(tokens)[0]
+
+
+def text_to_names_list(text):
+    """Read out names from text.
+
+    This is a convenience function.
+    """
+    tokens = tokenize_all(text)
+    return tokens_to_names_list(tokens)
 
 
 if __name__ == "__main__":
@@ -351,4 +460,9 @@ of text after the list item.
     print
     print "Making PARAGRAPHs from TEXT:"
     print text_to_html(example)
+
+    print digest_text("""
+$set eggs: spam
+$set foo: bar
+""")
 
