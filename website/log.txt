@@ -1,3 +1,79 @@
+
+= 2005-06-03 =
+
+== 8:56 PM ==
+
+
+
+== 6:32 PM ==
+
+Okay, I think I've fixed the bug, I just need a test situation...
+
+== 8:38 AM ==
+
+Very briefly: I did a lot of work on it this morning, I got the
+WebsiteBuilder.compile_names_dictionary working.
+
+It's going well.
+
+I have a bug to fix:
+
+* lnlink is treating http://... as if it were a Local Name.
+
+
+= 2005-06-02 =
+
+== 12:50 AM ==
+
+Shoot, it's too late. Anyways:
+
+I need to put the recommended terms & languages notes in here. Or
+somewhere. Maybe in the base directory? Maybe in some "direction"
+directory, or with all the standards specifications, or..?
+
+== 9:45 AM ==
+
+It's going pretty well, so far. I've got the filesystem all abstracted
+away. Now I'm working on the "SiteBuilder" class, moving in the contents
+from __name__=='__main__' into there.
+
+
+== 8:50 AM ==
+
+Reworking to use the filesystem abstraction. I think I'm going to have
+it just read some of the autostart files, and store them in
+variables. No need to revisit them.
+
+
+= 2005-06-01 =
+
+== 8:21 PM ==
+
+Okay, I'm back from working on SinghText. I believe we have everything
+we need from over there- we can get a list of names in a given page, we
+can make <a name='foo'>, we can do all these different things.
+
+Now I just need to figure out what I need to do up here.
+
+* I believe I was supposed to apply some filesystem abstraction in
+  render.py.
+* I believe it was supposed to use optparse.
+
+So, let's take these in the following order:
+
+# Rework to use filesystem abstraction.
+# Setup optparse use.
+# Start making it work.
+** Build internal names table.
+*** From pre-existing list.
+*** Provided by pages. ($name)
+*** ...and then those that are looked up from the Internet.
+** Perform merging and collections and linking and whatnot.
+
+So, I guess whenever I next get to code, it's reworking to the
+filesystem abstraction that's up.
+
+
 = 2005-05-30 =
 
 == 2:23 PM ==

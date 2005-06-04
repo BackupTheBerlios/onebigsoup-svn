@@ -19,17 +19,25 @@ Need:
 
        	       	       	        HTML Template
 			    	     |
-       	   Pages     (WikiSyntax)    V
-	    in 	  ------->*--------> * (Cheetah)
-	   Format      	   \   	     |
-       	       	       	   |         |
-			 Names 	     V
+       	   Pages     (WikiSyntax)    V		      Linking can only
+	    in 	  ------->*--------> * (Cheetah)      occur proper after
+	   Format      	   \   	     |		      a master names
+       	       	       	   |         |		      table has included
+			 Names 	     V		      everything.
 			 Table--*--> * (Linking)
 			  (1)  	^    |
 			        |    |
 			       /     V
 	  Names Table (2)-----'  Final HTML
 			            pages
+
+  1. Start with the base names table.
+  2. Go through every document, and strip names from it.
+      --> Title
+      --> A NAMEs
+      --> Glossary Entries
+  3. Then, you can perform linking for your documents.
+
 
 
  . o O (We could prefix Local Names with a special sequence,
