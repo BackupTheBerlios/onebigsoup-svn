@@ -181,7 +181,7 @@ def collect_names_in_fragment(xhtml_fragment):
 
     The fragment must contain no errors.
     """
-    return collect_names('<html>' + xhtml_fragment + '</xhtml>')
+    return collect_names('<html>' + xhtml_fragment + '</html>')
 
 
 def link_names_in_fragment(xhtml_fragment, dictionary):
