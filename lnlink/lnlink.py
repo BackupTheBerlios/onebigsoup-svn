@@ -120,7 +120,7 @@ class TagManipulator(xml.sax.saxutils.XMLFilterBase):
                 return
             mask("src")
             return
-
+        
         if name == "a":
             if not attrs.has_key("href") or ignore_url(attrs["href"]):
                 pass_on()
@@ -137,17 +137,17 @@ def collect_names(xhtml):
 
     The XHTML must be a complete XHTML document, with no errors.
     """
-
+    
     result = sets.Set()
     
     parser = xml.sax.make_parser()
     parser.setContentHandler(NamesCollector(result))
-
+    
     inpsrc = xml.sax.xmlreader.InputSource()
     inpsrc.setByteStream(StringIO.StringIO(xhtml))
-
+    
     parser.parse(inpsrc)
-
+    
     return result
 
 
@@ -157,7 +157,7 @@ def link_names(xhtml, dictionary):
 
     The XHTML must be a complete XHTML document, with no errors.
     """
-
+    
     output = StringIO.StringIO()
     
     parser = xml.sax.make_parser()
