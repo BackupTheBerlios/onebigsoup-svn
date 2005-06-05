@@ -15,10 +15,8 @@ Further, there are *special lines* and *regions.*
 * Regions: start with a #foo line, end with a repeat #foo line, and
            consist of the text between the two #foo lines.
 
-TODO: Test whether you can ''italic'' and '''bold''' & link in list
-items. Make system use the html escape table for most text, but not
-region encoded text. Specificly: HEADER, *ITEM, #ITEM, TEXT, but not the
-other things.
+This module uses native strings, and does nothing with encoding or
+decoding to unicode.
 
 tokenize_one  -- tokenize one line
 tokenize_all  -- tokenize a complete text
@@ -282,8 +280,10 @@ def tokens_to_html(tokens):
                 result.append(content)
             else:
                 result.append('<font color="red">')
-                result.append('Region "%s" not understood.'
+                result.append('<p>Region "%s" not understood.</p>'
                               % region_type)
+                result.append("<p><code><pre>%s</pre></code></p>"
+                              % html_escape(content))
                 result.append('</font>')
         elif token_type == "LIST":
             cur_level = 0
