@@ -177,7 +177,6 @@ class LocalNamesHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                            "lookup": self.xmlrpc_lookup}
         try:
             args = list(args)
-            args[0] = str(args[0]) # hehehe
             result = xmlrpc_bindings[funct](*args)
             self.respond(200, u'Content-type', 'text/html; charset=utf-8')
             self.wfile.write(xmlrpclib.dumps((result,)))
