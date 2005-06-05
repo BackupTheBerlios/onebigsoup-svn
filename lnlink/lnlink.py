@@ -23,15 +23,16 @@ are expensive: We need to be able to resolve all names in one trip.
 Local names can be manually bound, or resolved automatically with the
 Old Style Local Names Query Server.
 
+.ignore_suffixes  -- URL extensions that are not Local Names
+.ignore_prefixes  -- URL prefixes that are not Local Names
+ignore_url  -- is string ignored (URL? file?) or not (Local Name)
 NamesCollector  -- SAX Handler that collects Local Names
 TagManipulator  -- SAX filter that tweaks attributes
+CollectedNames  -- collection of names to be bound
 collect_names  -- Find names in XHTML
 link_names  -- Link names in XHTML
 collect_names_in_fragment  -- Find names in XHTML fragment
 link_names_in_fragment  -- Link names in XHTML fragment
-ignore_url  -- is string ignored (URL? file?) or not (Local Name)
-.ignore_suffixes  -- URL extensions that are not Local Names
-.ignore_prefixes  -- URL prefixes that are not Local Names
 """
 
 import cStringIO as StringIO
@@ -44,6 +45,8 @@ import xml.sax.saxutils
 
 ignore_suffixes = [".gif", ".jpg", ".png", "/", ".html", ".txt"]
 ignore_prefixes = ["http://", "ftp://"]
+
+LIONS_OSLNQS_URL = "http://services.taoriver.net:9090/"
 
 
 def ignore_url(url):
@@ -132,11 +135,116 @@ class TagManipulator(xml.sax.saxutils.XMLFilterBase):
         pass_on()
 
 
+class CollectedNames:
+
+    """A collection of local names, to be bound to URLs.
+
+    This class represents a collection of local names that are bound, or
+    to be bound, to URLs.
+
+    bind  -- bind names to values
+    bind_unresolved_to_url  -- bind all unresolved names to an URL
+    bind_with_LNQS  -- use LNQS to bind names
+    .unresolved  -- set of unresolved names
+    .bound  -- dictionary of bindings
+    """
+
+    def __init__(self, unresolved=set(), bound={}):
+        """Initialize, optionally with names bound or otherwise."""
+        self.unresolved = unresolved
+        self.bound = bound
+
+    def bind(self, bindings, overwrite=False):
+        """Safely bind local names to values.
+
+        Return the set of bindings that were rejected, because they were
+        already defined. (If overwrite is true, returns an empty list.)
+        """
+        bindings_set = set(bindings)
+        if overwrite:
+            accepted = bindings_set
+            rejected = set()
+        else:
+            accepted = bindings_set & self.unresolved
+            rejected = bindings_set - accepted
+        for key in accepted:
+            self.bound[key] = bindings[key]
+        self.unresolved = self.unresolved - bindings_set
+        return rejected
+
+    def bind_unresolved_to_url(self, url):
+        """Bind all unresolved names to a given URL."""
+        for localname in self.unresolved:
+            self.bound[localname] = url
+        self.unresolved = set()
+
+    def bind_with_LNQS(self, namespace_description_url, xmlrpc_url,
+                       separator=":"):
+        """Bind unresolved local names with a Local Names Query Server.
+
+        Returns set of names that were not resolved.
+
+        xmlrpc_url is a dummy URL, until an LNQS actually exists that
+        you can use.
+        
+        Until the Local Names XML-RPC Query Server Interface (LNXRQSI)
+        is actually set in stone, and an LNQS actually written, this
+        function just defers to _bind_with_OSLNQS.
+
+        Still, this is the recommended function to use.
+        """
+        return self.bind_with_OSLNQS(self, namespace_description_url,
+                                     LIONS_OSLNQS_URL, separator)
+
+    def bind_with_OSLNQS(self, namespace_description_url,
+                         xmlrpc_url=LIONS_OSLNQS_URL, separator=":"):
+        """Bind unresolved local names using an OSLNQS. (deprecated)
+        
+        Returns set of names that were not resolved.
+        
+        An "OSLNQS" is an "Old Style Local Names Query Server." Or
+        perhaps "Old School Local Names Query Server." Regardless, this
+        is an old query server, pre-Local Names XML-RPC Query Interface
+        (LNXRQI) specification.
+        
+        Since it seems only one name server on the web meets the
+        description, and since this is only in use until the interface
+        specification is completed an a formal LNSQ, and thus this
+        function is almost automatically obsolete, I feel no guilt in
+        hard-coding it to Lion's OSLNQS.
+        
+        The Local Names XML-RPC Query Interface (LNXRQI) specification
+        is scheduled for completion October 2005, and a working Local
+        Names Query Server (LNQS) scheduled for completion November
+        2005.
+        
+        This function will be depricated, and perhaps useless, as soon
+        as we have an alternative LNQS.
+        """
+        import xmlrpclib
+        flags = ["loose", "check-neighboring-spaces"]
+        nameserver = xmlrpclib.ServerProxy(xmlrpc_url)
+        request_names = list(self.unresolved)
+        request_paths = []
+        for name in request_names:
+            request_paths.append([name])
+        urls = nameserver.lookup(request_paths,
+                                 namespace_description_url, flags)
+        for (key, value) in zip(request_names, urls):
+            if isinstance(value, basestring):
+                self.bound[key] = value
+                self.unresolved.discard(key)
+        return self.unresolved
+
+
 def collect_names(xhtml):
 
-    """Build a list of names to lookup, given XHTML.
+    """Build a set of names to lookup, given XHTML.
 
     The XHTML must be a complete XHTML document, with no errors.
+
+    Returns a CollectedNames instance; Read the .unresolved attribute
+    for the set of names to look up.
     """
     
     result = sets.Set()
@@ -149,21 +257,26 @@ def collect_names(xhtml):
     
     parser.parse(inpsrc)
     
-    return result
+    return CollectedNames(result)
 
 
-def link_names(xhtml, dictionary):
+def link_names(xhtml, collected_names):
     
     """Link Local Names found in XHTML.
-
+    
+    collected_names can be a dictionary or a CollectedNames instance.
+    
     The XHTML must be a complete XHTML document, with no errors.
     """
+
+    if isinstance(collected_names, CollectedNames):
+        collected_names = collected_names.bound
     
     output = StringIO.StringIO()
     
     parser = xml.sax.make_parser()
     
-    _filter = TagManipulator(dictionary, parser)
+    _filter = TagManipulator(collected_names, parser)
     parser.setContentHandler(_filter)
     _filter.setContentHandler(xml.sax.saxutils.XMLGenerator(output))
     
@@ -176,21 +289,26 @@ def link_names(xhtml, dictionary):
 
 
 def collect_names_in_fragment(xhtml_fragment):
-    """Build a list of names to lookup, given an XHTML fragment.
+    """Build a set of names to lookup, given an XHTML fragment.
     
-    This is a convenience function.
-
     The fragment must contain no errors.
+
+    Returns a CollectedNames instance; Read the .unresolved attribute
+    for the set of names to look up.
+
+    This is a convenience function.
     """
     return collect_names('<html>' + xhtml_fragment + '</html>')
 
 
-def link_names_in_fragment(xhtml_fragment, dictionary):
+def link_names_in_fragment(xhtml_fragment, collected_names):
     """Link Local Names found in XHTML fragment.
-    
-    This is a convenience function.
 
+    collected_names can be a dictionary or a CollectedNames instance.
+    
     The fragment must contain no errors.
+
+    This is a convenience function.
 
     It's also something of a hack. If anyone knows the proper solution,
     I'd love to know it. Mail lion at speakeasy.org. 2006-06-03.
