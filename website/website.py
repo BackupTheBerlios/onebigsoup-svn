@@ -1,9 +1,12 @@
 """Render ln.taoriver.net website.
 
-# TODO - debug WebsiteBuilder.list_of_names_used
-#        (-->lnlink.collect_names_in_fragment)
 # TODO - complete & debug WebsiteBuilder.build
-# TODO - document contexts' internal variables
+** (./) abstract collecting uses
+** (./) abstract collecting provided
+** (./) abstract collecting names from localnames.txt
+** abstract collecting names by server
+** write out full process
+# (./) TODO - document contexts' internal variables
 # TODO - final check, make sure methods and non-.variables are doc'ed
 # TODO - let user tweak ExecutionContext/FileSystemContext with optparse
 
@@ -34,6 +37,7 @@ INPUT_DIRECTORY = "input"
 OUTPUT_DIRECTORY = "output"
 TEMPLATE_FILENAME = "template.html"
 LOCAL_NAMESPACE_FILENAME = "localnames.txt"
+LOCAL_FILE_ENCODING = 'cp1252'  # Windows ANSI Codepage 1252
 
 OLDSTYLE_NAMESERVER_URL = "http://services.taoriver.net:9090/"
 
@@ -76,6 +80,12 @@ class FileSystemContext:
     filenames.
 
     init_with_module_defaults  -- initialize with module defaults
+    .path_to_text_files  -- where to read content text files
+    .path_to_input_files  -- where to read miscellaneous files
+    .path_to_output_files  -- where to write output files
+    .template_filename  -- filename, HTML template file
+    .local_namespace_filename  -- filename, base local names description
+    .file_encoding  -- encoding of text files on local filesystem
     """
 
     def __init__(self):
@@ -85,6 +95,7 @@ class FileSystemContext:
         self.path_to_output_files = None
         self.template_filename = None
         self.local_namespace_filename = None
+        self.file_encoding = None
 
     def init_with_module_defaults(self):
         """Initialize the context with module defaults.
@@ -96,6 +107,7 @@ class FileSystemContext:
         self.path_to_output_files = OUTPUT_DIRECTORY
         self.template_filename = TEMPLATE_FILENAME
         self.local_namespace_filename = LOCAL_NAMESPACE_FILENAME
+        self.file_encoding = LOCAL_FILE_ENCODING
 
 
 class ExecutionContext:
@@ -117,7 +129,8 @@ class ExecutionContext:
     .connected_to_internet  -- True/False, can make use of Internet?
     .oldstyle_xmlrpc_nameserver_url  -- XML-RPC Local Names query server
     .namespace_description_url  -- remote namespace, for names lookup
-    .base_url  -- base URL for output website
+    .base_url  -- base URL for output website, with trailing slash
+    .not_found_url  -- URL for lookups that can't be resolved
     """
 
     def __init__(self):
@@ -145,7 +158,12 @@ class ExecutionContext:
 class FileSystemAdapter:
     
     """Mediate input/output interactions with the file system.
-    
+
+    The page's filenames are in three categories:
+    * basename: "index"
+    * textname: "index.txt"
+    * htmlname: "index.html"
+
     text_file  -- read text file
     write_to_html  -- write HTML file
     template_text  -- read template text
@@ -157,37 +175,42 @@ class FileSystemAdapter:
         self._context = filesystem_context
         self._template_text = None
         self._local_namespace_text = None
-    
-    def text_file(self, name):
+
+    def text_file(self, basename):
         """Get contents of a text file.
         
         The text file is named without the .txt extension.
         """
-        if os.sep in name:
-            raise PathNavigationInFilenameException(name)
+        if os.sep in basename:
+            raise PathNavigationInFilenameException(basename)
         filename = self._context.path_to_text_files \
-                   + os.sep + name + ".txt"
-        return open(filename, "r").read()
+                   + os.sep + basename + ".txt"
+        encoding = self._context.file_encoding
+        return open(filename, "r").read().decode(encoding)
 
-    def text_file_names(self):
+    def text_file_basenames(self):
         """Return list of text files.
 
         The text file is named without the .txt extension.
         """
         all_files = os.listdir(self._context.path_to_text_files)
-        return [x[:-4] for x in all_files if x.endswith(".txt")]
+        basenames = []
+        for x in all_files:
+            if x.endswith(".txt"):
+                basenames.append(unicode(x[:-4]))
+        return basenames
     
-    def write_to_html(self, name, content):
+    def write_to_html(self, basename, content):
         """Write contents to an output HTML file.
 
         The HTML file is named without the .html extension.
         """
-        if os.sep in name:
-            raise PathNavigationInFilenameException(name)
+        if os.sep in basename:
+            raise PathNavigationInFilenameException(basename)
         filename = self._context.path_to_output_files \
-                   + os.sep + name + ".html"
+                   + os.sep + basename + ".html"
         f = open(filename, "w")
-        f.write(content)
+        f.write(content.encode(self._context.file_encoding))
         f.close()
 
     def template_text(self):
@@ -254,13 +277,35 @@ class WebsiteBuilder:
     def list_of_names_used(self):
         """Return set of names used in all text files."""
         names_used = set()
-        for filename in self._filesystem.text_file_names():
+        for filename in self._filesystem.text_file_basenames():
             text = self._filesystem.text_file(filename)
             html = singhtext.text_to_html(text)
             names = set(lnlink.collect_names_in_fragment(html))
+            print names
             names_used.update(names)
         return names_used
 
+    def names_provided_by_text_files(self):
+        """Return dictionary of names provided by text files."""
+        names_dict = {}
+        for basename in self._filesystem.text_file_basenames():
+            file_url = self._context.base_url + basename + ".html"
+            text = self._filesystem.text_file(basename)
+            tokens = singhtext.tokenize_all(text)
+            variables = singhtext.tokens_to_variables(tokens)[0]
+            if variables.has_key("title"):
+                title = variables["title"]
+                names_dict[title] = file_url
+            else:
+                names_dict[basename] = file_url
+            for name in singhtext.tokens_to_names_list(tokens):
+                names_dict[name] = file_url + "#" + name
+        return names_dict
+
+    def names_provided_by_localnames_file(self):
+        """Return dictionary of Local Names from localnames.txt."""
+        return self._local_namespace["LN"].copy()
+    
     def compile_names_dictionary(self):
         """Compile final dictionary of names to URLs.
 
@@ -272,14 +317,14 @@ class WebsiteBuilder:
         # ...and also strip names that they want to make use of.
         # Collect missing names from nameserver, if connected to the
           Internet.
-
+        
         Names that can't be found are linked to the not-found URL
         described in the execution context.
         """
         names_found = self._local_namespace["LN"].copy()
         names_used = []
-        for filename in self._filesystem.text_file_names():
-            text = self._filesystem.text_file(filename)
+        for basename in self._filesystem.text_file_basenames():
+            text = self._filesystem.text_file(basename)
             tokens = singhtext.tokenize_all(text)
             names_provided = singhtext.tokens_to_names_list(tokens)
             text_variables = singhtext.tokens_to_variables(tokens)[0]
@@ -310,7 +355,7 @@ class WebsiteBuilder:
 
         TODO: explain how, basically
         """
-        for name in self._filesystem.text_file_names():
+        for name in self._filesystem.text_file_basenames():
             text = self._filesystem.text_file(name)
             html = singhtext.text_to_html(text)
             template = self._filesystem.template_text()

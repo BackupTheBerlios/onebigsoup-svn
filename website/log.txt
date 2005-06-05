@@ -1,9 +1,30 @@
 
+= 2005-06-04 =
+
+== 6:23 PM ==
+
+Been working on this for a while today. Got distracted by web (damn the
+web!) and working on the MachineCodeBlocks today. But other than that,
+it's been good today.
+
+I'm about to commit the code, because I'm making a risky change: In
+lnlink, I'm adding a class to assist in the names-collection and linking
+process. It'll help keep track of a list of names to be linked, to link
+them, to make sure you don't double-link (or allow you to re-link,)
+something that helps you see what you've forgotten to link, and then
+something that will link things that aren't linked yet to a
+default.
+
+That kind of stuff.
+
+I think it'll help simplify the builder, and make things more friendly
+all around.
+
+Damn, I wish PEAK were well documented and mainstream. I see so many
+ways to use it.
+
+
 = 2005-06-03 =
-
-== 8:56 PM ==
-
-
 
 == 6:32 PM ==
 
