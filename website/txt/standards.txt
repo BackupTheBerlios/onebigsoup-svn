@@ -1,27 +1,58 @@
 
-OFFICIAL NAMES for things:
-----------------------------------------
+= Official Names for Local Names concepts =
+
+This is a language guide, mainly for internal use.
+
+== Local Names ==
 
 Local Names (two words, capitalized)
+* the concept
 
-SERVERS
--------------------
+Local Names project
+
+Local Names website
+
+Local Names system
+* refers to systems created by Local Names project
+* implies specifications created by Local Names project
+
+local name(s)
+* ex: "slashdot", bound to "http://slashdot.org/", is a local name
+
+namespace description
+* refers to a file, conforming to the Local Names system
+
+namespace
+* refers to the idea of a collection of local names, but not the file
+  itself
+* use "namespace description" if you want to talk about the file itself
+
+== Servers ==
+
 Local Names Store Server (LNSS)
+
 Local Names Query Server (LNQS)
 
-NAMESPACES
--------------------
-Services names
-Local Names site names
+== Namespace Descriptions ==
 
-Personal namespaces:
-* Joe Blogg's personal namespace
+Services names
+
+Local Names website names
+
+=== Personal Namespace Descriptions ===
+
+* "Joe Blogg's personal namespace"
 
 Subject namespaces:
-* Java namespace
 
-SITES
--------------------
-my.LocalNames (site)
-Web Browser Redirect (site)
-Local Names Wrap (site)
+* "Java namespace"
+
+== Special Websites ==
+
+* my.LocalNames (website)
+* Web Browser Redirect (website)
+* Local Names Wrap (website)
+
+You can say "my.LocalNames..." or you can say "the my.LocalNames
+website."
+
