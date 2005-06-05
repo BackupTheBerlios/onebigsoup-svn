@@ -33,6 +33,11 @@ Local Names Store Server (LNSS)
 
 Local Names Query Server (LNQS)
 
+Old Style Local Names Query Server (OSLNQS)
+* the one we're using right now,...
+* ...that has no specified query interface.
+* we discourage using this
+
 == Namespace Descriptions ==
 
 Services names

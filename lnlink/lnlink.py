@@ -1,26 +1,27 @@
-"""Link Local Names to URLs.
+"""Link local names to URLs.
 
-Read an XHTML document and bind Local Names found in <a href> and <img>
+Read an XHTML document and bind local names found in <a href> and <img>
 tags to URLs.
 
-Any <img src="..."> attribute or any <a href="..."> attribute that ends
-with .gif, .jpg, .png, .html, or / is assumed to be a URL or relatively
-addressed page or image. Everything else is assumed to be a Local Name.
+Given an <a href="...">, is it a local name?
+* assume it's a local name
+* unless it ends with: .gif, .jpg, .png, .html, or /
+* unless it starts with: http://, ftp://
 
-The recognized page and image extensions are customizable.
+Customize prefixes and suffixes with .ignore_suffixes, .ignore_prefixes.
 
-If a name is not resolved, it is left as it is. (That is, no changes are
-made.) You may want to bind all unresolved names to some error URL.
+Unresolved names can be bound to a URL, or left be (no changes made.)
 
-In the common case, Local Names are resolved via remote name server.
-Thus, this is generally a two step process: First pass, you collect
-names to resolve from the XHTML. Then you resolve the names to URLs.
-Then you make your second pass, and output the URLs in place of the
-names.
+Resolving names is a two pass process:
+* first pass, collect local names to resolve from XHTML
+* (resolve names)
+* second pass, replace local names with URLs
 
-You want to collect the names first, because the network call to resolve
-them is expensive. You want to make one network call, rather than one
-per name you're resolving.
+The process is two pass, because network calls to resolve local names
+are expensive: We need to be able to resolve all names in one trip.
+
+Local names can be manually bound, or resolved automatically with the
+Old Style Local Names Query Server.
 
 NamesCollector  -- SAX Handler that collects Local Names
 TagManipulator  -- SAX filter that tweaks attributes
