@@ -70,15 +70,15 @@ class NamesCollector(xml.sax.handler.ContentHandler):
         If you don't pass a set of names_collected yourself, you can
         access the .names set yourself, to get the names.
         """
-        self.names = names_collected
+        self.collection = names_collected
     
     def startElement(self, name, attrs):
         if name == "a":
             if attrs.has_key("href") and not ignore_url(attrs["href"]):
-                self.names.add(attrs["href"])
+                self.collection.add(attrs["href"])
         elif name == "img":
             if attrs.has_key("src") and not ignore_url(attrs["src"]):
-                self.names.add(attrs["src"])
+                self.collection.add(attrs["src"])
 
 
 class TagManipulator(xml.sax.saxutils.XMLFilterBase):
@@ -142,6 +142,8 @@ class CollectedNames:
     This class represents a collection of local names that are bound, or
     to be bound, to URLs.
 
+    add  -- add name to collect
+    update  -- add several names to collect
     bind  -- bind names to values
     bind_unresolved_to_url  -- bind all unresolved names to an URL
     bind_with_LNQS  -- use LNQS to bind names
@@ -154,22 +156,38 @@ class CollectedNames:
         self.unresolved = unresolved
         self.bound = bound
 
+    def add(self, localname):
+        """Add a name to be collected.
+
+        If the name is already defined, it is not added.
+        """
+        if localname not in self.bound:
+            self.unresolved.add(localname)
+
+    def update(self, localnames):
+        """Add several names to be collected.
+
+        If a name is already defined, it is not added.
+        """
+        for localname in localnames:
+            if localname not in self.bound:
+                self.unresolved.add(localname)
+    
     def bind(self, bindings, overwrite=False):
         """Safely bind local names to values.
 
         Return the set of bindings that were rejected, because they were
         already defined. (If overwrite is true, returns an empty list.)
+
+        It's okay to bind something that hasn't been requested yet.
         """
-        bindings_set = set(bindings)
-        if overwrite:
-            accepted = bindings_set
-            rejected = set()
-        else:
-            accepted = bindings_set & self.unresolved
-            rejected = bindings_set - accepted
-        for key in accepted:
-            self.bound[key] = bindings[key]
-        self.unresolved = self.unresolved - bindings_set
+        rejected = set()
+        for key in bindings:
+            if overwrite or key not in self.bound:
+                self.bound[key] = bindings[key]
+                self.unresolved.discard(key)
+            else:
+                rejected.add(key)
         return rejected
 
     def bind_unresolved_to_url(self, url):
@@ -193,7 +211,7 @@ class CollectedNames:
 
         Still, this is the recommended function to use.
         """
-        return self.bind_with_OSLNQS(self, namespace_description_url,
+        return self.bind_with_OSLNQS(namespace_description_url,
                                      LIONS_OSLNQS_URL, separator)
 
     def bind_with_OSLNQS(self, namespace_description_url,
@@ -237,7 +255,7 @@ class CollectedNames:
         return self.unresolved
 
 
-def collect_names(xhtml):
+def collect_names(xhtml, collected_names=CollectedNames()):
 
     """Build a set of names to lookup, given XHTML.
 
@@ -247,17 +265,15 @@ def collect_names(xhtml):
     for the set of names to look up.
     """
     
-    result = sets.Set()
-    
     parser = xml.sax.make_parser()
-    parser.setContentHandler(NamesCollector(result))
+    parser.setContentHandler(NamesCollector(collected_names.unresolved))
     
     inpsrc = xml.sax.xmlreader.InputSource()
     inpsrc.setByteStream(StringIO.StringIO(xhtml))
     
     parser.parse(inpsrc)
     
-    return CollectedNames(result)
+    return collected_names
 
 
 def link_names(xhtml, collected_names):
