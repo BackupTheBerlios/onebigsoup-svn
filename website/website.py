@@ -1,25 +1,24 @@
 """Render ln.taoriver.net website.
 
-# TODO - complete & debug WebsiteBuilder.build
-** (./) abstract collecting uses
-** (./) abstract collecting provided
-** (./) abstract collecting names from localnames.txt
-** abstract collecting names by server
-** write out full process
-# (./) TODO - document contexts' internal variables
-# TODO - final check, make sure methods and non-.variables are doc'ed
-# TODO - let user tweak ExecutionContext/FileSystemContext with optparse
+* TODO - debug
+* TODO - final check, make sure methods and non-.variables are doc'ed
+* TODO - let user tweak ExecutionContext/FileSystemContext with optparse
+* TODO - get code to where I can use it for my personal website, if it's
+*        not already at that point
 
-Read pages from pages/, and output them to website/.
+Read pages from txt/, and output them to website/.
 
 The pages are first fitted into template.html, and then Local Names are
 linked with localnames.txt.
+
+The specifics of filenames and paths can be customized.
 
 PathNavigationInFilenameException  -- path found in filename
 FileSystemContext  -- folder & file locations
 ExecutionContext  -- all settings needed to build website
 FileSystemAdapter  -- file access
 WebsiteBuilder  -- build website
+default_builder  -- build defrault WebsiteBuilder
 """
 
 import string
@@ -35,15 +34,20 @@ import lnlink
 TXT_DIRECTORY = "txt"
 INPUT_DIRECTORY = "input"
 OUTPUT_DIRECTORY = "output"
+
 TEMPLATE_FILENAME = "template.html"
 LOCAL_NAMESPACE_FILENAME = "localnames.txt"
-LOCAL_FILE_ENCODING = 'cp1252'  # Windows ANSI Codepage 1252
 
-OLDSTYLE_NAMESERVER_URL = "http://services.taoriver.net:9090/"
+LOCAL_FILE_ENCODING = 'cp1252'  # Windows ANSI Codepage 1252
 
 BASE_URL = "http://ln.taoriver.net/"
 NAMESPACE_DESCRIPTION_URL = "http://ln.taoriver.net/localnames.txt"
-NOT_FOUND_URL = "http://ln.taoriver.net/localname_not_found.txt"
+NOT_FOUND_URL = "http://ln.taoriver.net/localname_not_found.html"
+
+LOCALNAMES_SEPARATOR = ":"
+
+OLDSTYLE_NAMESERVER_URL = "http://services.taoriver.net:9090/"
+
 CONNECTED = False  # SET THIS TO TRUE WHEN DOING REMOTE LOOKUPS
 
 
@@ -127,6 +131,7 @@ class ExecutionContext:
     init_with_module_defaults  -- initialize with module defaults
     .filesystem_context  -- FileSystemContext to use
     .connected_to_internet  -- True/False, can make use of Internet?
+    .localnames_separator  -- local names separator character
     .oldstyle_xmlrpc_nameserver_url  -- XML-RPC Local Names query server
     .namespace_description_url  -- remote namespace, for names lookup
     .base_url  -- base URL for output website, with trailing slash
@@ -136,6 +141,7 @@ class ExecutionContext:
     def __init__(self):
         self.filesystem_context = None
         self.connected_to_internet = None
+        self.localnames_separator = None
         self.oldstyle_xmlrpc_nameserver_url = None
         self.namespace_description_url = None
         self.base_url = None
@@ -149,6 +155,7 @@ class ExecutionContext:
         self.filesystem_context = FileSystemContext()
         self.filesystem_context.init_with_module_defaults()
         self.connected_to_internet = CONNECTED
+        self.localnames_separator = LOCALNAMES_SEPARATOR
         self.oldstyle_xmlrpc_nameserver_url = OLDSTYLE_NAMESERVER_URL
         self.namespace_description_url = NAMESPACE_DESCRIPTION_URL
         self.base_url = BASE_URL
@@ -215,14 +222,15 @@ class FileSystemAdapter:
 
     def template_text(self):
         """Read text of input template.
-
+        
         Loads on first read.
         """
         if self._template_text is not None:
             return self._template_text
         filename = self._context.path_to_input_files \
                    + os.sep + self._context.template_filename
-        self._template_text = open(filename, "r").read()
+        text = open(filename, "r").read()
+        self._template_text = string.Template(text)
         return self._template_text
     
     def local_namespace_text(self):
@@ -243,21 +251,21 @@ class WebsiteBuilder:
 
     """Build the website.
 
-    TODO: BETTER TEXT HERE.
-    
-    Flow process that we're moving to:
-
-    Read each file, and build a lookup table from them.
-
-    Add to the table whatever's found in the input localnames.txt.
-
-    Fit each file into the template, and link the final result. Output
-    the result to the output directory.
-
-    All input/output operations are mediated by a file-system adapter.
+    The class makes use of the ExecutionContext to learn about
+    customizations to the process, including the embedded
+    FileSystemContext. Most of the functionality is about how to extract
+    names provided and used from the various files. The "build" function
+    describes, specificly, how the website is built.
 
     TODO -- function descriptions
-    compile_names_dictionary  -- compile name->URL dictionary
+    url_from_basename  -- build a URL from a basename
+    fit_html_inside_template  -- render text within the template
+    names_used_by_template  -- get names used by the template
+    names_used_by_text_file  -- get names used in one text file
+    names_used_by_all_text_files  -- get names used in all text files
+    names_provided_by_text_file  -- get names from one text file
+    names_provided_by_all_text_files  -- get names from all text files
+    names_provided_by_localnames_file  -- get names from localnames.txt
     build  -- build website
     """
 
@@ -273,96 +281,97 @@ class WebsiteBuilder:
                 self._context.oldstyle_nameserver_url)
         else:
             self._nameserver = None
+    
+    def url_from_basename(self, basename):
+        """Return URL representing HTML rendered from a text file."""
+        return self._context.base_url + basename + ".html"
 
-    def list_of_names_used(self):
+    def fit_html_inside_template(self, html):
+        """Return result of placing given html into the template."""
+        template = self._filesystem.template_text()
+        return template.substitute({"BODY": html,
+                                    "SECTION": "",
+                                    "HEAD": ""})
+    
+    def names_used_by_template(self):
+        """Return set of names used in the template file."""
+        template_without_text = self.fit_html_inside_template("")
+        return lnlink.collect_names(template_without_text).unresolved
+
+    def names_used_by_text_file(self, basename):
+        """Return set of names used by one text file."""
+        names_used = set()
+        text = self._filesystem.text_file(basename)
+        html = singhtext.text_to_html(text)
+        return lnlink.collect_names_in_fragment(html).unresolved
+        
+    def names_used_by_all_text_files(self):
         """Return set of names used in all text files."""
         names_used = set()
-        for filename in self._filesystem.text_file_basenames():
-            text = self._filesystem.text_file(filename)
-            html = singhtext.text_to_html(text)
-            names = set(lnlink.collect_names_in_fragment(html))
-            print names
-            names_used.update(names)
+        for basename in self._filesystem.text_file_basenames():
+            names_used.update(self.names_used_by_text_file(basename))
         return names_used
 
-    def names_provided_by_text_files(self):
+    def names_provided_by_text_file(self, basename):
+        """Return dictionary of names provided by one text file."""
+        names_dict = {}
+        file_url = self.url_from_basename(basename)
+        text = self._filesystem.text_file(basename)
+        tokens = singhtext.tokenize_all(text)
+        variables = singhtext.tokens_to_variables(tokens)[0]
+        if variables.has_key("title"):
+            title = variables["title"]
+        else:
+            title = basename
+        names_dict[title] = file_url
+        for name in singhtext.tokens_to_names_list(tokens):
+            names_dict[name] = file_url + "#" + name
+        return names_dict
+    
+    def names_provided_by_all_text_files(self):
         """Return dictionary of names provided by text files."""
         names_dict = {}
         for basename in self._filesystem.text_file_basenames():
-            file_url = self._context.base_url + basename + ".html"
-            text = self._filesystem.text_file(basename)
-            tokens = singhtext.tokenize_all(text)
-            variables = singhtext.tokens_to_variables(tokens)[0]
-            if variables.has_key("title"):
-                title = variables["title"]
-                names_dict[title] = file_url
-            else:
-                names_dict[basename] = file_url
-            for name in singhtext.tokens_to_names_list(tokens):
-                names_dict[name] = file_url + "#" + name
+            provided = self.names_provided_by_text_file(basename)
+            names_dict.update(provided)
         return names_dict
 
     def names_provided_by_localnames_file(self):
         """Return dictionary of Local Names from localnames.txt."""
         return self._local_namespace["LN"].copy()
     
-    def compile_names_dictionary(self):
-        """Compile final dictionary of names to URLs.
-
-        # Start with the input directory names.
-        # Visit each text file, and strip it's provided names.
-        ** Title
-        ** A NAMEs
-        ** (glossary entries?)
-        # ...and also strip names that they want to make use of.
-        # Collect missing names from nameserver, if connected to the
-          Internet.
-        
-        Names that can't be found are linked to the not-found URL
-        described in the execution context.
-        """
-        names_found = self._local_namespace["LN"].copy()
-        names_used = []
-        for basename in self._filesystem.text_file_basenames():
-            text = self._filesystem.text_file(basename)
-            tokens = singhtext.tokenize_all(text)
-            names_provided = singhtext.tokens_to_names_list(tokens)
-            text_variables = singhtext.tokens_to_variables(tokens)[0]
-            if text_variables.has_key("title"):
-                names_provided.append(text_variables["title"])
-            for name in names_provided:
-                names_found[name] = self._context.base_url + name \
-                                    + ".html"
-            html = singhtext.text_to_html(text)
-            names_used.extend(lnlink.collect_names_in_fragment(html))
-        if self._context.connected_to_internet == False:
-            for name in names_used:
-                if name not in names_found:
-                    names_found[name] = self._context.not_found_url
-        else:
-            flags = ["loose", "check-neighboring-spaces"]
-            namespace_url = self._context.namespace_description_url
-            for name in names_used:
-                if name not in names_found:
-                    url = self._nameserver.lookup(name,
-                                                  namespace_url,
-                                                  flags)
-                    names_found[name] = url
-        return names_found
-
     def build(self):
         """Build the website.
+        
+        The process works like so:
+        # Compile all names, both wanted & provided,
+        ** from the template
+        ** from the local names description,
+        ** from text files,
+        # XML-RPC for names still wanted,
+        # then render and record pages.
 
-        TODO: explain how, basically
+        All input/output operations are mediated by the execution
+        context's FileSystemAdapter.
         """
+        collection = lnlink.CollectedNames()
+        collection.update(self.names_used_by_template())
+        collection.update(self.names_used_by_all_text_files())
+        collection.bind(self.names_provided_by_localnames_file())
+        collection.bind(self.names_provided_by_all_text_files())
+        collection.bind_with_LNQS(
+            self._context.namespace_description_url,
+            self._context.oldstyle_xmlrpc_nameserver_url,
+            self._context.localnames_separator)
+        if self._context.connected_to_internet:
+            not_found_url = self._context.not_found_url
+            collection.bind_unresolved_to_url(not_found_url)
         for name in self._filesystem.text_file_basenames():
             text = self._filesystem.text_file(name)
             html = singhtext.text_to_html(text)
-            template = self._filesystem.template_text()
-            full_html = template.substitute({"BODY": html,
-                                             "SECTION": "",
-                                             "HEAD": ""})
-            names_dict = {}
+            full_html = self.fit_html_inside_template(html)
+            linked_html = lnlink.link_names(full_html, collection)
+            self._filesystem.write_to_html(name, linked_html)
 
 
 def default_builder():
@@ -378,38 +387,4 @@ def default_builder():
 if __name__ == "__main__":
     builder = default_builder()
     builder.build()
-
-
-##     # Read every file, translate it, link it, and write it out.
-##     filenames = os.listdir(TXT_DIRECTORY)
-##     for filename in [x for x in filenames if x.endswith(".txt")]:
-##         in_filename = TXT_DIRECTORY + os.sep + filename
-##         out_filename = HTML_DIRECTORY + os.sep + filename[:-4] + ".html"
-##         in_file = open(in_filename, "r")
-##         out_file = open(out_filename, "w")
-        
-##         text = singhtext.text_to_html(in_file.read())
-##         text = template.substitute({"BODY": text,
-##                                     "SECTION": "",
-##                                     "HEAD": ""})
-##         names_dict = {}
-##         for name in lnlink.collect_names(text):
-##             if name in names_dict:
-##                 continue
-##             print name,
-##             if name in local_namespace["LN"]:
-##                 names_dict[name] = local_namespace["LN"][name]
-##             else:
-##                 if not CONNECTED:
-##                     names_dict[name] = "NOT-CONNECTED-CANNOT-SET-NAME"
-##                 else:
-##                     flags = ["loose", "check-neighboring-spaces"]
-##                     url = nameserver.lookup(name,
-##                                             NAMESPACE_DESCRIPTION_URL,
-##                                             flags)
-##                     names_dict[name] = url
-##             print names_dict[name]
-##         text = lnlink.link_names(text, names_dict)
-        
-##         out_file.write(text)
 
