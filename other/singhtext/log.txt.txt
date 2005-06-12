@@ -1,4 +1,24 @@
 
+= 2005-06-10 =
+
+== 12:02 AM ==
+
+The token type regexes need to work on individual lines.
+
+That's why we're getting these \s bugs. \s*'s and \s+'s are eating up
+newlines. I can't figure out how to make them stop.
+
+So, I'm going to take the tokenizer, and make it work on newlines. The
+trick is the #regions, but I can use state for that.
+
+
+= 2005-06-07 =
+
+== 9:03 AM ==
+
+I believe I need to make the link regex into a multiline regex.
+
+
 = 2005-06-01 =
 
 == 7:59 PM ==

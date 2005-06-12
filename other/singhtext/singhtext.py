@@ -18,7 +18,7 @@ Further, there are *special lines* and *regions.*
 This module uses native strings, and does nothing with encoding or
 decoding to unicode.
 
-tokenize_one  -- tokenize one line
+tokenize_line  -- tokenize one line
 tokenize_all  -- tokenize a complete text
 text_to_paragraph  -- group TEXT lines into PARAGRAPHs
 group_list_items  -- group ITEMs into LISTs.
@@ -50,55 +50,107 @@ html_escape_table = {
 # column 1:  token type
 # column 2:  regular expression
 tokenizing_checks = [
-    ("HEADER", re.compile(r"(=+)(.+?)\1\n")),
-    ("*ITEM", re.compile(r"(\*+)\s+(.+?)\n")),  # grouped: LIST
-    ("#ITEM", re.compile(r"(#+)\s+(.+?)\n")),  # grouped: LIST
-    ("BLANK", re.compile(r"(\s*?)\n")),
-    ("REGION", re.compile(r"#(.+?)\n((?:.*?\n)+?)#\1\n")),
-    ("SPECIAL", re.compile(r"(\$\S+)\s+(.+?)\n")),
-    ("TEXT", re.compile(r"(.+?\n)")),  # Last resort, grouped: PARAGRAPH
+    ("HEADER", re.compile(r"^(=+)(.+)\1$")),
+    ("*ITEM", re.compile(r"^(\*+)\s+(.+)$")),  # grouped: LIST
+    ("#ITEM", re.compile(r"^(#+)\s+(.+)$")),  # grouped: LIST
+    ("REGION-DELIMITER", re.compile(r"^(#\S+)\s*(.+)?$")),
+    ("SPECIAL", re.compile(r"^(\$\S+)\s*(.+)?$")),
+    ("BLANK", re.compile("^\s*$")),
+    ("TEXT", re.compile(r"^(.+)$")),  # grouped: PARAGRAPH
     ]
 
 link_regex = r"[[(.+?)](.*?)]"  # As we think it
 link_regex = link_regex.replace("[", "\\[")  # [ isn't a character class
 link_regex = link_regex.replace("]", "\\]")  # ] isn't a character class
-link_re = re.compile(link_regex)
+link_re = re.compile(link_regex, re.DOTALL | re.MULTILINE)
 
 special_set_re = re.compile("(\S+):\s*(\S+)")  # $set (foo): (bar)
 
 
-def tokenize_one(text, pos):
-    """Read a token from the text, starting from a given position.
+def tokenize_line(line, start_pos=0):
+    """Tokenize one line of text.
 
     Returns a tuple of the form:
       (token_type, token_contents, start_pos, end_pos)
 
-    The end_pos is the next token's start_pos. That is,
-    str[start_pos:end_pos] gives you the text consumed by the tokenizer.
-
     tokenize_one reads tokenizing_checks for info about the token types.
     """
+    end_pos = start_pos + len(line)
     for (token_type, regex) in tokenizing_checks:
-        mo = regex.match(text[pos:])
+        mo = regex.match(line)
         if mo is not None:
             return (token_type, mo.groups(),
-                    pos, pos+mo.end())
+                    start_pos, end_pos)
     # This should never happen.
-    return ("ERROR", "can't figure out line type", pos, newline_pos)
+    return ("ERROR", "can't figure out line type", start_pos, end_pos)
 
 
 def tokenize_all(text):
-    if text[-1] != "\n":
-        text = text + "\n"
+
+    """Convert text into tokens.
+
+    Return a list of tokens. The token format is described in the
+    documentation string for function tokenize_line.
+    
+    TODO:
+    * (./) write tokenize_line function
+    * (./) update it's documentation
+    * rework tokenize_all
+    * update IT's documentation
+    * erase tokenize_one
+    * adjust the module documentation functions list
+    QUESTION:
+    * go to a line-based addressing system, instead of a token-based
+      addressing system? (may have been a better decision to begin
+      with...)
+    """
+
+    # Initialize the tokenizer.
     pos = 0
     results = []
-    error = False
-    while pos < len(text) and not error:
-        result = tokenize_one(text, pos)
-        results.append(result)
-        (token_type, token_contents, start_pos, end_pos) = result
-        error = token_type == "ERROR"
-        pos = end_pos
+    STATE_NORMAL = "normal"
+    STATE_REGION = "inside a region"
+    state = STATE_NORMAL
+
+    # Initialize region processing variables.
+    region_type = None  # ex: "#foo"
+    region_data = None  # ex: "bar," in "#foo bar"
+    region_lines = None
+    region_start_pos = None
+
+    # Read tokens.
+    for line in text.splitlines():
+        token = tokenize_line(line, pos)
+        pos = token[3]  # End position
+        
+        if state == STATE_NORMAL:
+            if token[0] != "REGION-DELIMITER":
+                results.append(token)
+            else:
+                state = STATE_REGION
+                region_type = token[1][0]
+                region_data = token[1][1]
+                region_lines = []
+                region_start_pos = pos
+        
+        elif state == STATE_REGION:
+            if token[0] != "REGION-DELIMITER" or \
+               token[1][1] != region_data:
+                region_lines.append(line + "\n")
+            else:
+                results.append(("REGION",
+                                (region_type,
+                                 region_data,
+                                 "".join(region_lines)),
+                                region_start_pos, pos))
+                state = STATE_NORMAL
+                region_type = None
+                region_data = None
+                region_lines = None
+                region_start_pos = None
+        
+        pos = pos + 1  # Account for end of line character.
+    
     return results
 
 
@@ -271,12 +323,12 @@ def tokens_to_html(tokens):
             result.append("<h%d>%s</h%d>" % (level, treat(content),
                                              level))
         elif token_type == "REGION":
-            (region_type, content) = token_contents
-            if region_type.upper() == "CODE":
+            (region_type, region_data, content) = token_contents
+            if region_type.upper() == "#CODE":
                 content = html_escape(content)
                 result.append("<p><code><pre>%s</pre></code></p>"
                               % content)
-            elif region_type.upper() == "LITERAL":
+            elif region_type.upper() == "#LITERAL":
                 result.append(content)
             else:
                 result.append('<font color="red">')
