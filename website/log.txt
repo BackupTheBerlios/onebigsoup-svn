@@ -1,4 +1,42 @@
 
+= 2005-06-08 =
+
+== 9:03 AM ==
+
+title: Still Work to Do
+
+* able to title a page one thing, but local name it another
+** ''just stick a ''$name'' at the top?''
+* sloppy name forming: automatically crunching a name up?
+** "Local Names" becomes localnames
+** two motivations:
+*** friendly <a name> lines
+*** local name linking
+
+
+== 8:46 AM ==
+
+Well, it's going good! I've worked out a number of bugs, and it seems to
+be rendering right!
+
+Now I believe all I need is to do is to change pages over to the new
+text file system, and I should be good to go!
+
+But first, I need to check what bugs I had back-logged.
+
+There are also two other issues:
+* the glossary
+* the news page
+
+Each of these may require special treatment.
+
+The ''glossary'' may be a specially formatted page, with it's own sort
+of conversion process.
+
+Same with the ''news'' page, which needs to emit RSS and have entry
+times somehow.
+
+
 = 2005-06-04 =
 
 == 6:23 PM ==

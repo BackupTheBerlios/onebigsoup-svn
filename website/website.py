@@ -1,10 +1,8 @@
 """Render ln.taoriver.net website.
 
-* TODO - debug
-* TODO - final check, make sure methods and non-.variables are doc'ed
 * TODO - let user tweak ExecutionContext/FileSystemContext with optparse
 * TODO - get code to where I can use it for my personal website, if it's
-*        not already at that point
+         not already at that point
 
 Read pages from txt/, and output them to website/.
 
@@ -18,7 +16,7 @@ FileSystemContext  -- folder & file locations
 ExecutionContext  -- all settings needed to build website
 FileSystemAdapter  -- file access
 WebsiteBuilder  -- build website
-default_builder  -- build defrault WebsiteBuilder
+basic_builder  -- build default WebsiteBuilder
 """
 
 import string
@@ -165,13 +163,14 @@ class ExecutionContext:
 class FileSystemAdapter:
     
     """Mediate input/output interactions with the file system.
-
+    
     The page's filenames are in three categories:
-    * basename: "index"
-    * textname: "index.txt"
-    * htmlname: "index.html"
-
+    * "basename"  - ex: "index"
+    * "textname"  - ex: "index.txt"
+    * "htmlname"  - ex: "index.html"
+    
     text_file  -- read text file
+    text_file_basenames  -- list text files
     write_to_html  -- write HTML file
     template_text  -- read template text
     local_namespace_text  -- read namespace description text
@@ -257,7 +256,6 @@ class WebsiteBuilder:
     names provided and used from the various files. The "build" function
     describes, specificly, how the website is built.
 
-    TODO -- function descriptions
     url_from_basename  -- build a URL from a basename
     fit_html_inside_template  -- render text within the template
     names_used_by_template  -- get names used by the template
@@ -359,13 +357,12 @@ class WebsiteBuilder:
         collection.update(self.names_used_by_all_text_files())
         collection.bind(self.names_provided_by_localnames_file())
         collection.bind(self.names_provided_by_all_text_files())
-        collection.bind_with_LNQS(
+        if self._context.connected_to_internet:
+            collection.bind_with_LNQS(
             self._context.namespace_description_url,
             self._context.oldstyle_xmlrpc_nameserver_url,
             self._context.localnames_separator)
-        if self._context.connected_to_internet:
-            not_found_url = self._context.not_found_url
-            collection.bind_unresolved_to_url(not_found_url)
+        collection.bind_unresolved_to_url(self._context.not_found_url)
         for name in self._filesystem.text_file_basenames():
             text = self._filesystem.text_file(name)
             html = singhtext.text_to_html(text)
@@ -374,7 +371,7 @@ class WebsiteBuilder:
             self._filesystem.write_to_html(name, linked_html)
 
 
-def default_builder():
+def basic_builder():
     """Return a WebsiteBuilder created using module defaults.
 
     This is a convenience function.
@@ -385,6 +382,6 @@ def default_builder():
 
 
 if __name__ == "__main__":
-    builder = default_builder()
+    builder = basic_builder()
     builder.build()
 
