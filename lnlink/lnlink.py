@@ -333,7 +333,8 @@ def link_names_in_fragment(xhtml_fragment, collected_names):
     test_result = link_names(test_string, {})
     xml_header_len = test_result.find(test_string)
     
-    full = link_names('<html>' + xhtml_fragment + '</html>', dictionary)
+    full = link_names('<html>' + xhtml_fragment + '</html>',
+                      collected_names)
     return full[xml_header_len:][len('<html>'):-len('</html>')]
 
 
