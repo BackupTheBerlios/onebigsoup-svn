@@ -38,7 +38,6 @@ import cherrypy.lib.filter.xmlrpcfilter
 
 
 PATH_PREFIX = "/home/jroes/lnss/"
-PATH_TO_CHERRYPY = PATH_PREFIX + "cherrypy" # this variable isn't used
 MAIL = "/usr/sbin/sendmail"
 HOST_NAME = "localnames.sosdg.org"
 PORT_NUMBER = 9001
@@ -288,6 +287,7 @@ class Server:
         return {'INTERFACE': 'v1 Local Names Store Interface',
                 'IMPLEMENTATION': 'JROES-LNS-D3-V1',
                 'SUPPORTS_PRIVATE_NAMESPACES': 0,
+                'SERVER_NAMESPACE_URL': '',
                 'URL_NAME_PATTERN': ''}
 
     def get_namespace_url(self, username, pw, namespace_name):
