@@ -64,7 +64,7 @@ link_regex = link_regex.replace("[", "\\[")  # [ isn't a character class
 link_regex = link_regex.replace("]", "\\]")  # ] isn't a character class
 link_re = re.compile(link_regex, re.DOTALL | re.MULTILINE)
 
-special_set_re = re.compile("(\S+):\s*(\S+)")  # $set (foo): (bar)
+special_set_re = re.compile("(\S+):\s*(.+)")  # $set (foo): (bar)
 
 
 def tokenize_line(line, start_pos=0):
@@ -168,7 +168,7 @@ def text_to_paragraph(tokens):
     def seal_texts():
         if len(texts) == 0:
             return []
-        contents = "".join([x[1][0] for x in texts])
+        contents = " ".join([x[1][0] for x in texts])
         first_pos = texts[0][2]
         last_pos = texts[-1][3]
         result.append(("PARAGRAPH", contents, first_pos, last_pos))
@@ -359,6 +359,8 @@ def tokens_to_html(tokens):
                 pass
             elif dollar_text == "$NAME":
                 result.append("<a name='%s'/>" % content)
+            elif dollar_text == "$REM":
+                pass
         elif token_type == "PARAGRAPH":
             result.append("<p>%s</p>" % treat(token_contents))
     return result

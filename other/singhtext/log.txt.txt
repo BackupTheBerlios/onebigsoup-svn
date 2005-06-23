@@ -1,4 +1,14 @@
 
+= 2005-06-13 =
+
+== 9:10 AM ==
+
+Feature wanted:
+* $toc
+* ...but how am I going to decide whether to <a name=""> every header or
+  not?
+* ..if I only a name ''some'' of them, how will I designate them?
+
 = 2005-06-10 =
 
 == 12:02 AM ==
