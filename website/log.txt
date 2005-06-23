@@ -1,12 +1,263 @@
 
+= 2005-06-22 =
+
+== 2:44 PM ==
+
+title: Version 1.3 Ideas:
+* "STRING" record type - unambigous (no relative)
+* extend "PATTERN" w/ $1, $2, $3, ...
+* the return of names lists?
+
+== 12:31 PM ==
+
+Continue with links page, after "Service Names"
+
+'''COMMIT LIST (output):'''
+* all .png
+* localnames.css
+* servicenames.txt
+
+'''COMMIT LIST (input):'''
+* all .svg
+
+'''DOWNLOAD LIST:'''
+* servicenames.txt
+* actual interface specifications
+* .svg
+
+= 2005-06-21 =
+
+== 9:01 PM ==
+
+title: Prioritizing, Recollecting Work To Do
+
+* unprocessed data? ''straight'' into output directory
+
+'''HIGH PRIORITY:'''
+
+* (./) commit list for output directory
+* (./) CSS, title, needs to look reasonable
+* (./) visit every page, checking for errors
+* (./) localnames.txt: NS "S" "servicenames.txt"
+* HIGH tasks from page list
+* utf-8 store localnames.txt
+* update glossary language for pattern, namespace, extension data
+
+PENDING INTERNET:
+* actual interface specifications
+* talk: LNNDS v1.2
+* try connected linking, recheck pages
+
+AFTER INTERNET RETRIEVALS:
+* setup Local Names XML-RPC Store Interface page
+* setup Local Names XML-RPC Query Interface page
+* name LNXRStoreI && LNXRQueryI
+* Fix Local Names Namespace Description Specification version 1.2 page!
+* Update LNNDS language for namespaces, patterns, extension data
+
+'''MEDIUM PRIORITY:'''
+
+* interesting and explanatory image for front page
+* index title look different
+* region sets (#set HEAD)
+* index: $HEAD broadcast localnames.txt, DOAP, RSS
+** update RSS feed
+** DOAP file
+* auto-list used but undefined names
+* MED tasks from page list
+* check "about" images
+* get SVG files
+* check specification v1.2, about Local Names, 
+* link menu to LNNDS v1.2, LNXRQueryI, LNXRStoreI
+* separators between glossary entries
+
+'''LOW PRIORITY:'''
+
+* autoconvert SVG to PNG
+* rewrite glossary entries
+* work out "downloads" page, until we actually have it
+* make sure separator=:
+* LOW tasks from page list
+* images in singhtext
+* check News LNXRStoreI (post-Internet)
+* check News LNXRQueryI (post-Internet)
+* automatic link checking output
+* standardize the language for namespace hopping, implicit traversal,
+  explicit traversal, etc., etc., and then integrate with the glossary
+* standardize canonical example records (LN, NS, PATTERN, and X)
+
+'''Individual Pages:'''
+
+specs: MED(rename title "Specifications")
+
+''DONE!'' downloads: (./) HIGH(missing title)
+
+about page: (./) HIGH(fix "What is Local Names?" link), MEDIUM(fix "[[spec]]"
+link), MEDIUM(fix "the spec" link)
+
+glossary page: LOW("Local Names server" - shouldn't require reading
+interfaces)
+
+news page: (./) HIGH(link "Local Names XML-RPC Store Interface", "Local Names
+XML-RPC Query Interface"), (./) HIGH(missing title), LOW(link "LNXRStoreI"
+"LNXRQueryI")
+
+
+links page: (./) HIGH(link "Services Names"), MED(link "Local Names
+Wrap"), MED(link "my.LocalNames" - standardize), MED("Web Browser
+Redirect"), MED("jump to website"), MED("Local Names Wrap"),
+MED("my.LocalNames"), (./) HIGH(missing title)
+
+glossary: (./) HIGH(rename title) LOW(make S:WP:URN link point to exact
+wikipedia entry for URN) MED(mention that "URL" might be a "relative
+URL")
+
+HIGH:
+first pass over glossary entries to write:
+* (./) URL
+* (./) record type
+* (./) LN
+* (./) NS
+* (./) PATTERN
+* (./) X
+* (./) namespace description
+* (./) line
+* (./) column
+* (./) local name
+* (./) name
+* (./) namespace link
+* (./) link key
+* (./) pattern
+* (./) pattern key
+* (./) URL template
+* (./) relative URL template (just join with URL template)
+* relative URL
+* extension data
+* extension key
+* extension values
+* record
+
+HIGH: second pass, check that everything is defined
+
+
+== 8:28 PM ==
+
+I left it in the middle of outputing localnames.txt;
+Contine from the end of the Builder class.
+
+== 10:01 AM ==
+
+Work to do:
+
+(nHL) means: "no Hard Link to ln.taoriver.net."
+(nF) means: "not found"
+
+ALL:
+* need the actual text of the Local Names XML-RPC Store Interface
+* need the actual text of the Local Names XML-RPC Query Interface
+* need the actual text of LNNDS v1.1
+* need the actual RSS feed
+* need the DOAP
+
+SINGHTEXT:
+* region sets (#set HEAD)
+
+WEBSITE.PY:
+* (./) output localnames.txt that includes new names
+* (./) "$set title: foo" handling
+* read & write CSS
+* read & write graphic images
+** SVG autoconvert?
+
+TEMPLATE:
+* (./) "spec" to "specifications" (specs)
+* (./) nHL (all links)
+* (./) localnames.txt link needs to work
+
+INDEX:
+* (./) "Read more about Local Names" - nHL
+* (./) table: nHL
+* (./) "a Local Names description" - nHL
+* $HEAD broadcast localnames.txt, DOAP, RSS, ...
+
+LOCAL NAMES SPECIFICATIONS:
+* need to relink "Local Names XML-RPC Store Interface"
+* need to relink "Local Names XML-RPC Query Interface"
+* ...to the actual specification itself.
+
+LOCAL NAMES NAMESPACE DESCRIPTION SPECIFICATION v1.2
+* nHL: understand the main ideas of Local Names
+* LNNDS v1.1: need actual text, and link to it
+* (./) Lion Kimbro: fix link
+* lion@speakeasy.org: fix link (says name not found...)
+* nHL: news
+* nHL: RSS feed
+* nf: Lion Kimbro's blog
+* link to Lion Kimbro's blog RSS feed
+* PAGE RENDERING STOPS! It's BROKEN!
+
+NEWS:
+* braodcast RSS
+
+Okay, I think this is enough to be fixed right now...
+
+...especially given that I can't get to the other pages.
+
+But we can do this. {:)}= This is a good learning experience. {:)}=
+
+Keep up the positive attitude! Remember Napoleon Hill; He's with us all
+the way.
+
+
+= 2005-06-13 =
+
+== 8:30 AM ==
+
+title: Work ''Still'' Remains
+
+Bugfixes:
+* remote XML-RPC lookups ''fails'' always
+
+...and all the things from 2005-06-08, 9:03 AM.
+
+How am I going to deal with name crunching?
+
+The problem is where to place the logic for looking up names. So far,
+I've just been doing name lookups by looking ''directly into a hash.''
+Instead, I need to be ''performing some hash calculation, and then
+looking into a hash.''
+
+In fact, in greater details: I need to look through the dictionary
+first for the literal text. ''Then'' check a hash version. ''Then''
+proceed to visit neighors, one by one.
+
+In essence, whatever the Local Names system would do, ''I'' need to do.
+
+This implies, to me, however, ''going through Local Names core.''
+Separate out code for resolving URLs, so I can attach a "null," or a
+logically constructed names table, in addition to actually looking stuff
+up on the Internet. Whatever code is used for resolving names on the
+server, the same code is used to resolve names locally. It should even
+be possible to delegate look-ups, in whole or in part, to another
+server. Or to retrieve cached versions from a server.
+
+In the meantime, I'm just going to use the straight names, as they
+appear in the Local Names table, website title, or $name entry.
+
+Once we have the query interface more or less settled out, and have a
+working query implementation like we like, I may be reworking the part
+of the website code that performs name-URL binding, to make use of it.
+
+
 = 2005-06-08 =
 
 == 9:03 AM ==
 
 title: Still Work to Do
 
-* able to title a page one thing, but local name it another
-** ''just stick a ''$name'' at the top?''
+* (./) able to title a page one thing, but local name it another
+** (./) ''just stick a ''$name'' at the top?''
+** (./) '''No:''' Just use $set.
 * sloppy name forming: automatically crunching a name up?
 ** "Local Names" becomes localnames
 ** two motivations:

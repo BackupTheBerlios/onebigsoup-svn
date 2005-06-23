@@ -1,7 +1,9 @@
+$set title: Local Names Standard Names
 
 = Official Names for Local Names concepts =
 
 This is a language guide, mainly for internal use.
+
 
 == Local Names ==
 
@@ -16,33 +18,98 @@ Local Names system
 * refers to systems created by Local Names project
 * implies specifications created by Local Names project
 
-local name(s)
+namespace, namespace description
+* "namespace" refers to the idea of a collection of local names, but not
+  the file itself
+* "namespace description" refers to the file itself, conforming to the
+  Local Names Namespace Description Specification.
+
+local name(s), "name", "URL", "relative URL"
 * ex: "slashdot", bound to "http://slashdot.org/", is a local name
+* a "name" is "bound" to a "URL," and that makes a "local name"
+* the URL might be a ''relative URL''
 
-namespace description
-* refers to a file, conforming to the Local Names system
-
+namespace link, link key, namespace URL, source namespace, target
 namespace
-* refers to the idea of a collection of local names, but not the file
-  itself
-* use "namespace description" if you want to talk about the file itself
+* a "namespace key" is "bound" to a "namespace URL," and that makes a
+  "namespace link"
+
+pattern, pattern key, URL template
+* a "pattern key" is "bound" to a "URL template," and that makes a
+  "pattern."
+
+extension data, extension key, extension values
+* an "extension key" is "bound" to "extension values," and that makes
+  "extension data."
+
+record, comment line, blank line
+* a "record" found in a "namespace" is what 
+
 
 == Servers ==
 
 Local Names Store Server (LNSS)
+* abbreviated "store server," ok after first use
 
 Local Names Query Server (LNQS)
+* abbreviated "query server," ok after first use
+* we used to say "name server," but this is too confusing-- don't do it!
 
 Old Style Local Names Query Server (OSLNQS)
 * the one we're using right now,...
 * ...that has no specified query interface.
 * we discourage using this
 
+
+== Specifications, Interfaces ==
+
+The specifications, as a whole, are called: "Local Names
+specifications."
+
+Local Names Namespace Description Sepecification version 1.2
+* LNNDS v1.2
+
+The interfaces are called: "Local Names interfaces."
+
+Local Names XML-RPC Store Interface
+* abbreviated '''LNXRStoreI''' - always spelling out Store
+* can also write: "store interface," if the long form has been invoked once
+* pronounced "LenzorStory"
+
+Local Names XML-RPC Query Interface
+* abbreviated '''LNXRQueryI''' - always spelling out Query
+* can also write: "query interface," if the long form has been invoked once
+* pronounced "LenzorQuery"
+
+Specifications:
+* "Local Names Namespace Description Specification"
+* "LNNDS"
+* "Local Names XML-RPC Store Interface specification"
+* "LNXRStoreI specification"
+* "Local Names XML-RPC Query Interface specification"
+* "LNXRQueryI specification"
+
+
+== Tools ==
+
+generic names (lower case):
+
+* Local Names core (lncore)
+* (XHTML) Local Names linker (lnlink)
+
+specific names:
+
+* Jonathan Roes' Local Names Store Server (lnstore)
+* Brian Templeton's del.icio.us to Local Names converter (lndelicious)
+* Old Style Local Names Query Server (OSLNQS, current lnresolve)
+
+
 == Namespace Descriptions ==
 
 Services names
 
 Local Names website names
+
 
 === Personal Namespace Descriptions ===
 
@@ -60,4 +127,7 @@ Subject namespaces:
 
 You can say "my.LocalNames..." or you can say "the my.LocalNames
 website."
+
+
+== Activities ==
 

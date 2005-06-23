@@ -10,18 +10,12 @@ X VERSION 1.1
 # Suggests an interesting use case for the query server:
 # Completing an in-progress name resolve.
 
-LN "this" "http://ln.taoriver.net/localnames.txt"
+LN "this" "localnames.txt"
 
-LN "spec" "http://ln.taoriver.net/spec-1.1.html"
-LN "downloads" "http://ln.taoriver.net/downloads.html"
-LN "index" "http://ln.taoriver.net/index.html"
-LN "about" "http://ln.taoriver.net/about.html"
-LN "news" "http://ln.taoriver.net/news"
-LN "links" "http://ln.taoriver.net/links"
-LN "glossary" "http://ln.taoriver.net/glossary"
-
-LN "services" "http://ln.taoriver.net/servicenames.txt"
-NS . .
+LN "services" "servicenames.txt"
+.  "servicenames" .
+NS "services" .
+.  "servicenames" .
 .  "S" .
 
 
@@ -49,7 +43,7 @@ LN "Greg Schueler" "http://greg.vario.us/blog/scrawl/localnames.html"
 LN "Straun" "http://youarenumber6.blogspot.com/"
 LN "Danny Ayers" "http://dannyayers.com/"
 
-LN "Lion Kimbro" "http://www.speakeasy.org/~lion/
+LN "Lion Kimbro" "http://www.speakeasy.org/~lion/"
 LN "Lion Kimbro's Blog" "http://lion.taoriver.net/"
 
 LN "Pet Names Markup Language" "http://www.erights.org/elib/capability/pnml.html"
@@ -71,3 +65,5 @@ LN "Wiki2xhtml" "http://www.neokraft.net/sottises/wiki2xhtml/"
 LN "BBCode" "http://www.christian-seiler.de/projekte/php/bbcode/index_en.html"
 LN "txt2html" "http://txt2html.sourceforge.net/"
 LN "C2:TextFilter" "http://c2.com/cgi/wiki?TextFilter"
+
+LN "A Manifesto For Collaborative Tools" "http://www.blueoxen.org/papers/0000D#nid3M1"

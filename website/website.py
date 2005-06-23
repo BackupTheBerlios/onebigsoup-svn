@@ -38,9 +38,9 @@ LOCAL_NAMESPACE_FILENAME = "localnames.txt"
 
 LOCAL_FILE_ENCODING = 'cp1252'  # Windows ANSI Codepage 1252
 
-BASE_URL = "http://ln.taoriver.net/"
+BASE_URL = ""
 NAMESPACE_DESCRIPTION_URL = "http://ln.taoriver.net/localnames.txt"
-NOT_FOUND_URL = "http://ln.taoriver.net/localname_not_found.html"
+NOT_FOUND_URL = "localname_not_found.html"
 
 LOCALNAMES_SEPARATOR = ":"
 
@@ -193,7 +193,7 @@ class FileSystemAdapter:
                    + os.sep + basename + ".txt"
         encoding = self._context.file_encoding
         return open(filename, "r").read().decode(encoding)
-
+    
     def text_file_basenames(self):
         """Return list of text files.
 
@@ -219,6 +219,19 @@ class FileSystemAdapter:
         f.write(content.encode(self._context.file_encoding))
         f.close()
 
+    def write_to_filename(self, filename, content):
+        """Write contents to a file with a given name.
+        
+        The filename is exactly as it is written.
+        """
+        if os.sep in filename:
+            raise PathNavigationInFilenameException(basename)
+        filename = self._context.path_to_output_files \
+                   + os.sep + filename
+        f = open(filename, "w")
+        f.write(content.encode(self._context.file_encoding))
+        f.close()
+    
     def template_text(self):
         """Read text of input template.
         
@@ -276,24 +289,32 @@ class WebsiteBuilder:
             self._filesystem.local_namespace_text())
         if self._context.connected_to_internet:
             self._nameserver = xmlrpclib.ServerProxy(
-                self._context.oldstyle_nameserver_url)
+                self._context.oldstyle_xmlrpc_nameserver_url)
         else:
             self._nameserver = None
     
     def url_from_basename(self, basename):
         """Return URL representing HTML rendered from a text file."""
         return self._context.base_url + basename + ".html"
-
-    def fit_html_inside_template(self, html):
-        """Return result of placing given html into the template."""
+    
+    def fit_html_inside_template(self, html, variables):
+        """Return result of placing given html into the template.
+        
+        "variables" is a dictionary; every variable will be substituted
+        into the template. For example, if "foo" is defined to "bar",
+        then all instances of "$FOO" will be replaced with "bar."
+        """
         template = self._filesystem.template_text()
-        return template.substitute({"BODY": html,
-                                    "SECTION": "",
-                                    "HEAD": ""})
+        replacements = {"BODY": html,
+                        "TITLE": "",
+                        "HEAD": ""}
+        for key in variables:
+            replacements[key.upper()] = variables[key]
+        return template.substitute(replacements)
     
     def names_used_by_template(self):
         """Return set of names used in the template file."""
-        template_without_text = self.fit_html_inside_template("")
+        template_without_text = self.fit_html_inside_template("", {})
         return lnlink.collect_names(template_without_text).unresolved
 
     def names_used_by_text_file(self, basename):
@@ -317,11 +338,9 @@ class WebsiteBuilder:
         text = self._filesystem.text_file(basename)
         tokens = singhtext.tokenize_all(text)
         variables = singhtext.tokens_to_variables(tokens)[0]
+        names_dict[basename] = file_url
         if variables.has_key("title"):
-            title = variables["title"]
-        else:
-            title = basename
-        names_dict[title] = file_url
+            names_dict["title"] = file_url
         for name in singhtext.tokens_to_names_list(tokens):
             names_dict[name] = file_url + "#" + name
         return names_dict
@@ -348,6 +367,7 @@ class WebsiteBuilder:
         ** from text files,
         # XML-RPC for names still wanted,
         # then render and record pages.
+        # render and record other (localnames.txt, ...)
 
         All input/output operations are mediated by the execution
         context's FileSystemAdapter.
@@ -357,18 +377,40 @@ class WebsiteBuilder:
         collection.update(self.names_used_by_all_text_files())
         collection.bind(self.names_provided_by_localnames_file())
         collection.bind(self.names_provided_by_all_text_files())
+        localnames_output = self.build_localnames(collection.bound)
+        self._filesystem.write_to_filename("localnames.txt",
+                                           localnames_output)
         if self._context.connected_to_internet:
             collection.bind_with_LNQS(
-            self._context.namespace_description_url,
-            self._context.oldstyle_xmlrpc_nameserver_url,
-            self._context.localnames_separator)
+                self._context.namespace_description_url,
+                self._context.oldstyle_xmlrpc_nameserver_url,
+                self._context.localnames_separator)
         collection.bind_unresolved_to_url(self._context.not_found_url)
         for name in self._filesystem.text_file_basenames():
             text = self._filesystem.text_file(name)
+            tokens = singhtext.tokenize_all(text)
             html = singhtext.text_to_html(text)
-            full_html = self.fit_html_inside_template(html)
+            variables = singhtext.tokens_to_variables(tokens)[0]
+            full_html = self.fit_html_inside_template(html, variables)
             linked_html = lnlink.link_names(full_html, collection)
             self._filesystem.write_to_html(name, linked_html)
+    
+    def build_localnames(self, names_dictionary):
+        """Return contents of a Locaal Names description.
+
+        Read the namespace description. Append at the end LN entries
+        that weren't already defined.
+
+        The contents are returned as a UTF-8 string.
+        """
+        contents = [self._filesystem.local_namespace_text(),
+                    u"# --- Automatically Collected Names ---", u""]
+        already_defined = self.names_provided_by_localnames_file()
+        for key in names_dictionary:
+            if key not in already_defined:
+                contents.append(u'LN "%s" "%s"' %
+                                (key, names_dictionary[key]))
+        return u'\n'.join(contents)
 
 
 def basic_builder():

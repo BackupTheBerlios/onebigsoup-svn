@@ -1,0 +1,48 @@
+X VERSION 1.1
+
+X PREFERRED-NAME common-services
+X FINAL http://ln.taoriver.net/servicenames.txt
+X LAST-CHANGED "2004-01-30"
+X AUTHOR "Lion Kimbro"
+X AUTHOR-FOAF "http://www.speakeasy.org/~lion/foaf.rdf"
+LN "this" "http://ln.taoriver.net/servicenames.txt"
+
+#
+# If you have a registry that you think would be generally
+# useful, please contact lion@speakeasy.org
+#
+# For example, if you had a registry of Free Software
+# projects, we could add a link to it from here.
+#
+
+
+# generally useful
+PATTERN "google" "http://www.google.com/search?&q=$NAME"
+PATTERN "images" "http://images.google.com/images?q=$NAME"
+
+PATTERN "WP" "http://en.wikipedia.org/wiki/$NAME"
+.       "wikipedia" .
+.       "encyclopedia" .
+PATTERN "WD" "http://en.wiktionary.org/wiki/$NAME"
+.       "wiktionary" .
+.       "dictionary" .
+PATTERN "WT" "http://wikitravel.org/en/article/$NAME"
+.       "travel" .
+.       "wikitravel" .
+PATTERN "D" "http://dictionary.reference.com/search?q=$NAME"
+.       "dict" .
+.       "dictionary" .
+PATTERN "TT" "http://www.technorati.com/tag/$NAME"
+.       "tag" .
+
+
+LN "time" "http://tycho.usno.navy.mil/cgi-bin/timer.pl"
+
+
+# RFCs information
+NS "RFC" "http://ln.taoriver.net/rfcs.txt"
+
+# local names technical
+NS "LN" "http://ln.taoriver.net/localnames.txt"
+.  "localnames" .
+

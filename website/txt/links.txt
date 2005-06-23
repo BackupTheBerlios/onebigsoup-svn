@@ -1,10 +1,10 @@
-$meta SECTION: links
+$set title: Local Names Links
 
 $name Namespaces
 === Namespaces ===
 
-* [[services] Services names (Google, Wikipedia, Dictionary, Technorati
-  Tags, ...)]
+* [[servicenames.txt] Services names (Google, Wikipedia, Dictionary,
+  Technorati Tags, ...)]
 * [[this] Local Names site names]
 
 * [[http://greg.vario.us/ln/description] Greg's personal namespace]
@@ -25,8 +25,6 @@ personal namespaces] over on [[my.LocalNames]].
 $name Web Applications
 === Web Applications ===
 
-* [[http://services.taoriver.net:9089/] Local Names Query Server] - (via
-  [[XML-RPC]]) - warning: old, will be obsolete by 2006.
 * [[Web Browser Redirect]] - [[OBS:UsingLocalNamesInFirefox] jump to
   websites] by name from the address bar.
 * [[Local Names Wrap]] - generate a namespace description from a wiki.
@@ -44,8 +42,8 @@ $name Web Applications
 
 === Development ===
 
-* [[Lion Kimbro] Lion Kimbro's blog] - main developer & coordinator
-* [[One Big Soup]] - wiki used for development
+* [[http://lion.taoriver.net/] Lion Kimbro's blog] - main developer & coordinator
+* [[http://onebigsoup.wiki.taoriver.net/] One Big Soup] - wiki used for development
 * [[OneBigSoup:LocalNames]] - wiki page dedicated to Local Names
 * [[OneBigSoup:OneBigSoupTeam]] - people who have involved themselves in
   Local Names, or other One Big Soup work.
