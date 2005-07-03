@@ -44,7 +44,7 @@ import xml.sax.saxutils
 
 
 ignore_suffixes = [".gif", ".jpg", ".png", "/", ".html", ".txt"]
-ignore_prefixes = ["http://", "ftp://"]
+ignore_prefixes = ["http://", "ftp://", "irc://"]
 
 LIONS_OSLNQS_URL = "http://services.taoriver.net:9090/"
 
@@ -153,6 +153,8 @@ class CollectedNames:
 
     def __init__(self, unresolved=set(), bound={}):
         """Initialize, optionally with names bound or otherwise."""
+        if isinstance(unresolved, list):
+            unresolved = set(unresolved)
         self.unresolved = unresolved
         self.bound = bound
 
@@ -245,7 +247,7 @@ class CollectedNames:
         request_names = list(self.unresolved)
         request_paths = []
         for name in request_names:
-            request_paths.append([name])
+            request_paths.append(name.split(":"))
         urls = nameserver.lookup(request_paths,
                                  namespace_description_url, flags)
         for (key, value) in zip(request_names, urls):

@@ -59,6 +59,30 @@ class HTMLFragmentTests(DictionarySetupTestBase):
         assert correct_output == actual_output, "General test #1 fails."
 
 
+class RemoteLookupTest(unittest.TestCase):
+
+    """Test that we can remotely look up names.
+
+    test1  -- test some lookups, using Lion's namespace description.
+    """
+
+    def test1(self):
+        """Make sure bind_with_LNQS is resolving everything.
+
+        If there's an error, it may be that it actually can't resolve
+        slashdot or freshmeat- you'll have to check it independently,
+        should this fail.
+        """
+        collection = lnlink.CollectedNames(["slashdot", "freshmeat"])
+        result = collection.bind_with_LNQS(
+            "http://taoriver.net/tmp/gmail.txt",
+            "http://services.taoriver.net:9090/")
+        assert len(result) == 0, "still some unresolved names"
+        bound = collection.bound
+        assert bound["slashdot"] == "http://www.slashdot.org/"
+        assert bound["freshmeat"] == "http://www.freshmeat.net/"
+
+
 if __name__ == '__main__':
     unittest.main()
 
