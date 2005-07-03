@@ -1,5 +1,42 @@
 
+= 2005-06-29 =
+
+== 2:01 AM ==
+
+I'm working to clear spec-1.2;
+
+Bad links:
+* LNNDS v1.1
+* Lion Kimbro,
+* lion@speakeasy.net
+* accompanying RSS feed
+* Lion Kimbro's Blog
+* RSS 2.0 feed
+* CommunityWiki:InternetRelayChat
+* various reasons.
+* Sunday ting.
+* CommunityWiki
+* his web site
+* CommunityWiki:OneBigSoup
+* TX A Manifesto For Collaborative Tools
+* TX Syntax key table shows up as text
+* TX correct (URL) to (URI)
+* TX URI template to URL template
+* TX comment line
+* TX blank line
+
+Now I just need to connect to the Internet, get this stuff off the
+ground.
+
+
 = 2005-06-22 =
+
+== 4:32 PM ==
+
+''Almost done!''
+
+Basically, it's just the Local Names Namespace Description Specification
+that needs to be handled, and then we're ready for upload..!
 
 == 2:44 PM ==
 
@@ -13,17 +50,22 @@ title: Version 1.3 Ideas:
 Continue with links page, after "Service Names"
 
 '''COMMIT LIST (output):'''
-* all .png
-* localnames.css
-* servicenames.txt
+* (./) all .png
+* (./) localnames.css
+* (./) servicenames.txt
 
 '''COMMIT LIST (input):'''
-* all .svg
+* (./) all .svg
+
+'''COMMIT LIST (txt):'''
+* interface specifications
 
 '''DOWNLOAD LIST:'''
-* servicenames.txt
-* actual interface specifications
-* .svg
+* (./) servicenames.txt
+* (./) .svg
+* (./) actual interface specifications
+
+Done with all ''that'' stuff!
 
 = 2005-06-21 =
 
@@ -39,24 +81,30 @@ title: Prioritizing, Recollecting Work To Do
 * (./) CSS, title, needs to look reasonable
 * (./) visit every page, checking for errors
 * (./) localnames.txt: NS "S" "servicenames.txt"
-* HIGH tasks from page list
-* utf-8 store localnames.txt
-* update glossary language for pattern, namespace, extension data
+* (./) utf-8 store localnames.txt (it already is!)
+* (./) update glossary language for pattern, namespace, extension data
+* backup older site
+* link menu to LNNDS v1.2, LNXRQueryI, LNXRStoreI
+* Local Names Namespace Description Specification v1.2
+** (./) fix page!
+** & Update LNNDS language for namespaces, patterns, extension data
+** & make damn sure LNNDS talks about relative urls.
 
 PENDING INTERNET:
-* actual interface specifications
-* talk: LNNDS v1.2
+* (./) actual interface specifications
+* (./) talk: LNNDS v1.2
 * try connected linking, recheck pages
 
 AFTER INTERNET RETRIEVALS:
-* setup Local Names XML-RPC Store Interface page
-* setup Local Names XML-RPC Query Interface page
-* name LNXRStoreI && LNXRQueryI
-* Fix Local Names Namespace Description Specification version 1.2 page!
-* Update LNNDS language for namespaces, patterns, extension data
+* (./) setup Local Names XML-RPC Store Interface page
+* (./) setup Local Names XML-RPC Query Interface page
+* (./) name LNXRStoreI && LNXRQueryI
 
 '''MEDIUM PRIORITY:'''
 
+* second pass to make sure names link right on website
+* nicely format Local Names XML-RPC Store Interface page
+* nicely format Local Names XML-RPC Query Interface page
 * interesting and explanatory image for front page
 * index title look different
 * region sets (#set HEAD)
@@ -66,9 +114,7 @@ AFTER INTERNET RETRIEVALS:
 * auto-list used but undefined names
 * MED tasks from page list
 * check "about" images
-* get SVG files
 * check specification v1.2, about Local Names, 
-* link menu to LNNDS v1.2, LNXRQueryI, LNXRStoreI
 * separators between glossary entries
 
 '''LOW PRIORITY:'''
@@ -90,54 +136,21 @@ AFTER INTERNET RETRIEVALS:
 
 specs: MED(rename title "Specifications")
 
-''DONE!'' downloads: (./) HIGH(missing title)
+downloads: ''done!''
 
-about page: (./) HIGH(fix "What is Local Names?" link), MEDIUM(fix "[[spec]]"
-link), MEDIUM(fix "the spec" link)
+about page: MEDIUM(fix "[[spec]]" link), MEDIUM(fix "the spec" link)
 
 glossary page: LOW("Local Names server" - shouldn't require reading
 interfaces)
 
-news page: (./) HIGH(link "Local Names XML-RPC Store Interface", "Local Names
-XML-RPC Query Interface"), (./) HIGH(missing title), LOW(link "LNXRStoreI"
-"LNXRQueryI")
+news page: LOW(link "LNXRStoreI" "LNXRQueryI")
 
+links page: MED(link "Local Names Wrap"), MED(link "my.LocalNames" -
+standardize), MED("Web Browser Redirect"), MED("jump to website"),
+MED("Local Names Wrap"), MED("my.LocalNames")
 
-links page: (./) HIGH(link "Services Names"), MED(link "Local Names
-Wrap"), MED(link "my.LocalNames" - standardize), MED("Web Browser
-Redirect"), MED("jump to website"), MED("Local Names Wrap"),
-MED("my.LocalNames"), (./) HIGH(missing title)
-
-glossary: (./) HIGH(rename title) LOW(make S:WP:URN link point to exact
-wikipedia entry for URN) MED(mention that "URL" might be a "relative
-URL")
-
-HIGH:
-first pass over glossary entries to write:
-* (./) URL
-* (./) record type
-* (./) LN
-* (./) NS
-* (./) PATTERN
-* (./) X
-* (./) namespace description
-* (./) line
-* (./) column
-* (./) local name
-* (./) name
-* (./) namespace link
-* (./) link key
-* (./) pattern
-* (./) pattern key
-* (./) URL template
-* (./) relative URL template (just join with URL template)
-* relative URL
-* extension data
-* extension key
-* extension values
-* record
-
-HIGH: second pass, check that everything is defined
+glossary: LOW(make S:WP:URN link point to exact wikipedia entry for URN)
+MED(mention that "URL" might be a "relative URL")
 
 
 == 8:28 PM ==

@@ -66,4 +66,4 @@ LN "BBCode" "http://www.christian-seiler.de/projekte/php/bbcode/index_en.html"
 LN "txt2html" "http://txt2html.sourceforge.net/"
 LN "C2:TextFilter" "http://c2.com/cgi/wiki?TextFilter"
 
-LN "A Manifesto For Collaborative Tools" "http://www.blueoxen.org/papers/0000D#nid3M1"
+LN "A Manifesto for Collaborative Tools" "http://www.blueoxen.org/papers/0000D#nid3M1"

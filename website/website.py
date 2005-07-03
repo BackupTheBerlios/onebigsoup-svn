@@ -46,7 +46,7 @@ LOCALNAMES_SEPARATOR = ":"
 
 OLDSTYLE_NAMESERVER_URL = "http://services.taoriver.net:9090/"
 
-CONNECTED = False  # SET THIS TO TRUE WHEN DOING REMOTE LOOKUPS
+CONNECTED = True  # SET THIS TO TRUE WHEN DOING REMOTE LOOKUPS
 
 
 class PathNavigationInFilenameException(Exception):
@@ -385,6 +385,7 @@ class WebsiteBuilder:
                 self._context.namespace_description_url,
                 self._context.oldstyle_xmlrpc_nameserver_url,
                 self._context.localnames_separator)
+        print "Unresolved:", collection.unresolved
         collection.bind_unresolved_to_url(self._context.not_found_url)
         for name in self._filesystem.text_file_basenames():
             text = self._filesystem.text_file(name)
