@@ -1,0 +1,26 @@
+$set title: Local Names News
+[[http://ln.taoriver.net/rss.rdf] (syndicate: RSS 1.0)]
+
+== 2005-06-21: Site Reworking, Interface Specification ==
+
+The project has undergone a lot of changes! We are now much more focused
+on [[Local Names interface] interfaces] and [[specs] specifications.]
+
+We have specified the [[LNXRStoreI] Local Names XML-RPC Store
+Interface,] and we are in the process of specifying the [[LNXRQueryI]
+Local Names XML-RPC Query Interface;] The only thing we need, really, is
+to figure out how we're going to report errors. So, it's almost done!
+
+We're almost to the fun part: Writing code.
+
+
+== 2004-12-12: Static Site Up ==
+
+Okay! I'm working on setting up the Local Names static site.
+
+It's not completely up yet; I'll create another newsmessage when it is.
+
+This page is only for major changes and what not. For more
+minute-by-minute details about what's going on, you'll have to
+[[http://lion.taoriver.net/] follow my blog.]
+

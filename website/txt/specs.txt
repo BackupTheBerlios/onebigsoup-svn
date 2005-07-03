@@ -1,0 +1,10 @@
+$set title: Local Names Specifications
+
+These are the ''current'' Local Names specifications:
+
+* [[Local Names Namespace Description Specification version 1.2]]
+* [[Local Names XML-RPC Store Interface]]
+* [[Local Names XML-RPC Query Interface]]
+
+[[index] (back to Local Names)]
+

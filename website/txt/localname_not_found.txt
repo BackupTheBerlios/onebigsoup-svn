@@ -1,0 +1,14 @@
+$set title: Local Name Not Found
+== Oops! ==
+
+During website linking, a [[local name]] was required, but not found.
+
+[[Lion Kimbro]] probably already knows about it, so you probably don't
+have to tell him anything.
+
+You ''might'' want to check [[http://ln.taoriver.net/localnames.txt] the
+local names description] for something that looks like what you're
+interested in, but I wouldn't count on it.
+
+-- Lion
+

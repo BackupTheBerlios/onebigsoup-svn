@@ -1,0 +1,7 @@
+$set title: Local Names Downloads
+
+Download our code from [[OBS:SubversionServer] our subversion server.]
+
+When our [[Local Names interface] new interfaces] are all spec'ed out,
+and the code is more mature, we'll link to them from here.
+

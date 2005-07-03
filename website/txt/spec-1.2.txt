@@ -1,0 +1,398 @@
+$set title: Local Names Namespace Description Specification v1.2
+
+$name LNNDS
+$name LNNDS v1.2
+$name Local Names Namespace Description Specification
+$name Local Names Namespace Description Specification version 1.2
+
+$name Background
+=== Background ===
+
+'''Before you read this document,''' make sure that you [[about]
+understand the main ideas of Local Names.]
+
+This document is the Local Names Namespace Description Specification,
+version 1.2. It is abbreviated "LNNDS v1.2". This document obsoletes 
+[[LNNDS v1.1] LNNDS v1.1.]
+
+This specification is maintained by [[Lion:my site] Lion Kimbro,] who is
+available by e-mail at [[mailto:lion@speakeasy.org] lion@speakeasy.org.]
+
+$name News and Contacts
+=== News and Contacts ===
+
+Major changes, releases, and news updates are posted to [[news] the
+Local Names website news page,] and [[news RSS] accompanying RSS feed.]
+Posts are made roughly once every 1-6 months.
+
+Ongoing development is presently (2005-06-16) coordinated on [[Lion:my
+blog] Lion Kimbro's blog,] which has [[Lion:my RSS]an RSS 2.0 news
+feed.] Posts are made roughly once every 1-7 days.
+
+Additional contact methods:
+
+'''IRC:''' [[irc://irc.freenode.net/#onebigsoup] irc.feenode.net,
+ #onebigsoup.] Activity is low, but everything is read. If you enter the
+room, '''plan to remain logged in for a few days;''' please read
+[[CommunityWiki:InternetRelayChat]] for more information about IRC and
+how we use it, especially if you are unfamiliar with IRC.
+
+The project presently keeps '''no mailing lists,''' for
+[[CommunityWiki:LimitationsOfMailingLists] various reasons.] Either
+speak in IRC, attend a [[WikiTing] Sunday ting,] write on Lion Kimbro's
+blog, write on [[CommunityWiki] CommunityWiki,] call Lion's cell phone,
+call Lion's Skype account, or otherwise get in contact with Lion Kimbro
+or a member of the [[One Big Soup]] effort.
+
+Lion Kimbro's contact information is kept on [[Lion:my site] his web
+site.]
+
+"One Big Soup" is the name of the super-project that gave rise to Local
+Names. The goal of One Big Soup is to develop Internet public
+communication systems by tying together existing Internet technologies
+with new protocols. Read [[CommunityWiki:OneBigSoup]] and [[A Manifesto
+for Collaborative Tools]] for more information.
+
+$name Encoding
+== Encoding ==
+
+Local Names namespace descriptions are encoded with:
+
+#LITERAL
+<p class="example">Content-type: text/plain; charset=UTF-8</p>
+#LITERAL
+
+Apache 2.0 can serve text files with these settings with the following
+directive:
+
+#LITERAL
+<p class="example">AddType "text/plain; charset=UTF-8" txt</p>
+#LITERAL
+
+$name Syntax
+== Syntax ==
+
+#CODE
+AddType "text/plain; charset=UTF-8" txt
+Syntax
+
+  <namespace_description> ::= "X VERSION 1.1"
+                              { <line> }
+
+  <line>    ::= <ws> |
+                <comment> |
+                <record>
+  <comment> ::= # { <character> }
+  <record>  ::= <record_type> <ws> <column> <ws> <column>
+  <column>  ::= "." |
+                <quotation-mark> { <column-character> } <quotation-mark> |
+                { <no-ws-col-char> }
+
+  <record_type> ::= "."       |
+                    "LN"      |
+                    "NS"      |
+                    "X"       |
+                    "PATTERN"
+
+  <ws>               : UTF-8 white space
+  <quotation-mark>   : quotation mark, like so: "
+  <character>        : any UTF-8 character
+  <column-character> : any UTF-8 character, escaping newlines, quotes, slashes.
+                       Newline: \n
+                       Quote: \"
+                       Slash: \\
+  <no-ws-col-char>   : any UTF-8 character,
+                       but forbidding newlines, quotes, slashes
+#CODE
+
+$name Syntax Key
+== Syntax Key ==
+
+#LITERAL
+<table border="1">
+
+  <tr> <td> &lt;blah-blah&gt; </td>
+       <td> non-terminal symbol </td>
+  </tr>
+  <tr> <td> "..." </td>
+       <td> literal text, without quotes around it </td>
+  </tr>
+  <tr> <td> { blah blah } </td>
+       <td> repetition, zero or more "blah blahs" </td>
+  </tr>
+
+</table>
+#LITERAL
+
+Don't get all pedantic on me.
+
+But if clarification is really needed, let me know, and we can work to
+improve the spec.
+
+$name Regarding Unicode Whitespace
+=== Regarding Unicode Whitespace ===
+
+This spec does not presently define line separators and whitespace.
+
+It will be changed to do so when:
+
+* Someone knowledgable about unicode whitespace talks with Lion, OR
+* a real demonstratable problem arises AND someone proposes a good solution, OR,
+* we participate in a standards process.
+
+The most that will be said here is:
+
+* Accept 0D, 0A, or 0D0A as line breaks,
+* if you have tables telling what unicode characters are white space, use them,
+* use common sense,
+* and don't worry, everything will be OK.
+
+$name Syntax Explanation
+== Syntax Explanation ==
+
+The first line '''MUST''' be:
+
+#LITERAL
+<p class="example">X VERSION 1.1</p>
+#LITERAL
+
+The remaining lines are one of three forms: Blank, comment, or record.
+
+'''[[blank line] Blank lines]''' are lines consisting of nothing but
+white space.
+
+'''[[comment line] Comment lines]''' start with a hash (#).
+
+'''[[record] Records]''' are composed of three [[column] columns.]
+
+The first column is the [[record type] record type,] and the meaning of
+the remaining two columns depends on the first column.
+
+The first columnm, the record type, can read either [[LN] "LN,"] [[NS]
+"NS,"] [[X] "X,"] or [[PATTERN] "PATTERN."] (No quotation marks, no
+commas, no periods. The first column can also be ''just a period.'' A
+period means a repetition of the previously used record type.
+
+The second and third columns can be:
+
+* a period ("."), now quotation marks around it, signifying a repetition
+  of the previous value used in the column,
+* quotation-mark-encased text, with newlines, quotes, and slashes,
+  escaped with "\n", "\"", or "\\",
+* text, without any whitespace, quotes, or slashes.
+
+That is, you can use a period in any column.
+
+Periods never have quotation marks around them.  If you are in the first
+column, you never use quotation marks. Quotation marks around the second
+or third column permit enclosed (but escaped) quotation marks, slashes,
+and white space.
+
+This concludes the description of the syntax.
+
+$name Semantics Explanation
+== Semantics Explanation ==
+
+#LITERAL
+<p class="foobar">LN (name) (URI)</p>
+#LITERAL
+
+This means to bind the [[name]] to the [[URL] URI.]
+
+#LITERAL
+<p class="foobar">NS (link key) (URI)</p>
+#LITERAL
+
+This means to link the namespace to a target namespace (described at the
+[[URL] URI.]) The target namespace is referred to by a convenient name,
+the [[link key] "link key."]
+
+#LITERAL
+<p class="foobar">PATTERN (name) (URI template)</p>
+#LITERAL
+
+This means to create a link to a "miniature namespace" that has no LN
+entries, but automatically applies a [[pattern]] to any name that is
+resolved in it.
+
+That is, a pattern simulates linking to a namespace that contains only
+an "X FINAL ([[URI template]])" record in it.
+
+#LITERAL
+<p class="foobar">X (key) (value)</p>
+#LITERAL
+
+This means to set some [[extension data]] for the immediate namespace.
+
+A namespace description interpreter should accept any key-value pair
+given in X records.
+
+$name X Records
+== X Records ==
+
+These are standard X records, recommended by this spec for use. Only the
+first, "X VERSION", is required. Everything else is optional.
+
+#LITERAL
+<p class="example">Text like this is an example.</p>
+#LITERAL
+
+$REM ---------- Laazy lazy lazy lazy. ----------
+#LITERAL
+
+<p class="foobar">
+    X VERSION 1.1
+</p>
+
+<p>
+    As is. Must be on the first line. <i>Exactly</i> as seen above: No quotes, a single space seperating the columns. <i>Exactly.</i>
+</p>
+
+<p class="foobar">
+    X AUTHOR (name)
+</p>
+<p>
+    The description's author's name.
+</p>
+<p class="example">X AUTHOR "Lion Kimbro"</p>
+
+<p class="foobar">
+    X AUTHOR-FOAF (URI)
+</p>
+<p>
+    A link to the description's author's FOAF file.
+</p>
+<p class="example">X AUTHOR-FOAF "http://www.speakeasy.org/~lion/foaf.rdf"</p>
+
+<p class="foobar">
+    X LAST-CHANGED (ISO-8601)
+</p>
+<p>
+    The date the namespace description was last changed.
+</p>
+<p class="example">X LAST-CHANGED "2005-01-28"</p>
+
+<p class="foobar">
+    X PREFERRED-NAME (name)
+</p>
+<p>
+    A preferred short name for the namespace.
+    Useful if you are automatically generating an
+    NS record, given just a URL of a namespace description.
+</p>
+<p class="example">X PREFERRED-NAME "The Prophet, by Gibran"</p>
+
+<p class="foobar">
+    X FINAL (URI-pattern)
+</p>
+<p>
+    <i>(Notes below.)</i>
+</p>
+
+<p class="example">X FINAL "The Prophet, by Gibran"</p>
+
+<h3><a name="xfinal">X FINAL</a></h3>
+
+<p>This standard requires the special treatment
+   of X FINAL.</p>
+
+<p>If a name is looked up, and no LN entry is found
+    for the name, but there is an X FINAL (URI pattern)
+    entry found, then the name is fitted to the pattern,
+    and that is the final URI.</p>
+
+<p> The pattern can include the text "$PAGE".
+    Wherever "$PAGE" appears in the pattern, "$PAGE"
+    is replaced with the name that is being fit to the
+    pattern.</p>
+
+<p>
+    Examples:
+</p>
+
+<p class="example">Name:     bar
+Pattern:  http://foo/$PAGE
+Result:   http://foo/bar</p>
+
+<p class="example">Name:     bar
+Pattern:  http://foo/$PAGE$PAGE--$PAGE
+Result:   http://foo/barbar--bar</p>
+
+<p>
+  A Local Names resolver MUST correctly handle
+  and interpret "X FINAL."
+</p>
+
+
+<h3><a name="redefinition">Redefinition</a></h3>
+
+<p class="question">
+  Q. Can LN, NS, and PATTERN records share the same name?
+</p>
+
+<p class="answer">
+  A. An LN record can reuse a name also used by an NS or
+     PATTERN record. But NS and PATTERN records cannot
+     share names with each other.
+</p>
+<p class="answer">
+     This is because an LN record is used for looking up
+     individual names, but both PATTERN and NS records
+     are used for looking up namespaces.
+</p>
+<p class="answer">
+     Recall that a PATTERN simulates a namespace, so
+     the name of a PATTERN will collide with the name
+     of an NS.
+</p>
+
+<p class="question">
+  Q. What happens if there is an LN redefinition,
+     or an NS/PATTERN redefinition?
+</p>
+
+<p class="answer"> 
+  A. Use the first value given. Log an error.
+</p>
+
+<p class="question">
+  Q. What happens if an X record is redefined?
+</p>
+
+<p class="answer">
+  A. X records are a special case; X records
+     line up into a list. The first entry to appear
+     in the text file is the first entry to appear
+     in the list.
+</p>
+<p class="answer">
+     This is so that meta-data requiring lists
+     can exist. (Albeit somewhat clumbsy.)
+</p>
+<p class="answer">
+     In particular, "X PREFERRED-NAME" could be
+     used repeatedly to list multiple possibilities,
+     in case a preferred name is already taken.
+</p>
+<p class="answer">
+     "X AUTHOR" may be used to name multiple authors.
+</p>
+<p class="answer">
+     But something like "X VERSION" should never
+     be repeated. It is syntactically okay,
+     but it shouldn't be done.
+</p>
+<p class="answer">
+     The same goes for "DATE-CHANGED."
+</p>
+
+<h3><a name="metatags">Meta Tags</a></h3>
+
+<p>If you wish to advertise a namespace from a web page, place the following in the head of your HTML document:</p>
+
+<blockquote>&lt;link rel="meta" type="text/plain" title="localnamespace" href="..." /&gt;</blockquote>
+
+<p>example:</p>
+
+<p class="example" style="width: 150%;">&lt;link rel="meta" type="text/plain" title="localnamespace" href="http://ln.taoriver.net/localnames.txt" /&gt;</p>
+#LITERAL

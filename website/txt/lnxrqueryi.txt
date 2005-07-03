@@ -1,0 +1,6 @@
+$set title: Local Names XML-RPC Query Interface
+$name LNXRQueryI
+
+(not written yet, see
+[http://onebigsoup.wiki.taoriver.net/moin.cgi/LnQueryInterface
+OBS:LnQueryInterface] for design work.)

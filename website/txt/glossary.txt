@@ -1,0 +1,613 @@
+$set title: Local Names Glossary
+
+These glossary values are canonical for the [[LNNDS v1.2] Local Names
+Namespace Description Specification version 1.2.]
+
+
+$REM ===================================================================
+
+$name blank line
+== blank line ==
+
+A '''blank line''' is a [[line]] in a [[namespace description]] that is
+either empty, or consists entirely of whitespace characters.
+
+
+$REM ===================================================================
+
+$name column
+== column ==
+
+"'''column'''" refers to a logical column in a [[record] record.]
+
+The first column is always the [[record type] record type.]
+
+The meanings of the second and third depending on the record type:
+[[LN] LN,] [[NS] NS,] [[PATTERN] PATTERN,] or [[X] X.]
+
+A column value cannot have any white space in it, unless it is
+surrounded by quotations marks. Within quotation marks, a quotation
+marks can be expressed with slash-quote (\"). you, Unfortunately, this
+means you have to use slash-slash (\\) to express an actual slash.
+
+If any column has a ''dot'' in it, then that means: "Use the column
+value used here in the previous record."
+
+
+$REM ===================================================================
+
+$name comment line
+== comment line ==
+
+A '''comment line''' is a [[line]] in a [[namespace description]] that
+is there for people to read, but has no meaning to the namespace
+interpreter.
+
+Every comment line begins with hash ("#") and is ignored by the
+namespace interpreter.
+
+Example:
+
+#CODE
+# This line is ignored.
+# So is this line
+LN "some line" "This line is not a comment line, it is a record."
+#CODE
+
+
+$REM ===================================================================
+
+$name extension data
+== extension data ==
+
+"'''extension data'""" is data that is extra information attached to a
+[[namespace] namespace.] This is so you attach extra information to a
+namespace, that does not itself define a [[local name] local name,]
+[[pattern] pattern,] or [[namespace link] namespace link.]
+
+Extension data is defined by [[X record] X records] within a
+[[namespace descrpition] namespace description.]
+
+The data is indexed by [[extension key] extension key,] and consists of
+a list of [[extension values] extension values.] X records with the same
+extension key add additional items to the list of extension values.
+
+The [[Local Names Namespace Description Specification version 1.2]]
+defines several extension keys, including the required "VERSION," as
+well as the recommended "AUTHOR," "AUTHOR-FOAF," "LAST-CHANGED,"
+"PREFERRED-NAME," and "FINAL."
+
+
+$REM ===================================================================
+
+$name extension key
+== extension key ==
+
+"'''extension key'''" refers to the string identifying a part of the
+[[extension data]] in a [[namespace] namespace.] The extension key is
+associated with a [[extension values] list of extension values.]
+
+For example, if you have a [[record]]:
+
+#CODE
+X "foo" "bar"
+#CODE
+
+...then the ''extension key'' is "foo," and we are appending "bar" to
+the list of [[extension values] extension values.]
+
+
+$REM ===================================================================
+
+$name extension values
+== extension values ==
+
+"'''extension values'''" refers to the list of strings associated with
+an [[extension key]] as part of the [[extension data]] found in a
+[[namespace] namespaces.]
+
+For example, if you have the following [[X record] X records] defining
+an extension key "foo":
+
+#CODE
+X "foo" "bar"
+X "foo" "baz"
+#CODE
+
+... then the ''extension values'' are: "bar" and "baz," in that order.
+
+
+$REM ===================================================================
+
+$name line
+== line ==
+
+"'''line'''" refers to a line in a [[namespace description] namespace
+description.]
+
+Lines are one of three types:
+* [[blank line]] -- with nothing in it.
+* [[comment line]] -- beginning with "#", ignored during processing.
+* [[record]] -- defining a record.
+
+Record lines consist of three columns, the first being the [[record
+type]], the meaning of the second and third depending on the rcord type.
+
+
+$REM ===================================================================
+
+$name link key
+== link key ==
+
+"'''link key'''," refers to the string identifying a [[namespace link]
+namespace link,] that has been bound to a [[URL] URL.]
+
+For example, if you have a line:
+
+#CODE
+NS "foo" "namespace_bar.txt"
+#CODE
+
+...then the ''link key'' is "foo," and it is bound to the [[relative
+URL]] "namespace_bar.txt."
+
+
+$REM ===================================================================
+
+$name LN
+$name LN record
+== LN record ==
+
+An '''LN record''' is a [[record]] found in a [[namespace description]]
+that binds a [[name]] to a [[URL]] or [[relative URL] relative URL,]
+forming a [[local name] local name.]
+
+An example:
+
+#LITERAL
+LN "foo" "bar"
+#LITERAL
+
+This creates a local name with the name "foo" bound to the relative URL
+"bar."
+
+Another example:
+
+#LITERAL
+LN "foo" "http://example.net/"
+#LITERAL
+
+This creates a local name with the name "foo" bound to the URL
+"http://example.net/".
+
+
+$REM ===================================================================
+
+$name local name
+== local name ==
+
+A '''local name''' is a binding between a single [[name]] and a [[URL]
+URL] found within a [[namespace] namespace.]
+
+Local names are defined by [[LN record] LN records] in a [[namespace
+description] namespace description.]
+
+"[[Local Names] Local Names,]" written with capital letters and always
+plural, refers to the complete Local Names system.
+
+
+$REM ===================================================================
+
+$name Local Names
+== Local Names ==
+
+'''Local Names''', written with capital first letters, like in a title,
+refers to ''the Local Names system.'' It's the whole collection of
+[[Local Names interface] interfaces, specifications,] [[Local Names
+server] servers,] perhaps even all the [[namespace] namespaces] and the
+[[Local Names project]] itself. The whole system, everything having to
+do with local names, all in one bundle.
+
+The idea of a [[local name] local name,] a single binding between
+[[name]] and [[URL] URL,] is all lower case.
+
+
+$REM ===================================================================
+
+$name Local Names server
+$name Local Names Query Server
+$name Local Names Store Server
+$name query server
+$name store server
+== Local Names server ==
+
+A [[Local Names]] server is a server that implements a [[Local Names
+interface] Local Names interface.]
+
+
+$REM ===================================================================
+
+$name name
+== name ==
+
+"'''name'''," refers to the string identifying a [[local name] local
+name,] that has been bound to a [[URL] URL.]
+
+For example, if you have a line:
+
+#CODE
+LN "foo" "bar"
+#CODE
+
+...then the ''name'' is "foo," and it is bound to the [[relative URL]]
+"bar."
+
+"name" is used ''specificly'' to talk about a local name. Do not confuse
+it with a [[pattern key] pattern key,] [[namespace key] namespace key,]
+or [[extension key] extension key.]
+
+
+$REM ===================================================================
+
+$name namespace link
+== namespace link ==
+
+A "'''namespace link'''" is a link between one [[namespace]] (the
+"source namespace") and another namespace (the "target namespace").
+
+Namespace links are defined by [[NS record] NS records] within a
+[[namespace description]]- the namespace description for the source
+namespace.
+
+Namespace links are always named, and the name is called the "[[link
+key] link key.]"
+
+Namespace links are unidirectional: If you link a namespace to another
+namespace, it is not necessarily the case that the target namespace will
+link back to the source namespace.
+
+
+$REM ===================================================================
+
+$name NS
+$name NS record
+== NS record ==
+
+An '''NS record''' is a [[record]] found in a [[namespace description]]
+that binds a [[link key]] to a [[URL]] or [[relative URL] relative URL,]
+forming a [[namespace link] namespace link.]
+
+An example:
+
+#LITERAL
+NS "foo" "localnames.txt"
+#LITERAL
+
+This creates a namespace link with the link key "foo" bound to the
+namespace description found at relative URL "localnames.txt".
+
+Another example:
+
+#LITERAL
+NS "foo" "http://example.net/localnames.txt"
+#LITERAL
+
+This creates a namespace link with the link key "foo" bound to the
+namespace description found at URL "http://example.net/localnames.txt".
+
+
+$REM ===================================================================
+
+$name OSLNQS
+$name Old Style Local Names Query Server
+== Old Style Local Names Query Server ==
+
+History lesson:
+
+In late 1994, [[Lion Kimbro]] wrote a [[Local Names Query Server]] based
+on an even older version. It had two interfaces, [[XML-RPC]] and
+[[REST]]. It's still in use today, June 2005. That said, there were a
+few problems with it:
+
+* There was no formal interface specification.
+* It was poorly documented.
+* It was difficult to maintain and document ''two'' interfaces.
+
+Lion decided to focus on specifications instead of implementations,
+which led to the creation of the [[Local Names interface] Local Names
+interfaces,] which he is much happier with.
+
+Before the Old Style Local Names Query Server, that was an even
+''older'' server, the ''original'' query server. It was horrible. The
+API was terribly inconsistent. And it's still in use today, because
+[[MooKitty]] wrote a Local Names [[WordPress]] plugin that became
+indispensible to Lion, and that was written to the original query
+server.
+
+Never use the original Local Names query server, and never use the Old
+Style Local Names Query Server.
+
+There is a few months here, June 2005, where we work towards the new
+[[Local Names XML-RPC Query Interface] Local Names XML-RPC Query
+Interface,] and then write/adapt an implementation to it. In the
+mean-time, please be patient, or offer your services to help!
+
+
+$REM ===================================================================
+
+$name Local Names interface
+== Local Names interface ==
+
+There are presently two [[Local Names]] interfaces:
+* the '''Local Names XML-RPC Query Interface''' ('''LNXRQueryI''')
+* the '''Local Names XML-RPC Store Interface''' ('''LNXRStoreI''')
+
+The '''query interface''' gives programs a way to ask a server to
+resolve names. It is comparable to a [[bind]] server in the [[Domain
+Name System] Domain Name System.] The query interface is specified in
+the [[Local Names XML-RPC Query Interface specification] Local Names
+XML-RPC Query Interface specification.] '''The query interface is still
+being determined. By the end of 2005, we should have the specification
+and a working implementation. See [[OBS:TheRadar] the radar] for
+scheduling details.'''
+
+The '''store interface''' gives programs a way to tell a server to bind
+a name to a [[URL] URL,] in some [[namespace] namespace.] The store
+interface is specified in the [[Local Names XML-RPC Store Interface
+specification] Local Names XML-RPC Store Interface specification.]
+
+A given [[Local Names server]] can implement multiple interfaces; It
+doesn't have to be one or the other.
+
+
+$REM ===================================================================
+
+$name namespace
+== namespace ==
+
+A '''namespace''' is a space that contains [[local name] local names.]
+
+Namespaces are defined by text files called [[namespace description]
+namespaces descriptions.]
+
+A namespace can point to other namespaces with [[NS record] NS records]
+in the namespace's description.
+
+
+$REM ===================================================================
+
+$name namespace description
+== namespace description ==
+
+A '''namespace description''' is text file defining a [[namespace]
+namespace.]
+
+The file consists of [[line] lines.] Each line is either a [[blank line]
+blank line,] a [[comment line] comment line,] or a [[record] record.]
+
+Records consist of 3 [[column] columns,] the first of which tells the
+[[record type] record type,] and the meaning of the second and third
+columns dependent on the record type.
+
+
+$REM ===================================================================
+
+$name pattern
+== pattern ==
+
+A "'''pattern'''" is a named substitution pattern. It emulates a
+namespace with infinite [[local name] local names:] Every [[name]] is bound
+to a [[URL]] calculated by substituting the name into a [[URL template]
+URL template.]
+
+Patterns are defined by [[PATTERN record] PATTERN records] within a
+[[namespace decription] namespace description.]
+
+In the order of resolution, patterns apply ''before'' [[namespace link]
+namespace links.] That is, a pattern can conceal a namespace link. (This
+is to preserve expressive power. Namespace links provide a dual purpose:
+They can be either explicitly traversed, or implicitly traversed. You
+can cover up a namespace link with a pattern, and it won't be usable by
+explicit traversal, but it will still be implicitly traversed. Having
+namespace links conceal patterns would reduce expressive power.)
+
+Patterns are always named, and the name of a pattern is called it's
+"[[pattern key] pattern key.]"
+
+
+$REM ===================================================================
+
+$name pattern key
+== pattern key ==
+
+"'''pattern key'''" refers to the string identifying a [[pattern]
+pattern,] that has been bound to a [[URL template] URL template.]
+
+For example, if you have a line:
+
+#CODE
+PATTERN "foo" "bar/$NAME"
+#CODE
+
+...then the ''pattern key'' is "foo," and it is bound to the [[relative
+URL template]] "bar/$NAME".
+
+
+$REM ===================================================================
+
+$name PATTERN
+$name PATTERN record
+== PATTERN record ==
+
+A '''PATTERN record''' is a [[record]] found in a [[namespace
+description]] that binds a [[pattern key]] to a [[URL template]] or
+[[relative URL] relative URL template,] forming a [[pattern] pattern.]
+
+An example:
+
+#LITERAL
+PATTERN "foo" "bar/$NAME"
+#LITERAL
+
+This creates a pattern with the pattern key "foo" bound to the
+relative URL template "bar/$NAME".
+
+Another example:
+
+#LITERAL
+PATTERN "foo" "http://example.net/$NAME"
+#LITERAL
+
+This creates a pattern with the pattern key "foo" bound to the
+URL template "http://example.net/$NAME".
+
+Read the [[glossary]] entry on [[pattern]] for information on how
+patterns are used.
+
+
+$REM ===================================================================
+
+$name record
+== record ==
+
+A '''record''' is a [[line]] in a [[namespace description]] that tells
+something about the [[namespace]] that the namespace description is
+defining.
+
+Every [[record]] has ''three columns.''
+"'''extension values'''" refers to the list of strings associated with
+an [[extension key]] as part of the [[extension data]] found in a
+[[namespace] namespaces.]
+
+For example, if you have the following [[X record] X records] defining
+an extension key "foo":
+
+#CODE
+X "foo" "bar"
+X "foo" "baz"
+#CODE
+
+... then the ''extension values'' are: "bar" and "baz," in that order.
+
+
+$REM ===================================================================
+
+$name record type
+== record type ==
+
+A [[namespace description]] is made of [[line] lines,] and each
+non-blank non-comment line defines a [[record] record.] Each record has
+a ''type,'' called the '''record type.'''
+
+The record type can be one of four things:
+* [[LN]] -- a [[local name]] record, binding a [[name]] to a [[URL]
+  URL.]
+* [[NS]] -- a [[namespace link]] record, binding a [[link key]] to a
+  [[URL] URL.]
+* [[PATTERN]] -- a [[pattern]] record, binding a [[pattern key]] to a
+  [[URL template] URL template.]
+* [[X]] -- an [[extension data]] record, appending an extension value to
+  the list of [[extension values]] associated with an [[extension key]
+  extension key.]
+
+
+$REM ===================================================================
+
+$name relative URL
+== relative URL ==
+
+(This is new in [[LNNDS v1.2] version 1.2 of the Local Names Namespace
+Description Specification.])
+
+Wherever you can put a [[URL] URL,] you can also put a ''relative URL.''
+The URL is specified relative to the last URL path element leading to
+the [[namespace description]] itself.
+
+For example, if the URL to get the namespace description were
+"http://example.com/localnames.txt", and the relative URL read
+"foo.html", then the resulting URL would be
+"http://example.com/foo.html".
+
+For another example, if the URL to get the namespace description read
+"file:///C:Documents and Settings/foo/My Documents/localnames.txt", and
+the relative URL read "bar.html", then the resulting URL would be
+"file:///C:Documents and Settings/foo/My Documents/bar.html".
+
+The Local Names Namespace Description Specification is ''mute'' on how
+an API returns relative URLs. However, the [[Local Names XML-RPC Query
+Interface]] specification will describe how URLs are returned when using
+it.
+
+
+$REM ===================================================================
+
+$name URL
+$name URI
+== URL ==
+
+'''U'''niform '''R'''esource '''L'''ocator.
+
+"[[Local Names]] binds [[name] names] to URLs."
+
+Technically, however, they are ''URIs.''
+
+The difference between a URL and an URI? A "URI," or "Uniform Resource
+Identifier," can be either an URL or an ''URN.'' Almost all URI's that
+you find in the world are URLs, but a handful are ''URNs,'' or "Uniform
+Resource Names." You can [[S:WP:URN] read more about them on Wikipedia.]
+
+Since most people are comfortable with "URLs," we just say "URL" in our
+documentation, rather than "URI."
+
+But, technically speaking, you can bind any [[local name]] to any
+'''URI.''' That is, you can bind any local name to a URL or an URN.
+
+Skirting the rules a little, you can bind to any arbitrary
+string. However, this may confuse the [[query server] query server,]
+which has no way of knowing whether it is the string, or a [[relative
+URL] relative URL.]
+
+If you want to bind keys to strings in the namespace, it's probably best
+to use [[X]] [[record] records.]
+
+
+$REM ===================================================================
+
+$name URL template
+$name URI template
+$name relative URL template
+$name relative URI template
+== URL template ==
+
+A '''URI template''' is a [[URI]] that can have a [[name]] substituted
+into it, before it is evalutated.
+
+Any occurances of "$NAME" in the URI template are replaced with a given
+name.
+
+Suppose the URI template were "http://example.com/$NAME", and the name
+was "foo", then the resulting URI would be "http://example.com/foo".
+
+
+$REM ===================================================================
+
+$name X
+$name X record
+== X record ==
+
+An '''X record''' is a [[record]] found in a [[namespace description]]
+that appends an extension value to the list of [[extension values]]
+associated with an [[extension key] extension key.]
+
+An example:
+
+#LITERAL
+X "foo" "bar"
+X "foo" "baz"
+#LITERAL
+
+These two lines add to the [[extension data]] identified by extension
+key "foo." After these two lines are processed, "foo" is bound to
+whatever it was bound to before, as well as the extension values "bar"
+and "baz."
+

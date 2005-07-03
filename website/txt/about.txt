@@ -1,0 +1,239 @@
+$set title: About Local Names
+
+This page describes the basic ideas behind [[Local Names]].
+
+Written Dec 19, 2004, updated June 18, 2005.
+
+* [[What is Local Names?]]
+* [[The Basics]]
+* [[Other Records]]
+* [[How Local Names are Used]]
+* [[Basics, Concluded]]
+
+$name What is Local Names?
+== What is Local Names? ==
+
+Local Names is a way to bind ''names'' to [[URL] URLs.]
+
+It's so you can talk about things ''naturally.'' Not just talk about
+them, but ''link'' to them, too. But ''not'' having to break your
+concentration, looking up URLs.
+
+Local Names was inspired by [[wiki]]. In a wiki, you don't have to break
+your concentration, to make a link. You just type something out, and it
+links. It's incredibly userful, and lends itself towards [[HyperText]
+hyper-text] and [[LinkLanguage] link language.] It becomes much easier
+to understand what people are talking about, and it becomes easier to
+refer back to important pages or conversations.
+
+Local Names can be used in wiki, [[blog] blogs,] bulletin boards,
+instant messengers, [[IRC] IRC,] [[Jabber] Jabber,] mail
+programs. Articles, responses, posts- they can all, potentially, make
+use of Local Names.
+
+Local Names can form links ''from'' anywhere text can be written, ''to''
+anything identifiable by URL. That means you could point a name to an
+image.
+
+Even things like media players, (which can play files located at URLs,)
+or [[RDF]] descriptions, could be trained to work with Local Names.
+
+Presently, it is possible (though difficult) to use Local Names with
+[[Firefox]], and many wiki by [[WikiFeatures:InterLink]InterLink.] (You
+can follow [[OBS:TheRadar]our implementation plan,] which casts into
+2006.)
+
+
+$name The Basics
+== The Basics ==
+
+You start with the idea of a [[namespace] namespace.] The namespace is a
+place where you keep [[local name] local names.] Inside a namespace,
+names are bound to URLs.
+
+#LITERAL
+<img style="float: right;" class="explaining"
+ src="ns_is_textfile.png" />
+#LITERAL
+
+So, for example, you have a personal namespace of your own. And in your
+namespace, you have the names of your friends, and links to their web
+pages.
+
+Now, namespaces are described in text files called [[namespace
+description] "namespace descriptions."] These files are best viewed as a
+collection of [[line] lines,] with three [[column] columns] each.
+
+The first column is special, and it's called the [[record type] record
+type.] The data in the second and third columns- whatever they mean, it
+depends on the record type.
+
+The most common record type is [[LN] LN.] LN stands for [[local name]
+local name.] That is, it means, "We're going to link the name in the
+second column to the URL in the third column."
+
+So, here's where part of my namespace description looks like. Just this
+fragment, it's a perfectly valid namespace description.
+
+#CODE
+X VERSION 1.2
+LN "my website" "http://www.speakeasy.org/~lion/"
+LN "my blog" "http://lion.taoriver.net/"
+LN "Bootstrap Institute" "http://www.bootstrap.org/"
+LN "cyborg" "http://www.williamgibsonbooks.com/archive/2003_01_28_archive.asp"
+LN "greg" "http://greg.vario.us"
+LN "joel" "http://www.livejournal.com/users/bug_complex/"
+LN "bpt" "http://www.livejournal.com/users/bpt/"
+LN "kpreid" "http://homepage.mac.com/kpreid/"
+#CODE
+
+And so on, and so forth.
+
+Here, practice yourself. Make a Local Names namespace description,
+righter here, just to get the form through your eyes, brain, and hand:
+
+#LITERAL
+<form><textarea rows="3" cols="80"></textarea></form>
+#LITERAL
+
+
+$name Linking Namespaces
+== Linking Namespaces ==
+
+It's very useful to link namespaces to namespaces.
+
+We discovered this in [[wiki] wiki,] when we invented
+[[WikiFeatures:InterLink] the InterLink.] That is, in many
+[[WikiFeatures:WikiEngine] wiki engines,] you can link to pages in other
+wiki. You do with with a format something like:
+
+#CODE
+WikiFeatures:RecentChanges
+#CODE
+
+...which links to [[WikiFeatures:RecentChanges]
+WikiFeatures:RecentChanges.]
+
+It's very convenient, and you come to expect it.
+
+So, the concept exists in [[Local Names]] as well. You can make what's
+called an [[NS]] [[record] record,] and link a namespace to a
+neighboring namespace.
+
+#LITERAL
+<center>
+<img class="indented" src="ns_linking.png" />
+</center>
+#LITERAL
+
+Here's what a namespace description looks like, using this concept:
+
+#CODE
+X VERSION 1.1
+LN "my website" "http://www.speakeasy.org/~lion/"
+LN "my blog" "http://lion.taoriver.net/"
+LN "Bootstrap Institute" "http://www.bootstrap.org/"
+LN "cyborg" "http://www.williamgibsonbooks.com/archive/2003_01_28_archive.asp"
+
+NS "python" "http://www.python.org/moin/LibraryReferencesNames?action=raw"
+NS "java" "http://greg.vario.us/names/Java%20Libraries.names"
+#CODE
+
+Those last two lines are NS records, and they mean that this namespace
+is linked to the namespace described at those URLs.
+
+So, for example, the namespace is linked to a namespace named "Python."
+The Python namespace is described by the namespace description at URL
+[[http://www.python.org/moin/LibraryReferenceNames?action=raw]].
+
+Note that the Python namespace isn't ''universally'' labelled "Python."
+In some other namespace, for example, it might be called "Library
+Reference," or something like that. Namespaces can suggest names for
+themselves, via an [[X]] record, but they don't have to be respected.
+
+
+$name Other Records
+== Other Records ==
+
+There are ''four'' types of records:
+
+* [[LN]] -- defining [[local name] local names]
+* [[NS]] -- linking to other [[namespace] namespaces]
+* [[PATTERN]]  -- defining ''pattern substitutions''
+* [[X]] -- setting ''extension data''
+
+Refer to the [[spec]] for more detailed information, but we'll talk
+briefly here about the X records.
+
+X records are for metadata. So for example:
+
+#CODE
+X "PREFERRED-NAME" "lion"
+#CODE
+
+...means that the preferred NS name for the namespace is "lion."
+
+Another X key is "FINAL." The FINAL key tells what URL pattern to use to
+link a local name to, if there are no LN records for that name.
+
+An example:
+
+#CODE
+X FINAL http://example.net/$NAME/
+#CODE
+
+So, this concludes the introduction to the Local Names namespace
+description.
+
+Next, how the namespace descriptions are used by applications.
+
+
+$name How Local Names are Used
+== How Local Names are Used ==
+
+An application talks with a [[Local Names Query Server] Local Names
+Query Server (LNQS).]
+
+The application asks the query server to resolve names, and it gets back
+the URLs.
+
+#LITERAL
+<img class="indented" align="right" src="ns_hopping.png" />
+#LITERAL
+
+So we see here, we have an application. It could be a wiki, it could be
+a blog, it could be a bulletin board, instant messenger, mail
+program. It could be an article, a response, a post, whatever.
+
+The application asks for help from the query server. The query server
+answers from it's cache, or goes out looking around for more namespace
+descriptions on the web. The query server then responds to the
+application with what it's found.
+
+This is basically just like [[DNS] DNS.] No big surprises here.
+
+
+$name Basics, Concluded
+== Basics, Concluded ==
+
+So you have:
+
+* [[namespace] Namespaces,] one text file per [[namespace] namespace.]
+* The text file is called a [[namespace description] namespace
+  description.]
+* The namespace description is a bunch of [[record] records.]
+* There are [[LN]] records, that link [[local name] local names] to
+  [[URL] URLs.]
+* There are [[NS]] records, that link namespaces to other namespaces.
+* There are [[X]] records, that provide additional information.
+* Applications talk to a [[query server] query server,] which looks
+  through namespaces to resolve names.
+
+For more info about:
+
+* the '''namespace description format''' -- consult [[spec] the spec]
+* '''downloads, tools, plugins''' - [[downloads] the downloads page]
+* '''existing namespaces, related projects''' -- consult [[links] the
+  "links" section of this site.]
+
+
