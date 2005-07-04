@@ -63,11 +63,12 @@ class RemoteLookupTest(unittest.TestCase):
 
     """Test that we can remotely look up names.
 
-    test1  -- test some lookups, using Lion's namespace description.
+    test1  -- test resolving within one namespace
+    test_namespace_hopping  -- test lookups transcending one namespace
     """
 
     def test1(self):
-        """Make sure bind_with_LNQS is resolving everything.
+        """Make sure bind_with_LNQS resolves names in one namespace.
 
         If there's an error, it may be that it actually can't resolve
         slashdot or freshmeat- you'll have to check it independently,
@@ -81,6 +82,23 @@ class RemoteLookupTest(unittest.TestCase):
         bound = collection.bound
         assert bound["slashdot"] == "http://www.slashdot.org/"
         assert bound["freshmeat"] == "http://www.freshmeat.net/"
+
+    def test_namespace_hopping(self):
+        """Make sure bind_with_LNQS resolves paths crossing namespaces.
+
+        If there's an error, it may be that it actually can't resolve
+        the lookup- you'll have to check it independently, to make
+        sure.
+        """
+        collection = lnlink.CollectedNames(["OneBigSoup:RecentChanges"])
+        result = collection.bind_with_LNQS(
+            "http://taoriver.net/tmp/gmail.txt",
+            "http://services.taoriver.net:9090/")
+        assert len(result) == 0, "still some unresolved names"
+        bound = collection.bound
+        url = ("http://onebigsoup.wiki.taoriver.net/moin.cgi/" +
+               "RecentChanges")
+        assert bound["OneBigSoup:RecentChanges"] == url
 
 
 if __name__ == '__main__':
