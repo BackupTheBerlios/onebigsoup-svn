@@ -1,0 +1,17 @@
+
+  ================
+  |  XML-RPC CGI |
+  ================
+
+
+  This Python module is a gateway between XML-RPC CGI requests, and
+  Python modules.
+
+  Basically: Just put this script in a CGI directory, and then any
+  Python modules in the same directory (that defines XMLRPC_namespace)
+  will be immediately callable by XML-RPC.
+
+  Full documentation is found at:
+
+    http://wiki.python.org/moin/AutoXmlRpcCgi
+
