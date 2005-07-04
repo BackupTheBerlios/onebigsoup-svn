@@ -271,7 +271,7 @@ def collect_names(xhtml, collected_names=CollectedNames()):
     parser.setContentHandler(NamesCollector(collected_names.unresolved))
     
     inpsrc = xml.sax.xmlreader.InputSource()
-    inpsrc.setByteStream(StringIO.StringIO(xhtml))
+    inpsrc.setByteStream(StringIO.StringIO(str(xhtml)))
     
     parser.parse(inpsrc)
     
@@ -299,7 +299,7 @@ def link_names(xhtml, collected_names):
     _filter.setContentHandler(xml.sax.saxutils.XMLGenerator(output))
     
     inpsrc = xml.sax.xmlreader.InputSource()
-    inpsrc.setByteStream(StringIO.StringIO(xhtml))
+    inpsrc.setByteStream(StringIO.StringIO(str(xhtml)))
     
     parser.parse(inpsrc)
 
