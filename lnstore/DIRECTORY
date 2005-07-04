@@ -1,0 +1,23 @@
+       	   	   /'	__--
+       	   	  /'__--
+------------------------------------------------------------------------
+       	    __--/
+       	__--  '/                  LOCAL NAMES STORE SERVERS
+    __--    .'/
+__--   	   ' /
+       	 .' /  	          Store Servers maintain namespace descriptions
+       	'  /             for users. Users can store names by the
+      .'  /             Local Names XML-RPC Store Interface, abbreviated
+     ' 	 /             "LNXRStoreI".
+   .'  	/
+  '    /
+.'    /        jroes -- Jonathon Roes' multi-user Store Server
+     /
+    /        monostore -- Lion Kimbro's single-namespace Store Server
+   /
+  /
+ /
+/
+
+
+

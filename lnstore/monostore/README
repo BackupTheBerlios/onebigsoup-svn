@@ -1,0 +1,72 @@
+
+  ===============
+  |  MonoStore  |
+  ===============
+
+
+  MonoStore is a Local Names Store Server. It implements the Local Names
+  XML-RPC Store Interface (LNXRStoreI).
+
+  The server is simple, and does not make full use of the
+  LNXRStoreI. Specificly, it:
+
+  * supports only a single namespace (you cannot create and delete
+    namespaces)
+  * does not support passwords- anybody can come by, and unset
+    everything out of your namespace description
+
+  There is a flaw in the implementation:
+  * only supports a single extension value per extension key (that is,
+    X records can only have one value per key)
+
+
+  INSTALLING
+  ----------
+
+  Instructions current to: 2005-07-04
+
+  The top of the script describes the details of installation and
+  configuration, but here's an intuitive explanation:
+
+    1. Create a directory. (Or perhaps reuse a CGI directory.)
+    2. Copy monostore.py to it.
+    3. Copy xrcgi.py to it. (found in /other/xrcgi)
+    4. Set variables in monostore.py:
+       * NAMESPACE_DESCRIPTION_PATH
+            -- where the namespace description will be stored
+       * NAMESPACE_DESCRIPTION_URL
+            -- how the public will get to the namespace description
+       * NAMESPACE_DATA_PATH
+            -- where the data for the namespace will be stored
+       * (maybe put the data and the namespace description in the same
+          directory as the scripts)
+    5. Make sure file permissions are good.
+       * That is, make sure that the Apache user can run the script,
+         and whenever the script creates or edits something, that
+         it'll work.
+    6. Configure Apache.
+       * Make sure the Apache user can run the script.
+         (Make sure that the script is interpreted as a CGI.)
+       * Make sure that the public can read the namespace description.
+    7. Make sure the script runs.
+       * Point a web browser at xrcgi.py. You should see the interface
+         documentation.
+       * If it's not working, you need to figure out why Apache isn't
+         running the script.
+    7. Call "set" once.
+       * Start a Python shell.
+       * import xmlrpclib
+       * s = xmlrpclib.ServerProxy("http://example.com/.../xrcgi.py")
+       * s.set("password", "default",
+               "LN", "slashdot", "http://slashdot.org/")
+       * This will trigger the creation of the namespace description.
+    8. Make sure the namespace description exists.
+       * Point a web browser at the NAMESPACE_DESCRIPTION_URL.
+       * If you don't see a namespace description, you need to figure
+         out why the script isn't able to create the namespace
+         description. It's probably a filesystem permissions problem;
+         make sure the user the web server is running as ("apache"..?)
+         has write access to the NAMESPACE_DESCRIPTION_PATH.
+ 
+  You're done!
+
