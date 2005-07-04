@@ -31,7 +31,7 @@ local name(s), "name", "URL", "relative URL"
 
 namespace link, link key, namespace URL, source namespace, target
 namespace
-* a "namespace key" is "bound" to a "namespace URL," and that makes a
+* a "link key" is "bound" to a "namespace URL," and that makes a
   "namespace link"
 
 pattern, pattern key, URL template

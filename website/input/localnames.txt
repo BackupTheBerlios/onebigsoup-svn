@@ -25,6 +25,10 @@ LN "One Big Soup" "http://onebigsoup.wiki.taoriver.net"
 NS "OneBigSoup" "http://onebigsoup.wiki.taoriver.net/moin.cgi/?action=localnames"
 .  "OBS" .
 
+NS "WikiFeatures" "http://wikifeatures.wiki.taoriver.net/moin.cgi/?action=localnames"
+NS "Lion" "http://taoriver.net/tmp/gmail.txt"
+NS "CommunityWiki" "http://wrap.localnames.taoriver.net/spaces/CommunityWiki/"
+
 # Downloads
 LN "core 1.1" "http://ln.taoriver.net/downloads/core1.1.tgz"
 .  "nameserver 1.1" .
@@ -65,5 +69,9 @@ LN "Wiki2xhtml" "http://www.neokraft.net/sottises/wiki2xhtml/"
 LN "BBCode" "http://www.christian-seiler.de/projekte/php/bbcode/index_en.html"
 LN "txt2html" "http://txt2html.sourceforge.net/"
 LN "C2:TextFilter" "http://c2.com/cgi/wiki?TextFilter"
+LN "Domain Name System" "http://en.wikipedia.org/wiki/DNS"
+.  "DNS" .
+LN "BIND" "http://en.wikipedia.org/wiki/BIND"
+LN "REST" "http://www.xfront.com/REST-Web-Services.html"
 
 LN "A Manifesto for Collaborative Tools" "http://www.blueoxen.org/papers/0000D#nid3M1"

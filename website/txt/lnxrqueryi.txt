@@ -1,6 +1,437 @@
 $set title: Local Names XML-RPC Query Interface
 $name LNXRQueryI
 
-(not written yet, see
-[http://onebigsoup.wiki.taoriver.net/moin.cgi/LnQueryInterface
-OBS:LnQueryInterface] for design work.)
+#LITERAL
+<center>
+#LITERAL
+'''DRAFT!'''
+#LITERAL
+</center>
+#LITERAL
+
+This is a DRAFT version only; Feedback welcome! Visit
+[[OBS:LnQueryInterface]] if you have any comments or criticism.
+
+#LITERAL
+<br> </br>
+#LITERAL
+
+#CODE
+  LOCAL NAMES XML-RPC QUERY INTERFACE
+  ===================================
+
+  This is the specification for the Local Names XML-RPC Query Interface
+  (LNXRQueryI).
+
+ 
+  BACKGROUND
+  ==========
+
+  Local Names [1] is a system for binding local names to global URLs. The
+  initial motivation was to help communities form link language. But it's
+  useful for other things as well, such as discovering and resolving short
+  names for software components that are arranged in a graph.
+
+  [1] http://ln.taoriver.net/
+  [2] http://communitywiki.org/LinkLanguage
+
+
+  PURPOSE
+  =======
+
+  The purpose is to make a standard way to resolve Local Names, given a
+  Local Names query server. People will probably want to write their own
+  names servers, optimized for the particulars of their situation. But
+  their names server should be usable by most software that makes use of
+  Local Names. Hence, this spec.
+
+  Examples of clients:
+  * a wiki-like text-to-HTML converter, that supports Local Names
+  * a web client redirection service, that fowards name lookups to URLs
+  * an XML-RPC or SOAP interface, that uses Local Names to locate services
+  * a CLI program, that returns URLs given names to look up
+  * an IRC or Jabber bot, that gives the URLs associated with names
+  * a script that relinks Local Names found in HTML to URLs
+
+  Examples of servers:
+  * a simple in-memory caching Local Names Query server
+  * a Local Names Query server using SQL in the back
+  * a Local Names Query server optimized for serving particular names
+  * a Local Names Query server alternating responses to distribute load
+
+
+  REQUIREMENTS
+  ============
+
+  * You're using v1.2 Local Names descriptions.
+
+  That said, if the specified syntax does not change significantly
+  in v1.3, v1.4, ..., this interface may work perfectly fine.
+
+  It may even work as we transition to v2.0, provided that the data
+  model does not change significantly.
+
+  * You're using XML-RPC.
+
+  This interface is readily adaptable to SOAP, though.
+
+
+  OVERVIEW
+  =============
+
+  All functions are defined in the "lnquery" namespace. That is,
+  if you have a function "foo" here, it's full name is "lnquery.foo".
+
+  Functions are grouped into "Query" and "Admin," because it's
+  convenient to think of them that way. But those groupings- They have
+  no bearing on the code, or the actual interface implementation. The
+  only reason we're grouping them like that is because it's easier to
+  think of them this way.
+
+  Query:
+  * lnquery.lookup(ns_url, name)
+  * lnquery.find(ns_url, path, record_type, style)
+  * lnquery.find_many(ns_url, paths, record_type, style)
+
+  Admin:
+  * lnquery.get_server_info()
+  * lnquery.get_cached_ns(ns_url)
+  * lnquery.dump_cache(ns_url)
+
+  The Query part is what you use to perform Local Names queries.
+
+  The Admin part is what you use to find out what resolution styles the
+  interface supports, and to get information about the cache.
+
+  The specification is soomewhat "loose." For example, there'a a
+  "ns_url" in a lot of places.  You MUST include the arguments in the
+  function signatures, but you don't have to actually use them. If you
+  wanted to make a query server that programatically converted paths
+  into URLs, and that did not make use of a namespace description to do
+  so, you can do that.
+  
+  There is a section at the end of this document called
+  "Considerations," which goes into some of these issues in
+  detail. Another section, "Scenarios," describes how you might
+  want to use the API, for different types of servers.
+  
+  Functions can produce errors; there's a section on "Error Codes"
+  below. When the specification for a function says "return error code
+  -201," it means to return the tuple (-201, "record not found").
+  Again, see "Error Codes" below for more details.
+
+
+  SPECIFICATION
+  =============
+
+    lnquery.lookup(ns_url, name)
+    ----------------------------
+
+  Lookup a single name within the named namespace, using the query
+  server's default lookup style.
+
+  It returns a string with the final URL in it.
+
+  Can return error codes: -200, -300
+
+
+    lnquery.find(ns_url, path, record_type, style)
+    ----------------------------------------------
+
+  Lookup an entry.
+
+  ns_url: (string) URL of the namespace description to find the name in
+  path: (list of strings) the lookup path to follow
+  record_type: "LN", "NS", "X", or "PATTERN"
+  style: name of style to lookup, or "default" for the default style
+
+  Lookup one path's result.
+
+  Return a string value, appropriate to the query style, if it succeeds.
+
+  Can return error codes: -200, -201, -300, -301
+
+
+    lnquery.find_many(ns_url, paths, record_type, style)
+    ----------------------------------------------------
+
+  This is the same as lnquery.find, only: Instead of accepting one path,
+  it accepts a list of paths.
+
+  And instead of returning a string or error, it returns a list of
+  strings and errors, corresponding to the paths passed.
+
+
+    lnquery.get_server_info()
+    -------------------------
+
+  Returns a description of the interface implementation.
+
+  It returns a dictionary, the following keys MUST appear in it.
+
+  * "INTERFACE"
+      - MUST return the text: "v1 Local Names Query Interface"
+  * "IMPLEMENTATION"
+      - Returns some unique name identifying the coede-base in use.
+      - For example, "LION-LNQS-D1-V1", for Lion Kimbros' Local Names
+        query server.
+      - You can make this name up; Just don't collide with anyone else.
+  * "CACHE"
+      - Returns information about the cache.
+      - A list of lists:
+        [[preferred name of first namespace (string),
+          URL of first namespace description (string),
+          seconds until first namespaces' cache times out (integer)],
+         [preferred name of second namespace,
+          URL of second namespace,
+          seconds until second namespaces' cache times out],
+         ...
+        ]
+  * "STYLES"
+      - Returns information about styles.
+      - A list of lists:
+        [[first style name (string),
+          first style human readable description (string)],
+         [second style name (string),
+          second style human readable description (string)],
+         ...
+        ]
+      - The first style is the default style.
+
+  The server can send over any other information it wants to, as well:
+  If you want a key-value pair in the returned dictionary that you don't
+  see here, feel free to add it. You may want to tell Lion about what it
+  is, though. If it's a pretty useful idea, in general, we can add it to
+  the spec as a recommended key-value pair for consideration.
+
+  The above keys MUST be defined, though.
+
+
+    lnquery.get_cached_ns(ns_url)
+    ----------------------------
+
+  The server returns it's cached version of the text at the given URL.
+
+  This is very useful while debugging a server. It is also useful in
+  emergency situations, when a namespace description has gone down.
+
+  The text of the cached page is returned as one giant string.
+
+  Can return error codes: -302
+
+
+    lnquery.dump_cache(ns_url)
+    --------------------------
+
+  Cause the server to dump a namespace description from cache.
+
+  Returns error code 0 on success.
+
+  Can return error codes: -302
+
+
+  ERROR CODES
+  ===========
+
+  All error codes are returned as tuples, of the following form:
+
+    (error #, error string)
+
+  The meanings of the error #'s follow. On a particular interface,
+  you should use these error #'s. You should probably use these error
+  strings as well, but they are more maleable. Your server may do
+  something special, and perhaps a different error string would be
+  better. You make the call. 
+
+    error #  string
+          0  "OK"
+         -1  "permission denied"
+         -2  "not implemented"
+         -3  "internal server error"
+         -4  "(error custom to server - replace this text per-error)"
+       -200  "bad record type- valid: LN, NS, X, PATTERN"
+       -201  "record not found"
+       -300  "cannot read namespace description"
+       -301  "unsupported style"
+       -302  "not cached"
+
+  (Error numbers are chosen to coincide with error numbers used by the
+   Local Names XML-RPC Store Interface.)
+
+  Error -4 deserves special note. If your server has some special
+  error condition that it wants to tell the user about, use this
+  code, and use the error string to tell the user whatever.
+
+  Note also: The error string is really up to the server. If it wants
+  to give additional information in the string, that's fine. For
+  example, if the server wants to say, "-300, cannot read namespace
+  description: This server only looks up local names within particular
+  name spaces," that's okay.
+
+  Error numbers are for client software to interpret.
+  Error strings are for human presentation.
+
+  Do not change the meanings of error numbers.
+  You may change error strings.
+
+  Clients, beware: errors -1. -2, -3, -4. They can crop up on any
+  function, for any reason. Beware.
+
+
+  CONSIDERATIONS
+  ==============
+
+  This section describes terms and details.
+
+
+  LOOKUP PATH:
+
+  A "lookup path" refers to the path followed to resolve a lookup
+  query. The lookup path takes the form of a list of strings.
+
+  ["...", "...", "...", ..., "...", "..."]
+   |<------------+--------------->| |<->|
+      names of namespaces           final name
+
+  Lookups begin in one namespace, specified by giving the URL of it's
+  namespace description.
+
+  The names of the namespaces, (before the final name in the lookup
+  path,) usually name NS records to follow. That last one, (just before
+  the final name in the lookup path,) may identify a PATTERN, instead of
+  an NS record.
+
+  The final name identifies the name of a record in the last namespace
+  description, or a name to be substituted into a template URL (found in
+  a PATTERN.)
+
+  Why so vague? Why do I say "usually" instead of "always"?
+
+  Because how a lookup path is used depends on the query style in use.
+
+
+  QUERY STYLE:
+
+  We have never settled on one way to resolve Local Names, given
+  namespace descriptions, a starting namespace description, and a lookup
+  path. Instead, we have left this open, and made some recommendations.
+  
+  An implementation of the Local Names XML-RPC Query Interface can
+  support several different query styles. An interface implementation
+  must support AT LEAST ONE query style.
+
+  The details of what styles are supported, and what they are like, are
+  provided by the lnquery.get_server_info method. The server need not
+  return any details, though, meaning that the client must use the
+  default query style ("default").
+
+  "Reverse lookups," where a user wants to find the name associated with
+  some URL in a given namespace, are implemented as query styles. See
+  "traditional-R", defined below, for an example.
+
+
+  DEFAULT QUERY STYLE:
+
+  "default" refers to the default query style.
+
+  If a client has not been configured to point to a particular style, it
+  must use "default" for the style argument.
+
+
+  TRADITIONAL QUERY STYLES:
+
+  This consideration describes the "Traditional Query Style," and the
+  "Traditional Reverse Query Style." They are described here as both
+  example and specification.
+
+  They are called "traditional," because they are inspired by the way
+  that the Old Style Local Names Query Server resolved queries, and the
+  way the even older Local Names Query Server resolved queries.
+
+  "traditional" - the Traditional Query Style
+
+  1. Start from the namespace description found at the given URL
+     (ns_url.) Start with the first name in the lookup path.
+
+     If the starting namespace can't be found, return error -300.
+
+  2. Is the current name the last name in the lookup path?
+
+     YES: Look up the record of the specified record type (record_type.)
+          First look by exact spelling. If it's not found, look second
+          for a loose match. If there's still no match, look for an X
+          FINAL record. Return the record. If it's an LN or NS or
+          PATTERN or X FINAL with a relative URL, calculate the full URL
+          and return it. If the specified record type is "PATTERN", send
+          the URL template without substiting "$NAME." (If, however, an
+          LN lookup defaulted to an X FINAL, substitute $NAME.) If the
+          specified record type is "X", send the associated value list
+          as a list of strings.
+
+          "going deep": If there is no match (and no X FINAL, as a last
+          resort for an LN lookup,) then we "go deep": For every
+          namespace link, perform step 2 YES, again, in the target
+          namespace. (However, we do not recursively go deep- the end
+          result is that we have checked the last namespace, and all the
+          namespaces that it is linked to.)
+
+          If there is still no match, return error code -201.
+     
+     NO: (continue)
+
+  3. Is there a PATTERN record with this exact name, and is the next
+     name the final name in the lookup path?
+
+     YES: If the URL template is a relative URL template, calculate the
+          full URL template. Regardless, substitute the final name of
+          the lookup path into the URL template. Return the result as a
+          string.
+
+     NO: (continue)
+
+  4. Is there an NS record with this exact name?
+
+     YES: transition to using the namespace described at the URL,
+          transition to evaluating the next name in the lookup path, and
+          go to step 2.
+
+     NO: (continue)
+
+  5. Is there a PATTERN record with a loose match to this name, and is
+     the next name the final name in the lookup path?
+
+     YES: (just like 3. YES)
+
+     NO: (continue)
+
+  6. Is there an NS record with a loose match to this name?
+
+     YES: (just like 4. YES)
+
+     NO: (continue)
+
+  7. The next namespace couldn't be resolved. Time to return error code
+     -201.
+
+  What is a "loose match?" Compare the second column value with the
+  given name performing the following conversions to both names before
+  comparing:
+  1. Ignore upper vs. lower case.
+  2. Ignore anything that is not a letter or a number.
+  3. Remove a trailing "s"
+  4. Remove a trailing "ing"
+  5. Remove a trailing "ed"
+  6. If either name is blank, fail the match.
+
+
+  "traditional-R" - the Traditional Reverse Query Style
+
+  Load the namespace description. (Return error -300 on failure.) Look
+  for a record of the given type, interpreting the name as a 3rd column
+  value, rather than a 2nd column value. If an exact match is found,
+  return it. If no exact match is found, search for a match ignoring
+  case (but preserving everything else.)
+
+  PATTERN records receive no special treatment. If a "$NAME" is in the
+  URL template, than a "$NAME" must be passed to find the pattern key.
+#CODE

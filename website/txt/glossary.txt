@@ -66,7 +66,7 @@ namespace, that does not itself define a [[local name] local name,]
 [[pattern] pattern,] or [[namespace link] namespace link.]
 
 Extension data is defined by [[X record] X records] within a
-[[namespace descrpition] namespace description.]
+[[namespace description] namespace description.]
 
 The data is indexed by [[extension key] extension key,] and consists of
 a list of [[extension values] extension values.] X records with the same
@@ -214,6 +214,15 @@ The idea of a [[local name] local name,] a single binding between
 
 $REM ===================================================================
 
+$name Local Names project
+== Local Names project ==
+
+The '''Local Names project''' refers to the people and the effort to
+construct the [[Local Names]] system.
+
+
+$REM ===================================================================
+
 $name Local Names server
 $name Local Names Query Server
 $name Local Names Store Server
@@ -243,7 +252,7 @@ LN "foo" "bar"
 "bar."
 
 "name" is used ''specificly'' to talk about a local name. Do not confuse
-it with a [[pattern key] pattern key,] [[namespace key] namespace key,]
+it with a [[pattern key] pattern key,] [[link key] link key,]
 or [[extension key] extension key.]
 
 
@@ -343,21 +352,34 @@ There are presently two [[Local Names]] interfaces:
 * the '''Local Names XML-RPC Store Interface''' ('''LNXRStoreI''')
 
 The '''query interface''' gives programs a way to ask a server to
-resolve names. It is comparable to a [[bind]] server in the [[Domain
+resolve names. It is comparable to a [[BIND]] server in the [[Domain
 Name System] Domain Name System.] The query interface is specified in
-the [[Local Names XML-RPC Query Interface specification] Local Names
-XML-RPC Query Interface specification.] '''The query interface is still
-being determined. By the end of 2005, we should have the specification
-and a working implementation. See [[OBS:TheRadar] the radar] for
-scheduling details.'''
+the [[Local Names XML-RPC Query Interface] Local Names XML-RPC Query
+Interface specification.] '''The query interface is still being
+determined. By the end of 2005, we should have the specification and a
+working implementation. See [[OBS:TheRadar] the radar] for scheduling
+details.'''
 
 The '''store interface''' gives programs a way to tell a server to bind
 a name to a [[URL] URL,] in some [[namespace] namespace.] The store
-interface is specified in the [[Local Names XML-RPC Store Interface
-specification] Local Names XML-RPC Store Interface specification.]
+interface is specified in the [[Local Names XML-RPC Store Interface]
+Local Names XML-RPC Store Interface specification.]
 
 A given [[Local Names server]] can implement multiple interfaces; It
 doesn't have to be one or the other.
+
+
+$REM ===================================================================
+
+$name Local Names Wrap
+== Local Names Wrap ==
+
+'''Local Names Wrap''' refers to specific server software. The software
+wraps up existing wiki, providing [[namespace description] namespace
+descriptions] for them.
+
+You can find one running at [[http://wrap.localnames.taoriver.net/]
+wrap.localnames.taoriver.net.]
 
 
 $REM ===================================================================
@@ -401,7 +423,7 @@ to a [[URL]] calculated by substituting the name into a [[URL template]
 URL template.]
 
 Patterns are defined by [[PATTERN record] PATTERN records] within a
-[[namespace decription] namespace description.]
+[[namespace description] namespace description.]
 
 In the order of resolution, patterns apply ''before'' [[namespace link]
 namespace links.] That is, a pattern can conceal a namespace link. (This
@@ -587,6 +609,32 @@ name.
 
 Suppose the URI template were "http://example.com/$NAME", and the name
 was "foo", then the resulting URI would be "http://example.com/foo".
+
+
+$REM ===================================================================
+
+$name Web Browser Redirect
+== Web Browser Redirect ==
+
+'''Web Browser Redirect''' refers to specific server software. The
+software interprets specially formatted HTTP requests as Local Names
+lookups, and then redirects the web browser to go to the found address.
+
+Try it out, by following this link:
+
+* [[http://services.taoriver.net:9090/?action=redirect&namespace=http://taoriver.net/tmp/gmail.txt&separator=:&lookup=Robotic Nation Evidence]]
+
+Note the following parts in this use:
+* ?action=redirect -- ''redirecting the web browser to another page''
+* &namespace=[[http://taoriver.net/tmp/gmail.txt]] -- ''[[namespace
+  description]] to start from''
+* &separator=: -- ''if namespace hopping occurs, this is the separator
+  character''
+* &lookup=Robotic Nation Evidence -- ''the name to look up''
+
+Here's another, that performs some hops:
+
+* [[http://services.taoriver.net:9090/?action=redirect&namespace=http://taoriver.net/tmp/gmail.txt&separator=:&lookup=S:WP:robot]]
 
 
 $REM ===================================================================
