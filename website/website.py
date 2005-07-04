@@ -340,7 +340,7 @@ class WebsiteBuilder:
         variables = singhtext.tokens_to_variables(tokens)[0]
         names_dict[basename] = file_url
         if variables.has_key("title"):
-            names_dict["title"] = file_url
+            names_dict[variables["title"]] = file_url
         for name in singhtext.tokens_to_names_list(tokens):
             names_dict[name] = file_url + "#" + name
         return names_dict
