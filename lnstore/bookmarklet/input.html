@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>Store Local Names</title>
+</head>
+<body>
+
+<h1>Store Local Names</h1>
+
+<form method="get" action="./store.cgi">
+
+<p>Add record...</p>
+
+<p>
+  <code>LN</code>
+  <input type="text" name="localname" value="$localname"></input>
+  <code>&quot;</code>
+  <input type="text" name="url" size="80" value="$url"></input>
+  <code>&quot;</code>
+</p>
+
+<p>
+  ...in namespace:
+  <input type="text" name="namespace" value="$namespace"></input>
+</p>
+
+<p>
+  ...maintained via store interface
+  <input type="text" name="interface" value="$interface"></input>
+  and password
+  <input type="text" name="password" value="$password"></input>
+</p>
+
+<p>
+  <input type="submit" value="Send"></input>
+</p>
+
+</form>
+
+</body>
+</html>
+
