@@ -1,0 +1,27 @@
+
+  ==================
+  |  Bookmarklets  |
+  ==================
+
+
+  Local Names Store Bookmarklets make it so you can store Local Names
+  into a server implementing the Local Names XML-RPC Store Interface
+  (LNXRStoreI.)
+
+
+  INSTALLING
+  ----------
+
+  Instructions current to: 2005-07-18
+
+  Copy all .py and .html files into a CGI directory.
+
+  Edit variable names that are in ALL CAPS in "shared.py." 
+
+  Do whatever you have to do to get Apache running the CGI,
+  and then hit page "input.py" with a web browser to try it out.
+
+  Local Names XML-RPC Store Server not included. The other folders in
+  the lnstore directory can help you with that. {:)}=
+
+
