@@ -10,20 +10,20 @@ TODO
 import cgi
 
 
-INPUT_URL = "http://taoriver.net/TODO/input.py"
+INPUT_URL = "http://taoriver.net/cgi-bin/a/input.py"
 """URL for user input page.
 
 Where the user is sent when they click on the bookmarklet.
 """
 
-ACTION_URL = "http://taoriver.net/TODO/action.py"
+ACTION_URL = "http://taoriver.net/cgi-bin/a/action.py"
 """URL for action page.
 
 The last page the user visits; All information needed to bind a name to
 a URL should be collected by the time this page is rendered.
 """
 
-DEFAULT_LNXRSTOREI = "http://taoriver.net/TODO/xrcgi.py"
+DEFAULT_LNXRSTOREI = "http://taoriver.net/cgi-bin/a/xrcgi.py"
 """URL for default Local Names XML-RPC Store Interface.
 
 This system can actually make use of any Local Names XML-RPC Store

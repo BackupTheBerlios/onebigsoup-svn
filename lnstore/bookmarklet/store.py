@@ -1,3 +1,4 @@
+#!/usr/bin/env python2.4
 """Local Names Store Storage Action
 
 Bind a local name in a namespace. You can use this from anywhere that
@@ -28,8 +29,8 @@ if __name__ == "__main__":
             print u"missing definition for <b>%s</b>" % x
             sys.exit()
     server = xmlrpclib.ServerProxy(data["interface"])
-    response = server.set(data["password"], data["namespace"],
-                          "LN", data["name"], data["url"])
+    response = server.lnstore.set(data["password"], data["namespace"],
+                                  "LN", data["localname"], data["url"])
     (err_code, err_string) = response
     print err_string
 

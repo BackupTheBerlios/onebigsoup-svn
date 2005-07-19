@@ -6,7 +6,7 @@
 
 <h1>Store Local Names</h1>
 
-<form method="get" action="./store.cgi">
+<form method="get" action="./store.py">
 
 <p>Add record...</p>
 
@@ -29,6 +29,30 @@
   and password
   <input type="text" name="password" value="$password"></input>
 </p>
+
+<p>
+  <input type="submit" value="Send"></input>
+</p>
+
+</form>
+
+<p>Or, make a bookmarklet!</p>
+
+<p>Fill out what you want to be regular:</p>
+
+<form method="get" action="./make.py">
+
+<ul>
+<li>Namespace:
+    <input type="text" name="namespace" value="$namespace"></input>
+</li>
+<li>Interface:
+    <input type="text" name="interface" value="$interface"></input>
+</li>
+<li>Password:
+    <input type="text" name="password" value="$password"></input>
+</li>
+</ul>
 
 <p>
   <input type="submit" value="Send"></input>

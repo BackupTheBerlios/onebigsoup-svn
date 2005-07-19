@@ -1,3 +1,4 @@
+#!/usr/bin/env python2.4
 """Local Names Store Bookmarklet Data Entry Page
 
 Render a data entry page. The page collects information that will be

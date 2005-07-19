@@ -1,3 +1,4 @@
+#!/usr/bin/env python2.4
 """Local Names Store Bookmarklet Maker
 
 Create a Local Names Store Bookmarklet for the user.
@@ -20,7 +21,6 @@ import shared
 
 if __name__ == "__main__":
     data = shared.read_cgi()
-    data["interface"] = "http://taoriver.net/foo.cgi"
     url = shared.INPUT_URL + "?" + urllib.urlencode(data)
     trick = ("javascript:" +
              "o=location.href;" +
