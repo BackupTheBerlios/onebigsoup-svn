@@ -5,7 +5,7 @@
      .'-o./o       
       o. \.         lnresolve -- Basic Local Names resolving server
      	  |o       
-  o__o	  |.        lnstore -- Jonathan Roes' multi-user namespace store
+  o__o	  |.        lnstore -- Local Names Store Servers
  ."o.\o   |o      
  o   o"o /.         lndelicious -- Brian Templeton's del.icio.us to
       o\/                          Local Names converter
