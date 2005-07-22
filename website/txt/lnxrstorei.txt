@@ -2,19 +2,21 @@ $set title: Local Names XML-RPC Store Interface
 $name LNXRStoreI
 
 #CODE
-  LOCAL NAMES STORE XML-RPC INTERFACE
-  ===================================
+  LOCAL NAMES XML-RPC STORE INTERFACE (LNXRStoreI)
+  ================================================
 
-  This is the specification for the Local Names Store XML-RPC Interface (LNSI).
+  This is the specification for the Local Names Store XML-RPC Interface,
+  abbreviated LNXRStoreI.
 
  
   BACKGROUND
   ==========
 
-  Local Names [1] is a system for binding local names to global URLs. The
-  initial motivation was to help communities form link language. [2] But
-  it's useful for other things as well, such as discovering and resolving short
-  names for software components that are arranged in a graph.
+  Local Names [1] is a system for binding local names to global
+  URLs. The initial motivation was to help communities form link
+  language. [2] But it's useful for other things as well, such as
+  discovering and resolving short names for software components that are
+  arranged in a graph.
 
   [1] http://ln.taoriver.net/
   [2] http://communitywiki.org/LinkLanguage
@@ -23,10 +25,9 @@ $name LNXRStoreI
   PURPOSE
   =======
 
-  The purpose is to make less work for people who write Local Names code.
-  If you write a server, than all clients should work- you shouldn't have
-  to rewrite them. And if you write a client, you should be able to
-  connect to any store.
+  If you write a Local Names Store Server, than all clients should work-
+  you shouldn't have to rewrite them. And if you write a client, you
+  should be able to connect to any store.
 
   Examples of clients:
   * a Firefox plugin that lets you assign Local Names to a webpage
@@ -56,28 +57,32 @@ $name LNXRStoreI
   REQUIREMENTS
   ============
 
-  * You're using v1.1 Local Names descriptions.
+  * You're using v1.1 or v1.2 Local Names descriptions.
 
-  The "set" function, in particular, is made for v1.1 descriptions.
-  That said, if the specified syntax does not change significantly
-  in v1.2, v1.3, ..., this interface may work perfectly fine.
+  The "add" function, in particular, is made for v1.1, v1.2
+  descriptions.  That said, if the specified syntax does not change
+  significantly in v1.3, v1.4, ..., this interface may work perfectly
+  fine.
+
+  Wherever this document says "Local Names Namespace Description
+  Specification," it is refering to v1.1, or v1.2.
 
   * You're using XML-RPC.
 
-  This interface is readily adaptable to SOAP, though.
+  This interface is easy to adapt to SOAP, though.
 
 
   OVERVIEW
   =============
 
-  All functions are defined in the "lnstore" namespace. That is,
-  if you have a function "foo" here, it's full name is "lnstore.foo".
+  All functions are defined in the "lnstore" namespace. That is, if you
+  have a function "foo" here, it's full name is "lnstore.foo".
 
-  Functions are grouped into "Admin," "Namespaces," and "Edits,"
-  because it's convenient to think of them that way. But those groupings-
-  They have no bearing on the code, or the actual interface implementation.
-  The only reason we're grouping them like that is because it's easier to
-  think of them this way.
+  Functions are grouped into "Admin," "Namespaces," and "Edits," because
+  it's convenient to think of them that way. But those groupings- They
+  have no bearing on the code, or the actual interface implementation.
+  The only reason we're grouping them like that is because it's easier
+  to think of them this way.
 
   Admin:
   * lnstore.get_server_info(pw)
@@ -90,39 +95,39 @@ $name LNXRStoreI
   * lnstore.get_namespace_url(pw, name_of_namespace)
 
   Edits:
-  * lnstore.set(pw, name_of_namespace, record_type, name, value)
-  * lnstore.unset(pw, name_of_namespace, record_type, name, value)
+  * lnstore.add(pw, name_of_namespace, record_type, name, value)
+  * lnstore.clear(pw, name_of_namespace, record_type, name)
 
-  The Admin part gives you some information about the server, and lets
-  a user change their password.
+  The Admin part gives you some information about the server, and lets a
+  user change their password.
 
   The Namespaces stuff is so that they can add, remove, list
-  namespaces. That is, if the server supports multiple namespaces.
-  It also features the all-important get_namespace_url function-
-  this is how you get the URL for your namespace description,
-  which is the final product of the server, after all.
+  namespaces. That is, if the server supports multiple namespaces.  It
+  also features the all-important get_namespace_url function- this is
+  how you get the URL for your namespace description, which is the final
+  product of the server, after all.
 
   The Edits stuff is where the real interaction happens. This is where
   you add records in the namespace description. You can also delete
   them.
 
-  The specification is soomewhat "loose." For example, there'a a
-  "pw" argument and a "namespace" argument in a lot of places.
-  You MUST include the arguments in the function signatures, but
-  you don't have to actually use them. They're just
-  there so that if you need them, you can make use of them.
-  Password may be ignored, or always set to "password". "namespace"
-  may similarly be ignored or always set to "default".
+  The specification is soomewhat "loose." For example, there'a a "pw"
+  argument and a "namespace" argument in a lot of places.  You MUST
+  include the arguments in the function signatures, but you don't have
+  to actually use them. They're just there so that if you need them, you
+  can make use of them.  Password may be ignored, or always set to
+  "password". "namespace" may similarly be ignored or always set to
+  "default".
 
   There is a section at the end of this document called
   "Considerations," which goes into some of these issues in
-  detail. Another section, "Scenarios," describes how you might
-  want to use the API, for different types of servers.
+  detail. Another section, "Scenarios," describes how you might want to
+  use the API, for different types of servers.
 
   Functions can produce errors; there's a section on "Error Codes"
-  below. When the specification for a function says "return error
-  code -1," it means to return the tuple (-1, "permission denied").
-  Again, see "Error Codes" below for more details.
+  below. When the specification for a function says "return error code
+  -1," it means to return the tuple (-1, "permission denied").  Again,
+  see "Error Codes" below for more details.
 
 
   SPECIFICATION
@@ -146,18 +151,19 @@ $name LNXRStoreI
   * "SUPPORTS_PRIVATE_NAMESPACES"
       - Returns 1 if the server implements private namespaces.
       - Returns 0 if it doesn't.
-      - Private namespaces is pretty rare, so you probably want a 0 here.
+      - Private namespaces are pretty rare, so you probably want a 0
+        here.
       - The reason we have this, is because we want people to be clear
         about whether the server supports some privacy features or not.
       - See the relevant parts of "Considerations" and "Scenarios" for
         more information.
   * "SERVER_NAMESPACE_URL"
       - example: "http://example.net/namespaces/"
-      - Returns the URL of the server's namespace. The "Server's Namespace"
-        is a Local Names namespace description that points to all the other
-        namespace descriptions- at least the ones accessible by this
-        interface, at least. For more information, read the section in
-        "Considerations" on the server's namespace.
+      - Returns the URL of the server's namespace. The "Server's
+        Namespace" is a Local Names namespace description that points to
+        all the other namespace descriptions- at least the ones
+        accessible by this interface, at least. For more information,
+        read the section in "Considerations" on the server's namespace.
       - Return "" (an empty string) if the server doesn't support this
         feature.
   * "URL_NAME_PATTERN"
@@ -189,7 +195,7 @@ $name LNXRStoreI
 
 
     lnstore.change_password(pw, new_pw)
-    ---------------------------
+    -----------------------------------
 
   Exactly as you would think. First parameter's the current password,
   second parameter is the password you're changing to.
@@ -198,7 +204,7 @@ $name LNXRStoreI
 
 
     lnstore.create_namespace(pw, name_of_namespace)
-    ---------------------------------------
+    -----------------------------------------------
 
   This is a request to create a namespace.
 
@@ -207,7 +213,7 @@ $name LNXRStoreI
 
 
     lnstore.delete_namespace(pw, name_of_namespace)
-    ---------------------------------------
+    -----------------------------------------------
 
   This is a request to delete a namespace.
 
@@ -216,74 +222,89 @@ $name LNXRStoreI
 
 
     lnstore.get_namespaces(pw)
-    ------------------
+    --------------------------
 
   Returns a list of namespaces.
 
-  Preferrably, this should be a list of namespaces that the
-  user, with the given password, has some influence over.
+  Preferrably, this should be a list of namespaces that the user, with
+  the given password, has some influence over.
 
-  If the user wants to see all namespaces, including those that
-  the user doesn't have write access to, the user should probably
-  rely on the server's namespace, described in section
-  "Considerations."
+  If the user wants to see all namespaces, including those that the user
+  doesn't have write access to, the user should probably rely on the
+  server's namespace, described in section "Considerations."
 
-  Rememeber that this is a namespace STORE interface: It's
-  oriented towards people who want to store names in a namespace.
+  Rememeber that this is a namespace STORE interface: It's oriented
+  towards people who want to store names in a namespace.
 
-  If all the namespaces are publicly writable, you're probably
-  just going to ignore the password parameter. Send the complete list.
+  If all the namespaces are publicly writable, you're probably just
+  going to ignore the password parameter. Send the complete list.
 
 
     lnstore.get_namespaces_url(pw, name_of_namespace)
-    -----------------------------------------
+    -------------------------------------------------
 
   Return the URL of where to find the namespace description.
 
-  There's no point in letting users store names, if nobody can
-  read them.
+  There's no point in letting users store names, if nobody can read
+  them.
 
-  Then again, you might want only some users to be able to get
-  the namespace description URL. So, check the password, if you
-  like. Return -1 if the user doesn't have permission. Or -100,
-  if you want to pretend that the namespace doesn't exist.
+  Then again, you might want only some users to be able to get the
+  namespace description URL. So, check the password, if you like. Return
+  -1 if the user doesn't have permission. Or -100, if you want to
+  pretend that the namespace doesn't exist.
 
 
-    lnstore.set(pw, name_of_namespace, record_type, name, value)
-    ----------------------------------------------------
+    lnstore.add(pw, name_of_namespace, record_type, name, value)
+    ------------------------------------------------------------
 
-  This is the function where the user actually gets to set some
-  data.
+  This is the function where the user actually gets to store some data.
 
-  The record_type must be one of "LN", "NS", "X", or "PATTERN".
-  The meaning of the record type is described in the Local Names
-  v1.1 Namespace Description specification.
+  The record_type must be one of "LN", "NS", "X", or "PATTERN".  The
+  meaning of the record type is described in the Local Names v1.1
+  Namespace Description specification.
 
-  The name and the value correspond to the second and third
-  column values in the namespace description.
+  The name and the value correspond to the second and third column
+  values in the namespace description.
+
+  If record_type is "LN", "NS", or "PATTERN", this call binds the name
+  to the appropriate value. If there is already a listing with the given
+  name, the usual behavior is to replace the old value. (Assuming that
+  there are no access restrictions prohibiting this. Error code -1,
+  otherwise.)  However, it's possible a server will choose to double
+  list the key. This is implicitly discouraged by the Local Names
+  Namespace Description Specification. However, if the server permits
+  it, remember that only the first listed value is recognized by the
+  Local Names Namespace Description Specification.
+
+  If record_type is "X", though, "add" appends the value to the
+  extension values associated with the named extension index. The Local
+  Names Namespace Description Specification permits multiple values for
+  extension data.
 
   Return 0 on success.
 
-  Return -1 if the user doesn't have permission to write to
-  the namespace, or if the user doesn't have permission to
-  write to this particular record, or whatever.
+  Return -1 if the user doesn't have permission to write to the
+  namespace, or if the user doesn't have permission to write to this
+  particular record, or whatever.
 
   Return -100 if the namespace doesn't exist.
 
-  Return -200 if the record_type is bad- if it's not "LN", "NS",
-  "X", or "PATTERN".
+  Return -200 if the record_type is bad- if it's not "LN", "NS", "X", or
+  "PATTERN".
 
 
-    lnstore.unset(pw, name_of_namespace, record_type, name, value)
-    ------------------------------------------------------
+    lnstore.clear(pw, name_of_namespace, record_type, name)
+    -------------------------------------------------------
 
   This is how you erase a record.
 
-  The function signature is very similar to lnstore.set's,
-  refer to it.
+  If the record_type is "X", this call erases all extension values
+  identified by the named extesion index.
 
-  If you go to delete a record, but it wasn't there, you want
-  to return error -201.
+  The function works similar to lnstore.add; refer to it.
+
+  Return -201 if there is no record identified by the given record_type
+  and name.
 
 
   ERROR CODES
@@ -293,11 +314,11 @@ $name LNXRStoreI
 
     (error #, error string)
 
-  The meanings of the error #'s follow. On a particular interface,
-  you should use these error #'s. You should probably use these error
+  The meanings of the error #'s follow. On a particular interface, you
+  should use these error #'s. You should probably use these error
   strings as well, but they are more maleable. Your server may do
   something special, and perhaps a different error string would be
-  better. You make the call. 
+  better. You make the call.
 
     error #  string
           0  "OK"
@@ -311,21 +332,20 @@ $name LNXRStoreI
        -200  "bad record type- valid: LN, NS, X, PATTERN"
        -201  "record not found"
 
-  Error -4 deserves special note. If your server has some special
-  error condition that it wants to tell the user about, use this
-  code, and use the error string to tell the user whatever.
+  Error -4 deserves special note. If your server has some special error
+  condition that it wants to tell the user about, use this code, and use
+  the error string to tell the user whatever.
 
-  Note also: The error string is really up to the server. If it wants
-  to give additional information in the string, that's fine. For
-  example, if the server wants to say, "-1, permission denied:
-  You are authorized to set local names Foo, Bar, and Baz, in
-  this namespace," that's okay.
+  Note also: The error string is really up to the server. If it wants to
+  give additional information in the string, that's fine. For example,
+  if the server wants to say, "-1, permission denied: You are authorized
+  to set local names Foo, Bar, and Baz, in this namespace," that's okay.
 
-  Error numbers are for client software to interpret.
-  Error strings are for human presentation.
+  Error numbers are for client software to interpret.  Error strings are
+  for human presentation.
 
-  Do not change the meanings of error numbers.
-  You may change error strings.
+  Do not change the meanings of error numbers.  You may change error
+  strings.
 
   Clients, beware: errors -1. -2, -3, -4. They can crop up on any
   function, for any reason. Beware.
@@ -341,12 +361,12 @@ $name LNXRStoreI
 
   "password" is the null password.
 
-  If a client has not been configured to use a particular
-  password, it should just send "password" for the password.
+  If a client has not been configured to use a particular password, it
+  should just send "password" for the password.
 
-  If a server does not care about passwords, however, it should
-  not demand "password" be set. It should just ignore whatever
-  password the user sends.
+  If a server does not care about passwords, however, it should not
+  demand "password" be set. It should just ignore whatever password the
+  user sends.
 
 
   DEFAULT NAMESPACE:
@@ -356,152 +376,139 @@ $name LNXRStoreI
   If a client has not been configured to point to a particular
   namespace, it should use "default" for the namespace argument.
 
-  Some servers might be single-namespace servers. You may want
-  to return error (-100, "no such namespace - server only supports
-  default namespace"), if the user tries to write to anything
-  other than the default namespace.
+  Some servers might be single-namespace servers. You may want to return
+  error (-100, "no such namespace - server only supports default
+  namespace"), if the user tries to write to anything other than the
+  default namespace.
 
 
   THE SERVER'S NAMESPACE:
 
-  A server that supports multiple namespaces may want to keep a
-  thing called, "the server's namespace." This refers to a
-  special namespace, that points to all the other namespaces.
-  That is, the namespace consists almost entirely of NS records,
-  pointing to the namespace descriptions of the other namespaces.
+  A server that supports multiple namespaces may want to keep a thing
+  called, "the server's namespace." This refers to a special namespace,
+  that points to all the other namespaces.  That is, the namespace
+  consists almost entirely of NS records, pointing to the namespace
+  descriptions of the other namespaces.
 
-  If you support this feature, provide the URL to the server's
-  namespace in response to "lnstore.get_server_info". The key
-  is "SERVER_NAMESPACE_URL".
+  If you support this feature, provide the URL to the server's namespace
+  in response to "lnstore.get_server_info". The key is
+  "SERVER_NAMESPACE_URL".
 
 
   ADVERTISING THE STORE INTERFACE:
 
-  A namespace description can report the address of the Local
-  Names XML-RPC Store Interface that is used to edit itself.
+  A namespace description can report the address of the Local Names
+  XML-RPC Store Interface that is used to edit it.
 
-  Place an X record with key "XMLRPC-STORE-INTERFACE", and the
-  value being the URL of the Local Names XML-RPC Store Interface
-  that is used to edit the namespace.
+  Place an X record with key "XMLRPC-STORE-INTERFACE", and the value
+  being the URL of the Local Names XML-RPC Store Interface that is used
+  to edit the namespace.
 
 
   SCENARIOS
   =========
 
-  This section exists to show how to apply the interface in
-  different ways for different, but interoperable, results.
-  The interface is flexible. While most of the interface has
-  fixed meaning, what you *do* in response to the fixed meaning
-  is actually pretty versitile.
+  This section exists to show how to apply the interface in different
+  ways for different, but interoperable, results.  The interface is
+  flexible. While most of the interface has fixed meaning, what you *do*
+  in response to the fixed meaning is actually pretty versitile.
 
 
   Firefox Plugin:
 
-  A firefox plugin might work something like this. The user
-  configures the plugin to use a particular XML-RPC store
-  interface, with a particular password. The plugin loads the
-  list of namespaces, using lnstore.get_namespaces. If
-  "default" is available, that's automatically selected.
-  If the user didn't set a password, it uses "password".
+  A firefox plugin might work something like this. The user configures
+  the plugin to use a particular XML-RPC store interface, with a
+  particular password. The plugin loads the list of namespaces, using
+  lnstore.get_namespaces. If "default" is available, that's
+  automatically selected.  If the user didn't set a password, it uses
+  "password".
 
   The user sees a webpage, and says, "I want to name this,"
-  somehow. Perhaps the user right-clicks, and then sees
-  the following options for naming a page:
+  somehow. Perhaps the user right-clicks, and then sees the following
+  options for naming a page:
     "Name page..."
     "Name page with Title."
     "Name page with selected text."
-  If the user selects "Name page..." the user is prompted to
-  enter a name, or names, for the page. If the user selects
-  "Name page with Title," it uses the web page title. If
-  the user selects some text with the cursor, and then
-  right clicks and selects "Name page with selected text,"
-  it uses whatever text they selected.
+  If the user selects "Name page..." the user is prompted to enter a
+  name, or names, for the page. If the user selects "Name page with
+  Title," it uses the web page title. If the user selects some text with
+  the cursor, and then right clicks and selects "Name page with selected
+  text," it uses whatever text they selected.
 
-  Regardless, the plugin calls the server's lnstore.set
-  method. If it were namespace "default," using the default
-  password, naming the Local Names website, it might look
-  like this:
+  Regardless, the plugin calls the server's lnstore.set method. If it
+  were namespace "default," using the default password, naming the Local
+  Names website, it might look like this:
     lnstore.set("password", "default",
                 "LN", "Local Names", "http://ln.taoriver.net/")
-  The server returns (0, "OK") on success. Or, perhaps
-  (-1, "permission denied") if the server requires a password.
+  The server returns (0, "OK") on success. Or, perhaps (-1, "permission
+  denied") if the server requires a password.
 
   
   Server with Private Namespaces:
 
   Lets flip around to the server side of thing.
 
-  Let's say we want to make a server that supports private
-  namespaces. A private namespace will be one that is not
-  visible to anybody else, and that you have to use the
-  proper password to write to.
+  Let's say we want to make a server that supports private namespaces. A
+  private namespace will be one that is not visible to anybody else, and
+  that you have to use the proper password to write to.
 
-  Now, there's no API function that says, "make this
-  namespace private." So, you might want to extend the
-  interface with a new function, for special use in
-  making namespaces private.
+  Now, there's no API function that says, "make this namespace private."
+  So, you might want to extend the interface with a new function, for
+  special use in making namespaces private.
 
-  Alternatively, you can make your server recognize
-  a special "X record," for internal use. Make it so
-  that a call to:
+  Alternatively, you can make your server recognize a special "X
+  record," for internal use. Make it so that a call to:
 
     lnstore.set(pw, namespace, "X", "PRIVATE", "1")
 
   ...will make the namespace private.
 
-  Then, you put in password sensitivity in
-  lnstore.get_server_info. Have it return 1 in response
-  for key "SUPPORTS_PRIVATE_NAMESPACES".
+  Then, you put in password sensitivity in lnstore.get_server_info. Have
+  it return 1 in response for key "SUPPORTS_PRIVATE_NAMESPACES".
 
-  In lnstore.get_namespaces(pw), you want to pay attention
-  to the password provided. If it's not right, send the
-  list of namespaces MINUS the ones that are private.
+  In lnstore.get_namespaces(pw), you want to pay attention to the
+  password provided. If it's not right, send the list of namespaces
+  MINUS the ones that are private.
 
-  In the functions that do something to a namespace,
-  you want to cloak the existance of the namespace.
-  If someone tries to .get_namespace_url or .set or
-  .unset to the private namespace, you want to say,
-  (-100, "no such namespace").
+  In the functions that do something to a namespace, you want to cloak
+  the existance of the namespace.  If someone tries to
+  .get_namespace_url or .set or .clear to the private namespace, you
+  want to say, (-100, "no such namespace").
 
-  If you allow the general public to create namespaces,
-  you're going to have to come up with some good excuse
-  why they can't create the namespace. Either plead
-  (-3, "internal server error"), or tell the truth:
-  (-101, "namespace already exists"). Of course, there's
-  always (-1, "permission denied") as well. The choice
-  is yours.
+  If you allow the general public to create namespaces, you're going to
+  have to come up with some good excuse why they can't create the
+  namespace. Either plead (-3, "internal server error"), or tell the
+  truth: (-101, "namespace already exists"). Of course, there's always
+  (-1, "permission denied") as well. The choice is yours.
 
 
   Server with Multiple Users:
 
-  Let's say you wanted to make a server that supported
-  multiple users, each user able to keep multiple
-  namespaces, individually administered..!
+  Let's say you wanted to make a server that supported multiple users,
+  each user able to keep multiple namespaces, individually
+  administered..!
 
-  The API *clearly* doesn't have the concept of users,
-  but there are still things we can do here.
+  The API *clearly* doesn't have the concept of users, but there are
+  still things we can do here.
 
-  Each user is going to get their own XML-RPC interface.
-  That is, each user is going to have their own URL
-  that they configure their client software with.
+  Each user is going to get their own XML-RPC interface.  That is, each
+  user is going to have their own URL that they configure their client
+  software with.
 
   It might be something like:
 
     http://example.com/publicnames/user034/
 
-  When a user goes the website at
-  http://example.com/publicnames/, they are greeted
-  with a web page that tells them how to register an
-  account. The server registers their email, password,
-  and then shows them their user account. Among the
-  various things it does, it gives the URL for their
-  Local Names store XML-RPC interface. The user plugs
-  that URL into their firefox plugin, (or command line
-  tool, or whatever,) and the user can now name
-  webpages the stumble upon with ease.
+  When a user goes the website at http://example.com/publicnames/, they
+  are greeted with a web page that tells them how to register an
+  account. The server registers their email, password, and then shows
+  them their user account. Among the various things it does, it gives
+  the URL for their Local Names store XML-RPC interface. The user plugs
+  that URL into their firefox plugin, (or command line tool, or
+  whatever,) and the user can now name webpages the stumble upon with
+  ease.
 
-  For bonus points, allow them to XPI install a
-  Firefox plugin that is already preconfigured to use
-  their namespaces on your server, complete with URL
-  and password.
+  For bonus points, allow them to XPI install a Firefox plugin that is
+  already preconfigured to use their namespaces on your server, complete
+  with URL and password.
 #CODE

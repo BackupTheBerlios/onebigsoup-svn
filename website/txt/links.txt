@@ -57,6 +57,9 @@ Local Naming Systems:
 * [[Pet Names Markup Language]]
 * [[Plexnames]]
 
+* [[OpenURL]] -- ''very interesting project, attacks the problem of
+  establishing links from information at a much more general level''
+
 $name Link Abbreviation
 Link Abbreviation:
 
