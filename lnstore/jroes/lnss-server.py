@@ -3,6 +3,7 @@
 
 NOTE!
 * General interface test suite would be nice.
+** See beginning of this at testcase.py
 
 Work to do:
 * (./) PEP-8-ify (- documentation)
@@ -62,14 +63,20 @@ class Server:
         logger.info('Saved database: %s' % (databasefile,))
         return True
 
+    def _escape_string(s):                                                                 
+        """Escape a string for presentation in a namespace description."""                 
+        s = s.replace('\\', '\\\\')                                                        
+        s = s.replace('"', '\\"')                                                          
+        s = s.replace('\n', '\\n')                                                         
+        return '"' + s + '"'                                                               
+
     def _save_namespace(self, username, namespace_name):
         """Create a LocalNames description and pop it into a file."""
         f = open(webpath + username + "-" + namespace_name, 'w')
         f.write("X VERSION 1.1\n")
         for record in self.userlist[username][namespace_name]:
-            f.write(record[0] + " \"" + record[1] + "\" \"" + record[2] +
+            f.write(record[0] + " \"" + _escape_string(record[1]) + "\" \"" + _escape_string(record[2]) +
                     "\"\n")
-
         f.close()
 
     def get_namespace(self, username, namespace):
