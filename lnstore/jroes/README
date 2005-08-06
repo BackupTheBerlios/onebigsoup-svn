@@ -7,6 +7,31 @@
   This server implements the Local Names XML-RPC Store Interface.
   Use it to bind names to URLs in namespaces via XML-RPC.
 
-  This code isn't documented yet.
+  The following should get you started using this implementation.
+  Contact jroes@sosdg.org with any comments, questions, or love :)
 
+  == Client Usage ==
 
+  1. Create an account.
+
+     import xmlrpclib
+     lnstore = xmlrpclib.ServerProxy("http://localnames.sosdg.org:9001")
+     lnstore.create_user("username", "email@address.com", "password")
+
+    Your XML-RPC URL will be http://localnames.sosdg.org:9001/username
+
+  2. Play with it!
+
+  Here's how you would create a namespace and add a LN entry to it:
+
+     import xmlrpclib
+     lnstore.create_namespace("password", "namespace_name")
+     lnstore.set("password", "namespace_name", "LN", "Test URL", "http://www.testurl.com")
+
+  == Server Usage ==
+
+  1. Install CherryPy.
+  2. Edit the configuration file lnss-server.py.
+  3. screen python lnss-server.py
+
+That's it! :)
