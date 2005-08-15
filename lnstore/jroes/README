@@ -25,12 +25,13 @@
   Here's how you would create a namespace and add a LN entry to it:
 
      import xmlrpclib
-     lnstore.create_namespace("password", "namespace_name")
-     lnstore.set("password", "namespace_name", "LN", "Test URL", "http://www.testurl.com")
+     lnstore = xmlrpclib.ServerProxy("http://localnames.sosdg.org:9001/username")
+     lnstore.lnstore.create_namespace("password", "namespace_name")
+     lnstore.lnstore.add("password", "namespace_name", "LN", "Test URL", "http://www.testurl.com")
 
   == Server Usage ==
 
-  1. Install CherryPy.
+  1. Install CherryPy - http://www.cherrypy.org.
   2. Edit the configuration file lnss-server.py.
   3. screen python lnss-server.py
 

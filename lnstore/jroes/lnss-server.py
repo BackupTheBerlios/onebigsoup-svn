@@ -194,7 +194,7 @@ class Server:
         else:
             return NamespaceDoesntExistError
 
-    def set(self, username, pw, namespace_name, record_type, key, value):
+    def add(self, username, pw, namespace_name, record_type, key, value):
         """Bind name to URL."""
         if not self.userlist.has_key(username):
             return UserDoesntExistError
@@ -218,9 +218,9 @@ class Server:
         else:
             return NamespaceDoesntExistError
 
-    def unset(self, username, pw, namespace_name, record_type,
+    def clear(self, username, pw, namespace_name, record_type,
               key, value):
-        """Unset namespace entry."""
+        """Clear namespace entry."""
         if not self.userlist.has_key(username):
             return UserDoesntExistError
         elif self.userlist[username]['_password'] != pw:
@@ -278,29 +278,29 @@ class Server:
         else:
             return NamespaceDoesntExistError
 
-    def default(self, username, function, password, *args):
-        if (function == "get_server_info"):
-            return self.get_server_info(username, password)
-        elif (function == "change_password"):
-            return self.change_password(username, password, args[0])
-        elif (function == "create_namespace"):
-            return self.create_namespace(username, password, args[0])
-        elif (function == "delete_namespace"):
-            return self.delete_namespace(username, password, args[0])
-        elif (function == "get_namespace_url"):
-            return self.get_namespace_url(username, password, args[0])
-        elif (function == "get_namespaces"):
-            return self.get_namespaces(username, password)
-        elif (function == "set"):
-            return self.set(username, password,
-                            args[0], args[1], args[2], args[3])
-        elif (function == "unset"):
-            return self.unset(username, password,
-                              args[0], args[1], args[2], args[3])
+    def default(self, username, lnstore, function, password, *args):
+        if (lnstore == "lnstore"):
+            if (function == "get_server_info"):
+                return self.get_server_info(username, password)
+            elif (function == "change_password"):
+                return self.change_password(username, password, args[0])
+            elif (function == "create_namespace"):
+                return self.create_namespace(username, password, args[0])
+            elif (function == "delete_namespace"):
+                return self.delete_namespace(username, password, args[0])
+            elif (function == "get_namespace_url"):
+                return self.get_namespace_url(username, password, args[0])
+            elif (function == "get_namespaces"):
+                return self.get_namespaces(username, password)
+            elif (function == "add"):
+                return self.add(username, password,
+                                args[0], args[1], args[2], args[3])
+            elif (function == "clear"):
+                return self.clear(username, password,
+                                  args[0], args[1], args[2], args[3])
         else:
             return InternalServerError
     default.exposed = True
-
 
 if __name__ == "__main__":
         config = ConfigParser.ConfigParser()
