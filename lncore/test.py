@@ -10,14 +10,45 @@ import unittest
 import lncore
 
 
-basic_text = """
+basic_text = u"""
 X "VERSION" "1.2"
 LN "foo" "http://example.com/"
 LN "bar" "http://example.com/"
 X "FINAL" "http://example.com/$NAME"
+NS "neighbor" "http://example.net/"
+PATTERN "pat" "http://example.com/$ARG1/$ARG2/"
 """
 
 '''Basic namespace description for use in simple tests.'''
+
+neighbor_text = u"""
+X "VERSION" "1.2"
+LN "baz boz" "http://example.net/bazboz/"
+"""
+
+'''Neighbor namespace description for testing namespace links.'''
+
+
+def return_basic_namespaces(url):
+    """Simple namespace builder, used during tests.
+    
+    Always return basic_text.
+    
+    Why? Because I do most of my testing in the bus, without access
+    to the Internet. So I need a url-to-text builder that doesn't
+    require Internet access. Hence this function. It pretends to be
+    the Internet, returning text in response to url requests. In
+    this case, it always returns basic_text.
+    """
+    if url == "http://example.net/":
+        return neighbor_text
+    return basic_text
+
+
+any_url_to_lines = lncore.combine(lncore.text_to_lines,
+                                  return_basic_namespaces)
+any_url_to_namespace = lncore.combine(lncore.lines_to_namespace,
+                                      any_url_to_lines)
 
 
 class QuotationTests(unittest.TestCase):
@@ -116,12 +147,17 @@ class TokenizingTest(unittest.TestCase):
                 lncore.LN, "bar", "http://example.com/"),
                (lncore.Line.RCD,
                 lncore.X, "FINAL", "http://example.com/$NAME"),
+               (lncore.Line.RCD,
+                lncore.NS, "neighbor", "http://example.net/"),
+               (lncore.Line.RCD,
+                lncore.PATTERN, "pat",
+                "http://example.com/$ARG1/$ARG2/"),
                (lncore.Line.BLK,
                 None, None, None),]
     
     def testLines(self):
         """DOC"""
-        lines = lncore.tokenize(basic_text)
+        lines = lncore.text_to_lines(basic_text)
         specs = TokenizingTest.results
         for (line, spec) in zip(lines, specs):
             (line_type, record_type, key, value) = spec
@@ -142,7 +178,7 @@ class NamespaceTest(unittest.TestCase):
     
     def setUp(self):
         """Create a namespace to test from the basic text."""
-        lines = lncore.tokenize(basic_text)
+        lines = lncore.text_to_lines(basic_text)
         self.namespace = lncore.lines_to_namespace(lines)
     
     def testConversionFromText(self):
@@ -185,6 +221,109 @@ class UrlTemplateTest(unittest.TestCase):
         """DOC"""
         val = self.args_pattern.replace(["foo", "bar", "baz"])
         assert val == "http://example.com/foo/bar/baz"
+
+
+class StoreTest(unittest.TestCase):
+    
+    """Test namespace description Store.
+    
+    DOC
+    
+    DOC
+    """
+    
+    def setUp(self):
+        """Create simple Store."""
+        self.store = lncore.Store(any_url_to_namespace)
+    
+    def testCaching(self):
+        """Make sure that the store is caching namespaces."""
+        ns1 = self.store("http://example.com/")
+        ns1.get_bboard("test")["flag"] = True
+        ns2 = self.store("http://example.com/")
+        assert ns1.get_bboard("test")["flag"] == True
+
+
+class TraditionalStyleTest(unittest.TestCase):
+    
+    """Test Traditional Style resolution.
+    
+    DOC
+    
+    DOC: JUST THOUGHTS; REWORK OR DELETE THEM LATER:
+    We want to make sure that:
+    * It resolves a correctly spelled name.
+    * It resolves a closely spelled name.
+    * It resolves a name found in a neighboring namespace.
+    * It resolves a closely spelled name in a neighboring namespace.
+    * That it can namespace hop.
+    * That PATTERNs are resolved.
+    * That X "FINAL" works.
+    
+    DOC
+    """
+    
+    L = [("LN", "foo", "http://example.com/"),
+         ("LN", "bar", "http://example.com/"),
+         ("LN", "foos", "http://example.com/"),
+         ("LN", "baz boz", "http://example.net/bazboz/"),
+         ("LN", "bazboz", "http://example.net/bazboz/"),
+         ("LN", ["neighbor", "baz boz"], "http://example.net/bazboz/"),
+         ("LN", ["pat", "foo", "bar"], "http://example.com/foo/bar/"),
+         ("LN", "beer", "http://example.com/beer"),
+         ("NS", "neighbor", "http://example.net/"),
+         ("PATTERN", "pat", "http://example.com/$ARG1/$ARG2/"),
+         ("X", "FINAL", ["http://example.com/$NAME"]),
+         ("X", "VERSION", ["1.2"]),]
+    
+    def setUp(self):
+        """DOC"""
+        self.store = lncore.Store(any_url_to_namespace)
+        self.style = lncore.Traditional(self.store)
+    
+    def testLookups(self):
+        """Try out several lookups on the Traditional Style."""
+        for (record_type, lookup, url) in TraditionalStyleTest.L:
+            result = self.style.find("http://example.com/",
+                                     lookup, record_type)
+            assert result == (0, url)
+
+
+class TestKeyHashOrderedDictionary(unittest.TestCase):
+    
+    """DOC
+    
+    DOC
+    
+    DOC
+    """
+    
+    def setUp(self):
+        """DOC"""
+        self.D = lncore.KeyHashOrderedDictionary()
+        self.D["foo bar"] = "baz"
+        self.D["baz boz"] = "foo bar"
+    
+    def testRetrieval(self):
+        """DOC"""
+        assert self.D["foobar"] == "baz"
+        assert self.D["baz   boz"] == "foo bar"
+    
+    def testDelete(self):
+        """DOC"""
+        del self.D["foo bars"]
+        assert self.D.get("foo bar") == None
+    
+    def testLoad(self):
+        """Testing loading data from another ordered dictionary."""
+        ordered = lncore.OrderedDictionary()
+        ordered["foo bar"] = "baz"
+        ordered["baz boz"] = "foo bar"
+        keyhash = lncore.KeyHashOrderedDictionary()
+        keyhash.load_from(ordered)
+        assert keyhash.order() == ["foobar", "bazboz"]
+        assert keyhash["foobar"] == "baz"
+        assert keyhash["baz   boz"] == "foo bar"
 
 
 if __name__ == "__main__":

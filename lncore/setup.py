@@ -9,6 +9,5 @@ setup(name="localnames",
       author='Lion Kimbro',
       author_email='lion@speakeasy.org',
       url='http://purl.net/net/localnames/',
-      py_modules=["lnparser", "localnames"])
-
+      py_modules=["lnparser", "localnames", "lncore"])
 
