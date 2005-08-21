@@ -2,11 +2,11 @@
 ###/---\###|     OTHER SOFTWARE:
 ###|   |###|
 ###|   |###|
-###|   |###|         singhtext  -- text-to-HTML fragment renderer
+###|   |###|       singhtext  -- text-to-HTML fragment renderer
 ###|   \---/
-###|                 xrcgi  -- web GGI to Python by XML-RPC gateway
+###|               xrcgi  -- web to Python by XML-RPC gateway (CGI)
 ###|   /---\
-###|   |###|
+###|   |###|       xrserve  -- web to Python by XML-RPC gateway (server)
 ###|   |###|
 ###|   |###|
 ###\---/###|
