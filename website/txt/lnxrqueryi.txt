@@ -95,7 +95,7 @@ This is a DRAFT version only; Feedback welcome! Visit
 
   Admin:
   * lnquery.get_server_info()
-  * lnquery.get_cached_ns(ns_url)
+  * lnquery.get_cached_text(ns_url)
   * lnquery.dump_cache(ns_url)
 
   The Query part is what you use to perform Local Names queries.
@@ -132,7 +132,7 @@ This is a DRAFT version only; Feedback welcome! Visit
 
   It returns a string with the final URL in it.
 
-  Can return error codes: -200, -300
+  Can return error codes: -300
 
 
     lnquery.find(ns_url, path, record_type, style)
@@ -187,6 +187,8 @@ This is a DRAFT version only; Feedback welcome! Visit
           seconds until second namespaces' cache times out],
          ...
         ]
+      - If an entry does not have a preferred name, return an empty
+        string.
   * "STYLES"
       - Returns information about styles.
       - A list of lists:
@@ -207,7 +209,7 @@ This is a DRAFT version only; Feedback welcome! Visit
   The above keys MUST be defined, though.
 
 
-    lnquery.get_cached_ns(ns_url)
+    lnquery.get_cached_text(ns_url)
     ----------------------------
 
   The server returns it's cached version of the text at the given URL.

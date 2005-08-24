@@ -45,12 +45,6 @@ def return_basic_namespaces(url):
     return basic_text
 
 
-any_url_to_lines = lncore.combine(lncore.text_to_lines,
-                                  return_basic_namespaces)
-any_url_to_namespace = lncore.combine(lncore.lines_to_namespace,
-                                      any_url_to_lines)
-
-
 class QuotationTests(unittest.TestCase):
     
     """Test quoting and unquoting.
@@ -223,18 +217,34 @@ class UrlTemplateTest(unittest.TestCase):
         assert val == "http://example.com/foo/bar/baz"
 
 
-class StoreTest(unittest.TestCase):
-    
-    """Test namespace description Store.
-    
-    DOC
-    
+class TestThatUsesTestStore(unittest.TestCase):
+
+    """Super-class for tests that use the TestStore.
+
+    DOC - children need call setUp if override.
+
     DOC
     """
     
     def setUp(self):
         """Create simple Store."""
-        self.store = lncore.Store(any_url_to_namespace)
+        self.store = lncore.TestStore()
+        self.store.bind("http://example.com/", basic_text)
+        self.store.bind("http://example.net/", neighbor_text)
+
+
+class StoreTest(TestThatUsesTestStore):
+    
+    """Test the test namespace description Store.
+
+    It feels a bit silly to test a test store, and perhaps it is. But
+    there are other tests that are going to rely on the TestStore, and I
+    want to make sure that it's actually working like I think it does.
+    
+    DOC
+    
+    DOC
+    """
     
     def testCaching(self):
         """Make sure that the store is caching namespaces."""
@@ -243,8 +253,17 @@ class StoreTest(unittest.TestCase):
         ns2 = self.store("http://example.com/")
         assert ns1.get_bboard("test")["flag"] == True
 
+    def testCacheList(self):
+        """Make sure that get_cache_list works."""
+        correct = [("", "http://example.com/", 1000),
+                   ("", "http://example.net/", 1000)]
+        correct2 = [("", "http://example.net/", 1000),
+                    ("", "http://example.com/", 1000)]
+        result = self.store.get_cache_list()
+        assert result == correct or result == correct2, result
 
-class TraditionalStyleTest(unittest.TestCase):
+
+class TraditionalStyleTest(TestThatUsesTestStore):
     
     """Test Traditional Style resolution.
     
@@ -278,7 +297,7 @@ class TraditionalStyleTest(unittest.TestCase):
     
     def setUp(self):
         """DOC"""
-        self.store = lncore.Store(any_url_to_namespace)
+        TestThatUsesTestStore.setUp(self)
         self.style = lncore.Traditional(self.store)
     
     def testLookups(self):

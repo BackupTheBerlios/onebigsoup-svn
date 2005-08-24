@@ -2,12 +2,11 @@
 
 DOC
 
+TODO: adjust tests to use TestStore.
+
 DOC
-url_to_text  -- DOC
 text_to_lines  -- DOC
 lines_to_namespace  -- DOC
-combine  -- DOC
-url_to_namespace  -- DOC
 quote  -- DOC
 unquote  -- DOC
 Namespace  -- DOC
@@ -23,6 +22,8 @@ import re
 import sets
 
 import urllib
+
+import webcache
 
 
 punctuation_re = re.compile(r'[^A-Za-z0-9\s]+', re.UNICODE)
@@ -59,10 +60,17 @@ X = "X"
 PATTERN = "PATTERN"
 record_types = [LN, NS, X, PATTERN]
 
+styles = []
 
-def url_to_text(url):
-    """Given a URL of UTF-8 text, return the text."""
-    return urllib.urlopen(url).read().decode('utf-8')
+"""Registered styles.
+
+Register every style class in the styles dictionary above. The first
+listed style is the default style.
+
+Each style should define info and find(url, path, record_type).
+
+DOC: Describe info and the find functions in more depth.
+"""
 
 
 def text_to_lines(text):
@@ -95,14 +103,6 @@ def lines_to_namespace(lines):
         else:
             ns[X].setdefault(line.key, []).append(line.value)
     return ns
-
-
-def combine(f, g):
-    return lambda x:f(g(x))
-
-
-url_to_namespace = combine(lines_to_namespace,
-                           combine(text_to_lines, url_to_text))
 
 
 def quote(text):
@@ -210,36 +210,163 @@ class Namespace:
             return None
         return UrlTemplate(patterns[0]).replace(args)
 
+    def preferred_name(self):
+        """Return the preferred name, as found in X "PREFERRED-NAME".
+
+        If there is none, return None.
+        """
+        return self.data["X"].get("PREFERRED-NAME",[None])[0]
+
 
 class Store:
     
-    """Namespace store.
+    """Internet-based Namespace store.
+
+    The Store contains a page cache, and a namespace cache.
+    
+    The page cache associates web pages and timeouts with every URL. The
+    page cache is intended to be a webcache.WebCache instance. If you
+    leave the page cache at it's default None, a webcache.WebCache will
+    be created.
+    
+    The namespace cache associates lncore.Namespace instances with every
+    URL. What about timeouts for namespace data? We just rely on the
+    page cache's timeouts to tell us when to dump a namespace cache
+    entry.
     
     DOC
     
     DOC
     """
     
-    def __init__(self, builder=url_to_namespace):
-        """Create a namespace store.
-        
-        builder is a function (or something that can be called like a
-        function) that accepts a url, and returns a namespace.
+    def __init__(self, page_cache=None):
+        """Create namespace store that retrieves, stores pages by cache.
+
+        Pass a new webcache.WebCache in as the page_cache argument,
+        unless you have made your own object that meets the same
+        interface.
         """
-        self.cache = {}
-        self.builder = builder
+        self.ns_cache = {}  # Namespaces cache.
+        self.page_cache = page_cache
+        if self.page_cache is None:
+            self.page_cache = webcache.WebCache()
     
     def __call__(self, url):
         """Get a namespace from the store.
-        
-        If it's cached, return it from the cache. If not, build it, and
-        then return it.
+
+        If the namespace is cached, and hasn't timed out- return it. If
+        not, get the page from the page cache, build a namespace from
+        it, and return it.
         """
-        if url in self.cache:
-            return self.cache[url]
-        ns = self.builder(url)
-        self.cache[url] = ns
+        if ((url in self.ns_cache) and \
+            (self.page_cache.time_to_live(url) > 0)):
+            return self.ns_cache[url]
+        ns_text = self.page_cache.get_page(url).decode('utf-8')
+        lines = text_to_lines(ns_text)
+        ns = lines_to_namespace(lines)
+        self.ns_cache[url] = ns
         return ns
+    
+    def get_cached_text(self, ns_url):
+        """Get the unicode text of a cached namespace description."""
+        if ((url not in self.ns_cache) or
+            (self.page_cache.time_to_live(ns_url) <= 0)):
+            return (-302, "not cached")
+        return (0, self.page_cache.get_page(ns_url))
+    
+    def time_to_live(self, url):
+        """Return the number of seconds before a namespace times out."""
+        return self.page_cache.time_to_live(url)
+    
+    def get_cache_list(self):
+        """Return list of information about the cache.
+
+        By "the cache," we don't just mean the namespace cache
+        (ns_cache), we also mean the full page cache.
+
+        If the server has been rebooted, and the ns_cache is empty, but
+        the disk cache is full- beware: This can be a potentially very
+        costly operation..! It'll open up every namespace, interpret it,
+        and cache it in memory. It does that, because it pulls the X
+        "PREFERRED-NAME" record out, if it's there.
+        
+        DOC - based on "CACHE" in lnquery.get_server_info.
+
+        DOC
+        """
+        self.clean()
+        results = []
+        for url in self.page_cache:
+            preferred_name = self(url).preferred_name() or ""
+            ttl = self.time_to_live(url)
+            results.append((preferred_name, url, ttl))
+        return results
+    
+    def clean(self):
+        """Vet cache of expired entries.
+        
+        Internally, call this to make sure that the namespaces and names
+        lists are in sync with the webcache. Externally, you can call
+        this if you think you might clear up some memory.
+        """
+        self.page_cache.clean()
+        for url in self.ns_cache:
+            if url not in self.page_cache:
+                del self.ns_cache[url]
+
+
+class TestStore:
+
+    """A Namespace store for use when testing.
+
+    The store does not go to the Internet. Rather, it constructs
+    namespaces from constant text.
+
+    DOC
+    """
+    
+    def __init__(self):
+        """DOC"""
+        self.namespaces = {}
+
+    def bind(self, url, ns_text):
+        """DOC
+
+        ns_text must be unicode.
+        """
+        lines = text_to_lines(ns_text)
+        ns = lines_to_namespace(lines)
+        self.namespaces[url] = ns
+        ns.get_bboard("STORE")["TEXT"] = ns_text
+
+    def __call__(self, url):
+        """Get a namespace from the store.
+
+        Return None if there is no such namespace.
+        """
+        return self.namespaces.get(url)
+
+    def get_cached_text(self, url):
+        """Get the unicode text of a namespace description."""
+        if url not in self.namespaces:
+            return None
+        return self.namespaces[url].get_bboard("STORE")["TEXT"]
+
+    def get_cache_list(self):
+        """Return list of information about the cache.
+
+        DOC
+        """
+        results = []
+        for url in self.namespaces:
+            preferred_name = self(url).preferred_name() or ""
+            ttl = self.time_to_live(url)
+            results.append((preferred_name, url, ttl))
+        return results
+    
+    def time_to_live(self, url):
+        """Always return 1000 seconds. (They never expire in here.)"""
+        return 1000
 
 
 class Traditional:
@@ -250,6 +377,10 @@ class Traditional:
     
     DOC
     """
+
+    info = ["traditional",
+            "This is the normal way of resolving names, described in"
+            " the Local Names XML-RPC Query Interface specification."]
     
     def __init__(self, store):
         """DOC
@@ -284,7 +415,7 @@ class Traditional:
         try:
             ns = self.store(url)
         except IOERROR:
-            return (-TODO, TODO)
+            return (-300, "cannot read namespace description: %s" % url)
         
         if len(path) == 1:
             return self.last_pathentry(url, path[0], record_type)
@@ -319,7 +450,7 @@ class Traditional:
         if use == "ns":
             return self.find(ns_result, path[1:], record_type)
         
-        return (-TODO, TODO)
+        return (-201, "record not found: %s" % path[0])
     
     def last_pathentry(self, url, name, record_type):
         """DOC
@@ -339,7 +470,7 @@ class Traditional:
         for neighbor_key in ns[NS].order():
             neighbor_url = ns[NS][neighbor_key]
             if neighbor_url not in explored:
-                result = self.look_through(neighbor_url,
+                result = self.look_through(neighbor_url.encode('utf-8'),
                                            record_type, name)
                 if result is not None:
                     return (0, result)
@@ -354,7 +485,7 @@ class Traditional:
         
         # It simply wasn't found.
         
-        return (-TODO, TODO)
+        return (-201, "record not found: %s" % name)
     
     def look_through(self, url, record_type, key):
         """Perform a quick look through a namespace, looking for a key.
@@ -371,13 +502,9 @@ class Traditional:
         if result is not None:
             return result
         return bb[record_type].get(key)
-    
-    def TODO(self, TODO):
-        """DOC
-        
-        DOC
-        """
-        TODO
+
+
+styles.append(Traditional)
 
 
 class Line:
@@ -634,8 +761,4 @@ class UrlTemplate:
                 n = n + 1
             else:
                 return text
-
-
-if __name__ == "__main__":
-    TODO
 
