@@ -314,6 +314,19 @@ class Store:
             if url not in self.page_cache:
                 del self.ns_cache[url]
 
+    def dump_cache(self, url):
+        """DOC
+
+        DOC
+        """
+        found = False
+        if url in self.ns_cache:
+            del self.ns_cache[url]
+        if url in self.page_cache:
+            self.page_cache.dump(url)
+            found = True
+        return found
+
 
 class TestStore:
 

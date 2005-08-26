@@ -76,17 +76,15 @@ $name Syntax
 AddType "text/plain; charset=UTF-8" txt
 Syntax
 
-  <namespace_description> ::= "X VERSION 1.1"
-                              { <line> }
+  <namespace_description> ::= { <line> }
 
-  <line>    ::= <ws> |
-                <comment> |
-                <record>
+  <line>    ::= <ws> <newline> |
+                <comment> <newline> |
+                <record> <newline>
   <comment> ::= # { <character> }
-  <record>  ::= <record_type> <ws> <column> <ws> <column>
+  <record>  ::= <record_type> { <ws> }+ <column> { <ws> }+ <column>
   <column>  ::= "." |
-                <quotation-mark> { <column-character> } <quotation-mark> |
-                { <no-ws-col-char> }
+                <quotation-mark> { <column-character> } <quotation-mark>
 
   <record_type> ::= "."       |
                     "LN"      |
@@ -94,15 +92,15 @@ Syntax
                     "X"       |
                     "PATTERN"
 
-  <ws>               : UTF-8 white space
+  <ws>               : ASCII space or ASCII tab
+  <newline>          : ASCII NL, CR, FF
   <quotation-mark>   : quotation mark, like so: "
-  <character>        : any UTF-8 character
-  <column-character> : any UTF-8 character, escaping newlines, quotes, slashes.
+  <character>        : any UTF-8 character, save NL, CR, FF
+  <column-character> : any UTF-8 character, escaping the following:
                        Newline: \n
                        Quote: \"
                        Slash: \\
-  <no-ws-col-char>   : any UTF-8 character,
-                       but forbidding newlines, quotes, slashes
+             A slash followed by anything else SHOULD generate an error.
 #CODE
 
 $name Syntax Key
@@ -110,53 +108,33 @@ $name Syntax Key
 
 #LITERAL
 <table border="1">
-
-  <tr> <td> &lt;blah-blah&gt; </td>
-       <td> non-terminal symbol </td>
+  <tr>
+    <td> &lt;blah-blah&gt; </td>
+    <td> non-terminal symbol </td>
   </tr>
-  <tr> <td> "..." </td>
-       <td> literal text, without quotes around it </td>
+  <tr>
+    <td> "..." </td>
+    <td> literal text, without quotes around it </td>
   </tr>
-  <tr> <td> { blah blah } </td>
-       <td> repetition, zero or more "blah blahs" </td>
+  <tr>
+    <td> { blah blah } </td>
+    <td> repetition, zero or more "blah blahs" </td>
   </tr>
-
 </table>
 #LITERAL
-
-Don't get all pedantic on me.
-
-But if clarification is really needed, let me know, and we can work to
-improve the spec.
 
 $name Regarding Unicode Whitespace
 === Regarding Unicode Whitespace ===
 
-This spec does not presently define line separators and whitespace.
+Whitespace and line separators are defined in tables published by the
+Unicode people.
 
-It will be changed to do so when:
-
-* Someone knowledgable about unicode whitespace talks with Lion, OR
-* a real demonstratable problem arises AND someone proposes a good solution, OR,
-* we participate in a standards process.
-
-The most that will be said here is:
-
-* Accept 0D, 0A, or 0D0A as line breaks,
-* if you have tables telling what unicode characters are white space, use them,
-* use common sense,
-* and don't worry, everything will be OK.
+Accept 0D, 0A, or 0D0A as line breaks.
 
 $name Syntax Explanation
 == Syntax Explanation ==
 
-The first line '''MUST''' be:
-
-#LITERAL
-<p class="example">X VERSION 1.1</p>
-#LITERAL
-
-The remaining lines are one of three forms: Blank, comment, or record.
+Lines are one of the following three forms: Blank, comment, or record.
 
 '''[[blank line] Blank lines]''' are lines consisting of nothing but
 white space.
@@ -175,18 +153,20 @@ period means a repetition of the previously used record type.
 
 The second and third columns can be:
 
-* a period ("."), now quotation marks around it, signifying a repetition
-  of the previous value used in the column,
+* a period ("."), no quotation marks around it, signifying a
+  repetition of the previous value used in the column,
 * quotation-mark-encased text, with newlines, quotes, and slashes,
   escaped with "\n", "\"", or "\\",
-* text, without any whitespace, quotes, or slashes.
 
 That is, you can use a period in any column.
 
-Periods never have quotation marks around them.  If you are in the first
-column, you never use quotation marks. Quotation marks around the second
-or third column permit enclosed (but escaped) quotation marks, slashes,
-and white space.
+Periods never have quotation marks around them.  If you are in the
+first column, you never use quotation marks. Quotation marks are found
+around the second or third column if you aren't using a period.
+
+''NOTE: In previous versions of the spec, you could opt to not have
+quotes around the second and third columns. No longer. Nobody ever
+used it, save for X records.''
 
 This concludes the description of the syntax.
 
@@ -194,13 +174,13 @@ $name Semantics Explanation
 == Semantics Explanation ==
 
 #LITERAL
-<p class="foobar">LN (name) (URI)</p>
+<p class="foobar">LN &quot;(name)&quot; &quot;(URI)&quot;</p>
 #LITERAL
 
 This means to bind the [[name]] to the [[URL] URI.]
 
 #LITERAL
-<p class="foobar">NS (link key) (URI)</p>
+<p class="foobar">NS &quot;(link key)&quot; &quot;(URI)&quot;</p>
 #LITERAL
 
 This means to link the namespace to a target namespace (described at the
@@ -208,7 +188,7 @@ This means to link the namespace to a target namespace (described at the
 the [[link key] "link key."]
 
 #LITERAL
-<p class="foobar">PATTERN (name) (URI template)</p>
+<p class="foobar">PATTERN &quot;(name)&quot; &quot;(URI template)&quot;</p>
 #LITERAL
 
 This means to create a link to a "miniature namespace" that has no LN
@@ -216,10 +196,10 @@ entries, but automatically applies a [[pattern]] to any name that is
 resolved in it.
 
 That is, a pattern simulates linking to a namespace that contains only
-an "X FINAL ([[URI template]])" record in it.
+an "X &quot;FINAL&quot; ([[URI template]])" record in it.
 
 #LITERAL
-<p class="foobar">X (key) (value)</p>
+<p class="foobar">X &quot;(key)&quot; &quot;(value)&quot;</p>
 #LITERAL
 
 This means to set some [[extension data]] for the immediate namespace.
@@ -230,8 +210,8 @@ given in X records.
 $name X Records
 == X Records ==
 
-These are standard X records, recommended by this spec for use. Only the
-first, "X VERSION", is required. Everything else is optional.
+These are standard X records, recommended by this spec for
+use. Everything is optional, but X "VERSION" is strongly recommended.
 
 #LITERAL
 <p class="example">Text like this is an example.</p>
@@ -241,7 +221,7 @@ $REM ---------- Laazy lazy lazy lazy. ----------
 #LITERAL
 
 <p class="foobar">
-    X VERSION 1.1
+    X &quot;VERSION&quot; 1.2
 </p>
 
 <p>
@@ -249,55 +229,103 @@ $REM ---------- Laazy lazy lazy lazy. ----------
 </p>
 
 <p class="foobar">
-    X AUTHOR (name)
+    X &quot;AUTHOR&quot; &quot;(name)&quot;
 </p>
 <p>
     The description's author's name.
 </p>
-<p class="example">X AUTHOR "Lion Kimbro"</p>
+<p class="example">X &quot;AUTHOR&quot; &quot;Lion Kimbro&quot;</p>
 
 <p class="foobar">
-    X AUTHOR-FOAF (URI)
+    X &quot;AUTHOR-FOAF&quot; &quot;(URI)&quot;
 </p>
 <p>
     A link to the description's author's FOAF file.
 </p>
-<p class="example">X AUTHOR-FOAF "http://www.speakeasy.org/~lion/foaf.rdf"</p>
+<p class="example">X &quot;AUTHOR-FOAF&quot; &quot;http://www.speakeasy.org/~lion/foaf.rdf&quot;</p>
 
 <p class="foobar">
-    X LAST-CHANGED (ISO-8601)
+    X &quot;LAST-MODIFIED&quot; &quot;(ISO-8601)&quot;
 </p>
 <p>
     The date the namespace description was last changed.
 </p>
-<p class="example">X LAST-CHANGED "2005-01-28"</p>
+<p class="example">X &quot;LAST-MODIFIED&quot; &quot;2005-01-28&quot;</p>
 
 <p class="foobar">
-    X PREFERRED-NAME (name)
+    X &quot;PREFERRED-NAME&quot; &quot;(name)&quot;
 </p>
 <p>
     A preferred short name for the namespace.
     Useful if you are automatically generating an
     NS record, given just a URL of a namespace description.
 </p>
-<p class="example">X PREFERRED-NAME "The Prophet, by Gibran"</p>
+<p class="example">X &quot;PREFERRED-NAME&quot; &quot;The Prophet, by Gibran&quot;</p>
 
 <p class="foobar">
-    X FINAL (URI-pattern)
+    X &quot;PREFERRED-QUERY-SERVER&quot; &quot;(url)&quot;
+</p>
+#LITERAL
+
+The URL of a [[Local Names Query Server]] that usually keeps this
+namespace description (and perhaps it's neighbors) cached.
+
+#LITERAL
+<p class="example">X &quot;PREFERRED-QUERY-SERVER&quot; &quot;http://example.net/lnquery/&quot;</p>
+
+<p class="foobar">
+    X &quot;AUTHORITATIVE-STORE-SERVER&quot; &quot;(url)&quot;
+</p>
+
+<p class="foobar">
+    X &quot;AUTHORITATIVE-STORE-NAMESPACE&quot; &quot;(name)&quot;
+</p>
+
+<p class="foobar">
+    X &quot;AUTHORITATIVE-STORE-PASSWORD&quot; &quot;(password)&quot;
+</p>
+
+#LITERAL
+
+These three X records tell how to edit the namespace via the [[Local Names XML-RPC Store Interface]].
+
+All, some, or none of these 3 X records can be defined.
+
+AUTHORITATIVE-STORE-SERVER tells the URL of the store interface.
+
+AUTHORITATIVE-STORE-NAMESPACES tells the name of the namespace, as
+understood by the store interface.
+
+AUTHORITATIVE-STORE-PASSWORD tells the password to use when editing
+the namespace via the store interface. Remember, you don't have to
+list this.
+
+If a namespace or password are not given, an interpreter will likely
+default to default namespace "default" and null password "password",
+as described in the [[Local Names XML-RPC Store Interface]
+specification.]
+
+#LITERAL
+<p class="example">X &quot;AUTHORITATIVE-STORE-SERVER&quot; &quot;http://example.net/lnquery/&quot;</p>
+<p class="example">X &quot;AUTHORITATIVE-STORE-NAMESPACE&quot; &quot;robotics&quot;</p>
+<p class="example">X &quot;AUTHORITATIVE-STORE-PASSWORD&quot; &quot;xyzzy&quot;</p>
+
+<p class="foobar">
+    X &quot;FINAL&quot; &quot;(URI-pattern)&quot;
 </p>
 <p>
     <i>(Notes below.)</i>
 </p>
 
-<p class="example">X FINAL "The Prophet, by Gibran"</p>
+<p class="example">X &quot;FINAL&quot; &quot;The Prophet, by Gibran&quot;</p>
 
-<h3><a name="xfinal">X FINAL</a></h3>
+<h3><a name="xfinal">X &quot;FINAL&quot;</a></h3>
 
 <p>This standard requires the special treatment
-   of X FINAL.</p>
+   of X &quot;FINAL&quot;.</p>
 
 <p>If a name is looked up, and no LN entry is found
-    for the name, but there is an X FINAL (URI pattern)
+    for the name, but there is an X &quot;FINAL&quot; (URI pattern)
     entry found, then the name is fitted to the pattern,
     and that is the final URI.</p>
 
@@ -356,6 +384,27 @@ Result:   http://foo/barbar--bar</p>
 </p>
 
 <p class="question">
+  Q. How do X "AUTHOR" and X "AUTHOR-FOAF" relate?
+</p>
+
+<p class="answer">
+  A. AUTHOR is used to name authors. AUTHOR-FOAF is used to link to
+  author FOAF descriptions. They do not refer to one another. If you
+  want to list three authors by name, and link to three other authors
+  by FOAF, or perhaps one of the authors that is explicitely named
+  also has a FOAF link- it does not matter, and there is no
+  specification about how they relate. The interpreter cannot know,
+  save if it notices that the FOAF description features says that a
+  person's name is the same as an AUTHOR field says.
+</p>
+
+<p class="answer">
+  Try not to overthink this one. If all you have are names of authors,
+  just list the names of authors. If all you have are FOAF links,
+  include the FOAF links. If you like, list both names and FOAF links.
+</p>
+
+<p class="question">
   Q. What happens if an X record is redefined?
 </p>
 
@@ -370,15 +419,15 @@ Result:   http://foo/barbar--bar</p>
      can exist. (Albeit somewhat clumbsy.)
 </p>
 <p class="answer">
-     In particular, "X PREFERRED-NAME" could be
+     In particular, X &quot;PREFERRED-NAME&quot; could be
      used repeatedly to list multiple possibilities,
      in case a preferred name is already taken.
 </p>
 <p class="answer">
-     "X AUTHOR" may be used to name multiple authors.
+     X &quot;AUTHOR&quot; may be used to name multiple authors.
 </p>
 <p class="answer">
-     But something like "X VERSION" should never
+     But something like X &quot;VERSION&quot; should never
      be repeated. It is syntactically okay,
      but it shouldn't be done.
 </p>

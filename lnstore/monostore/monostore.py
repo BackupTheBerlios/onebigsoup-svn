@@ -31,6 +31,7 @@ unset  -- remove namespace values
 
 import re
 import bsddb
+import xmlrpclib
 
 
 NAMESPACE_DESCRIPTION_PATH = "/var/www/html/ns.txt"  # Change this
@@ -86,6 +87,17 @@ def _output_page():
                                 _escape_string(value)))
     db.close()
     f.close()
+
+
+def _dump_cache(query_server_url, ns_url):
+    """Tell a query server to dump a namespace description."""
+    if ns_url is None or query_server_url is None:
+        return
+    server = xmlrpclib.ServerProxy(query_server_url)
+    try:
+        server.lnquery.dump_cache(ns_url)
+    except e:
+        pass
 
 
 def get_server_info(pw):
@@ -144,8 +156,10 @@ def set(pw, name_of_namespace, record_type, name, value):
         return (-200, "bad record type- valid: LN, NS, X, PATTERN")
     db = bsddb.hashopen(NAMESPACE_DATA_PATH)
     db[record_type + "." + name] = value
+    query_server_url = db.get("X.PREFERRED-QUERY-SERVER")
     db.close()
     _output_page()
+    _dump_cache(query_server_url, NAMESPACE_DESCRIPTION_URL)
     return (0, "OK")
 
 
@@ -159,7 +173,9 @@ def unset(pw, name_of_namespace, record_type, name, value):
     if db[record_type + "." + name] != value:
         return (-201, "record not found")
     del db[record_type + "." + name]
+    query_server_url = db.get("X.PREFERRED-QUERY-SERVER")
     db.close()
     _output_page()
+    _dump_cache(query_server_url, NAMESPACE_DESCRIPTION_URL)
     return (0, "OK")
 

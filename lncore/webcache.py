@@ -89,7 +89,6 @@ class WebCache:
     
     def dump_page(self, url):
         """Force a cache entry to expire."""
-
         del self._time_db[url]
         del self._page_db[url]
         self._time_db.sync()

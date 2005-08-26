@@ -65,6 +65,27 @@ def get_server_info():
               "IMPLEMENTATION": "OBS-LNQS",
               "CACHE": store.get_cache_list(),
               "STYLES": [style.info for style in lncore.styles],}
-    # TODO: Fill out CACHE.
     return result
+
+
+def get_cached_text(ns_url):
+    """Return the text of the namespace description, as cached.
+
+    For additional cache information, call lnquery.get_server_info.
+    """
+    result = store.get_cached_text(ns_url)
+    if result == None:
+        return (-302, "not cached")
+    return (0, "ok")
+
+
+def dump_cache(ns_url):
+    """
+
+    DOC
+    """
+    dumped = store.dump_cache(ns_url)
+    if dumped == False:
+        return (-302, "not cached")
+    return (0, "ok")
 
