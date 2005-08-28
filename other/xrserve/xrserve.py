@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """Serve specially marked modules by XML-RPC.
 
-  -Hhostname   host name, default ""
-  -Pportnum    port number, default 8000
+  -H hostname   host name, default ""
+  -p portnum    port number, default 8000
 
 This script starts an XML-RPC server, and publishes auto-detected
 modules from the working directory.
