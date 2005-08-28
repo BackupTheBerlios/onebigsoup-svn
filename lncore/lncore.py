@@ -323,7 +323,7 @@ class Store:
         if url in self.ns_cache:
             del self.ns_cache[url]
         if url in self.page_cache:
-            self.page_cache.dump(url)
+            self.page_cache.dump_page(url)
             found = True
         return found
 
