@@ -41,7 +41,7 @@ def find(ns_url, find_path, record_type, style_name):
     """
     if style_name not in lncore.styles:
         return (-301, "unsupported style: %s")
-    resolver = lncore.styles[style_name](store)
+    resolver = lncore.style_named(style_name)
     return resolver.find(ns_url, find_path, record_type)
 
 
