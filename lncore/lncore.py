@@ -79,7 +79,7 @@ def style_named(name):
     for style in styles:
         if style.info[0].lower() == name.lower():
             return style
-    return (-301, "unknown style")
+    return None
 
 def text_to_lines(text):
     """Tokenize a v1.2 Local Names namespace description into lines.
