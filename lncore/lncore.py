@@ -72,6 +72,14 @@ Each style should define info and find(url, path, record_type).
 DOC: Describe info and the find functions in more depth.
 """
 
+def style_named(name):
+    """DOC
+    DOC
+    """
+    for style in styles:
+        if style.info[0].lower() == name.lower():
+            return style
+    return (-301, "unknown style")
 
 def text_to_lines(text):
     """Tokenize a v1.2 Local Names namespace description into lines.
