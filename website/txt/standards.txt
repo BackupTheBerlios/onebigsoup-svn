@@ -24,7 +24,7 @@ namespace, namespace description
 * "namespace description" refers to the file itself, conforming to the
   Local Names Namespace Description Specification.
 
-local name(s), "name", "URL", "relative URL"
+local name(s), "name", "[relative] URL"
 * ex: "slashdot", bound to "http://slashdot.org/", is a local name
 * a "name" is "bound" to a "URL," and that makes a "local name"
 * the URL might be a ''relative URL''
@@ -34,16 +34,19 @@ namespace
 * a "link key" is "bound" to a "namespace URL," and that makes a
   "namespace link"
 
-pattern, pattern key, URL template
+pattern, "pattern key", "[relative] URL template", "pattern argument"
 * a "pattern key" is "bound" to a "URL template," and that makes a
-  "pattern."
+  "pattern." The URL template contains pattern arguments.
 
 extension data, extension key, extension values
 * an "extension key" is "bound" to "extension values," and that makes
   "extension data."
 
 record, comment line, blank line
-* a "record" found in a "namespace" is what 
+* a "record" found in a "namespace" is what
+
+relative URL, relative URL template
+basic relative URL handling behavior
 
 
 == Servers ==

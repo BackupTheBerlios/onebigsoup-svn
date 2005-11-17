@@ -44,7 +44,7 @@ blog, write on [[CommunityWiki] CommunityWiki,] call Lion's cell phone,
 call Lion's Skype account, or otherwise get in contact with Lion Kimbro
 or a member of the [[One Big Soup]] effort.
 
-Lion Kimbro's contact information is kept on [[Lion:my site] his web
+Lion Kimbro's contact information is on [[Lion:my site] his web
 site.]
 
 "One Big Soup" is the name of the super-project that gave rise to Local
@@ -73,16 +73,16 @@ $name Syntax
 == Syntax ==
 
 #CODE
-AddType "text/plain; charset=UTF-8" txt
 Syntax
 
   <namespace_description> ::= { <line> }
 
-  <line>    ::= <ws> <newline> |
+  <line>    ::= <newline> |
                 <comment> <newline> |
                 <record> <newline>
-  <comment> ::= # { <character> }
-  <record>  ::= <record_type> { <ws> }+ <column> { <ws> }+ <column>
+
+  <comment> ::= "#" { <comment-character> }
+  <record>  ::= <record_type> <one_space> <column> <one_space> <column>
   <column>  ::= "." |
                 <quotation-mark> { <column-character> } <quotation-mark>
 
@@ -92,15 +92,16 @@ Syntax
                     "X"       |
                     "PATTERN"
 
-  <ws>               : ASCII space or ASCII tab
-  <newline>          : ASCII NL, CR, FF
-  <quotation-mark>   : quotation mark, like so: "
-  <character>        : any UTF-8 character, save NL, CR, FF
-  <column-character> : any UTF-8 character, escaping the following:
-                       Newline: \n
-                       Quote: \"
-                       Slash: \\
-             A slash followed by anything else SHOULD generate an error.
+  <one_space>         : ASCII space (32)
+  <quotation-mark>    : ASCII quotation mark (34,) like so: "
+  <newline>           : ASCII NL, CR, FF
+  <comment-character> : any UTF-8 character, save NL, CR, FF
+  <column-character>  : any UTF-8 character, escaping the following:
+                        Newline: \n
+                        Quote: \"
+                        Slash: \\
+                        A slash followed by anything else
+                        SHOULD generate an error.
 #CODE
 
 $name Syntax Key
@@ -114,7 +115,7 @@ $name Syntax Key
   </tr>
   <tr>
     <td> "..." </td>
-    <td> literal text, without quotes around it </td>
+    <td> literal text, as ASCII, without quotes around it </td>
   </tr>
   <tr>
     <td> { blah blah } </td>
@@ -124,10 +125,7 @@ $name Syntax Key
 #LITERAL
 
 $name Regarding Unicode Whitespace
-=== Regarding Unicode Whitespace ===
-
-Whitespace and line separators are defined in tables published by the
-Unicode people.
+=== Regarding Newlines ===
 
 Accept 0D, 0A, or 0D0A as line breaks.
 
@@ -188,15 +186,37 @@ This means to link the namespace to a target namespace (described at the
 the [[link key] "link key."]
 
 #LITERAL
-<p class="foobar">PATTERN &quot;(name)&quot; &quot;(URI template)&quot;</p>
+<p class="foobar">PATTERN &quot;(pattern key)&quot; &quot;(URI template)&quot;</p>
 #LITERAL
 
-This means to create a link to a "miniature namespace" that has no LN
-entries, but automatically applies a [[pattern]] to any name that is
-resolved in it.
+This means to create a link to a [[URI template]].
 
-That is, a pattern simulates linking to a namespace that contains only
-an "X &quot;FINAL&quot; ([[URI template]])" record in it.
+The URI template is referred to by a convenient name, the [[pattern key]
+"pattern key."]
+
+Replacements in the URI template are made by identifiers: "$NAME" and
+"$ARGn" where n is a number, starting from 1. "$NAME" is equivalent to
+"$ARG1".
+
+Resolution of the pattern depends upon the query style (see the
+[[Local Names XML-RPC Query Interface]] for details,) but basically,
+if a pattern is named in the query path, then the remainder of the
+path is interpreted as pattern arguments, and the final URI is created
+from that.
+
+Examples:
+
+#LITERAL
+<p class="example">Query path:     foo, bar
+Pattern record:  PATTERN &quot;foo&quot; &quot;http://foo/$NAME&quot;
+Result: &quot;http://foo/bar&quot;</p>
+#LITERAL
+
+#LITERAL
+<p class="example">Query path:     foo, bar, baz
+Pattern record:  PATTERN &quot;foo&quot; &quot;http://foo/$ARG1/$ARG2&quot;
+Result:   http://foo/bar/baz</p>
+#LITERAL
 
 #LITERAL
 <p class="foobar">X &quot;(key)&quot; &quot;(value)&quot;</p>
@@ -329,8 +349,8 @@ specification.]
     entry found, then the name is fitted to the pattern,
     and that is the final URI.</p>
 
-<p> The pattern can include the text "$PAGE".
-    Wherever "$PAGE" appears in the pattern, "$PAGE"
+<p> The pattern can include the text "$NAME".
+    Wherever "$NAME" appears in the pattern, "$NAME"
     is replaced with the name that is being fit to the
     pattern.</p>
 
@@ -339,11 +359,11 @@ specification.]
 </p>
 
 <p class="example">Name:     bar
-Pattern:  http://foo/$PAGE
+Pattern:  http://foo/$NAME
 Result:   http://foo/bar</p>
 
 <p class="example">Name:     bar
-Pattern:  http://foo/$PAGE$PAGE--$PAGE
+Pattern:  http://foo/$NAME$NAME--$NAME
 Result:   http://foo/barbar--bar</p>
 
 <p>

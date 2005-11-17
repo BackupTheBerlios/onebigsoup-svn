@@ -1,0 +1,7 @@
+X "VERSION" "1.2"
+LN "foo" "http://example.com/"
+LN "bar" "http://example.com/"
+X "FINAL" "http://example.com/$NAME"
+NS "neighbor" "http://localhost:8000/example.net.txt"
+NS "badneighbor" "http://localhost/example.net.txt"
+PATTERN "pat" "http://example.com/$ARG1/$ARG2/"

@@ -19,7 +19,7 @@ import bsddb
 class WebCache:
     
     """BSD DB cache for web pages.
-
+    
     __contains__ --  URL cached, not expired?
     get_page --  retrieve a page from cache or web
     dump_page --  dump a cache entry
@@ -46,23 +46,27 @@ class WebCache:
         self._page_db = bsddb.hashopen(page_db_filename)
         self._time_db = bsddb.hashopen(time_db_filename)
         self.cache_ttl = cache_ttl
-
+    
     def __iter__(self):
         """DOC"""
         self.clean()
         return iter(self._time_db)
-
+    
     def __contains__(self, url):
         """Return True if page is cached and hasn't expired."""
+        url = url.encode('utf-8')
         return self.time_to_live(url) > 0
     
     def get_page(self, url):
+        
         """Retrieve a page from the web or the cache.
         
         get_page returns the page contents retrieved by urllib.urlopen.
         
         url --  URL of web page to retrieve
         """
+        
+        url = url.encode('utf-8')
         
         now = time.time()
         if url in self._time_db:
@@ -81,6 +85,7 @@ class WebCache:
     
     def time_to_live(self, url):
         """Return seconds left before cache entry expires."""
+        url = url.encode('utf-8')
         now = time.time()
         if url in self._time_db:
             last_read = float(self._time_db[url])
@@ -89,6 +94,7 @@ class WebCache:
     
     def dump_page(self, url):
         """Force a cache entry to expire."""
+        url = url.encode('utf-8')
         del self._time_db[url]
         del self._page_db[url]
         self._time_db.sync()
@@ -124,11 +130,11 @@ if __name__ == "__main__":
                       type="int", help="time to live (in seconds)")
     parser.add_option("-u", "--url", dest="url", type="string",
                       help="url of page to retrieve and display")
-
+    
     (options, args) = parser.parse_args()
     if len(args) > 0:
         parser.error("incorrect number of arguments")
-
+    
     cache = WebCache(options.page_db_filename, options.time_db_filename,
                      options.ttl)
     if options.url is None:

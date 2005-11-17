@@ -7,8 +7,8 @@
   This Python module is a gateway between XML-RPC requests, and Python
   modules.
 
-  Basically: Just put this script in a directory with Python modules,
-  rand run it. Any Python modules in the same directoy that define
+  Basically: Put this script in a directory with Python modules, and run
+  it. Any Python modules in the same directory that define
   XMLRPC_namespace will be immediately callable by XML-RPC.
 
   Full documentation is found at:

@@ -64,12 +64,18 @@ styles = []
 
 """Registered styles.
 
-Register every style class in the styles dictionary above. The first
-listed style is the default style.
+Register every style class in the styles list above. The first listed
+style is the default style.
 
-Each style should define info and find(url, path, record_type).
+Each style class should define info and find(url, path, record_type).
 
-DOC: Describe info and the find functions in more depth.
+"info" is a two-tuple.
+* Element #1: the name of the style method as a string-- the name the
+  user will provide as an argument, when identifying the style.
+* Element #2: a long description string, describing the style in
+  English.
+
+DOC: describe find function in more depth
 """
 
 def style_named(name):
@@ -173,6 +179,19 @@ def traditional_hash(name):
     return name
 
 
+def basic_relative_url_handling_behavior(relative_url,
+                                         namespace_description_url):
+    """DOC
+
+    DOC
+    """
+    if relative_url.startswith("http://"):
+        return relative_url  # It's actually an absolute URL
+    slash_index = namespace_description_url.rfind("/")
+    base = namespace_description_url[:slash_index+1]
+    return base + relative_url
+
+
 class Namespace:
     
     """Namespace data and functionality.
@@ -209,7 +228,7 @@ class Namespace:
         return self.bboard.setdefault(name, {})
     
     def final(self, args):
-        """Return the results of placing args into X "FINAL".
+        """Return the success or failure of putting args into X "FINAL".
         
         If there is no X "FINAL" entry, return None.
         """
@@ -217,7 +236,7 @@ class Namespace:
         if patterns is None:
             return None
         return UrlTemplate(patterns[0]).replace(args)
-
+    
     def preferred_name(self):
         """Return the preferred name, as found in X "PREFERRED-NAME".
 
@@ -229,7 +248,7 @@ class Namespace:
 class Store:
     
     """Internet-based Namespace store.
-
+    
     The Store contains a page cache, and a namespace cache.
     
     The page cache associates web pages and timeouts with every URL. The
@@ -249,7 +268,7 @@ class Store:
     
     def __init__(self, page_cache=None):
         """Create namespace store that retrieves, stores pages by cache.
-
+        
         Pass a new webcache.WebCache in as the page_cache argument,
         unless you have made your own object that meets the same
         interface.
@@ -261,7 +280,7 @@ class Store:
     
     def __call__(self, url):
         """Get a namespace from the store.
-
+        
         If the namespace is cached, and hasn't timed out- return it. If
         not, get the page from the page cache, build a namespace from
         it, and return it.
@@ -288,10 +307,10 @@ class Store:
     
     def get_cache_list(self):
         """Return list of information about the cache.
-
+        
         By "the cache," we don't just mean the namespace cache
         (ns_cache), we also mean the full page cache.
-
+        
         If the server has been rebooted, and the ns_cache is empty, but
         the disk cache is full- beware: This can be a potentially very
         costly operation..! It'll open up every namespace, interpret it,
@@ -299,7 +318,7 @@ class Store:
         "PREFERRED-NAME" record out, if it's there.
         
         DOC - based on "CACHE" in lnquery.get_server_info.
-
+        
         DOC
         """
         self.clean()
@@ -307,7 +326,7 @@ class Store:
         for url in self.page_cache:
             preferred_name = self(url).preferred_name() or ""
             ttl = self.time_to_live(url)
-            results.append((preferred_name, url, ttl))
+            results.append((preferred_name, url.decode('utf-8'), ttl))
         return results
     
     def clean(self):
@@ -430,14 +449,18 @@ class Traditional:
         """DOC
         
         DOC
+
+        Return -300 if the URL can't be read.
+
+        DOC
         """
         if isinstance(path, basestring):
             path = [path]
         try:
             ns = self.store(url)
-        except IOERROR:
+        except IOError:
             return (-300, "cannot read namespace description: %s" % url)
-        
+
         if len(path) == 1:
             return self.last_pathentry(url, path[0], record_type)
         
@@ -452,7 +475,7 @@ class Traditional:
         if pattern_result is None:  # It wasn't there; Try loose.
             pattern_result = bb[PATTERN].get(path[0])
             pattern_loose = True
-        
+
         if ns_result and not ns_loose:
             use = "ns"
         elif pattern_result and not pattern_loose:
@@ -464,14 +487,12 @@ class Traditional:
         else:
             use = None
         
-        if use == "pattern":
-            pattern = UrlTemplate(pattern_result)
-            return (0, pattern.replace(path[1:]))
-        
         if use == "ns":
             return self.find(ns_result, path[1:], record_type)
-        
-        return (-201, "record not found: %s" % path[0])
+        elif use == "pattern":
+            return UrlTemplate(pattern_result).replace(path[1:])
+        else:
+            return (-201, "record not found: %s" % path[0])
     
     def last_pathentry(self, url, name, record_type):
         """DOC
@@ -491,7 +512,7 @@ class Traditional:
         for neighbor_key in ns[NS].order():
             neighbor_url = ns[NS][neighbor_key]
             if neighbor_url not in explored:
-                result = self.look_through(neighbor_url.encode('utf-8'),
+                result = self.look_through(neighbor_url,
                                            record_type, name)
                 if result is not None:
                     return (0, result)
@@ -502,7 +523,7 @@ class Traditional:
         if record_type == LN:
             result = ns.final(name)
             if result is not None:
-                return (0, result)
+                return result
         
         # It simply wasn't found.
         
@@ -516,8 +537,13 @@ class Traditional:
         
         NO special treatment here- if it's not found, return None. No
         looking through neighboring namespaces, or anything like that.
+
+        If the URL can't be loaded, it will just return None.
         """
-        ns = self.store(url)
+        try:
+            ns = self.store(url)
+        except IOError:
+            return None
         bb = self.bboard(ns)
         result = ns[record_type].get(key)
         if result is not None:
@@ -771,6 +797,8 @@ class UrlTemplate:
     
     def replace(self, args):
         """DOC"""
+        if args is None:
+            args = []
         if not isinstance(args, list):
             args = [args]
         text = self.text.replace("$NAME", args[0])
@@ -778,8 +806,21 @@ class UrlTemplate:
         while True:
             argnum = "$ARG%d" % n
             if argnum in text:
+                if n > len(args):
+                    return (-202, "insufficient PATTERN arguments- "
+                            "looking for argument %d" % n)
                 text = text.replace(argnum, args[n-1])
                 n = n + 1
             else:
-                return text
+                return (0, text)
+
+
+def find_style(style_name):
+    """Find a resolver class fulfilling a given style."""
+    if style_name == "default":
+        return styles[0]
+    for resolver_class in styles:
+        if resolver_class.info[0] == style_name:
+            return resolver_class
+    return None
 

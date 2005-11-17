@@ -46,7 +46,7 @@ LOCALNAMES_SEPARATOR = ":"
 
 OLDSTYLE_NAMESERVER_URL = "http://services.taoriver.net:9090/"
 
-CONNECTED = True  # SET THIS TO TRUE WHEN DOING REMOTE LOOKUPS
+CONNECTED = False  # SET THIS TO TRUE WHEN DOING REMOTE LOOKUPS
 
 
 class PathNavigationInFilenameException(Exception):

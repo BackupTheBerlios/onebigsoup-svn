@@ -1,6 +1,9 @@
 $set title: Local Names XML-RPC Query Interface
 $name LNXRQueryI
 
+* TODO: Make sure PATTERN propagates into all returns.
+* TODO: Code Relative Path resolution! (Traditional)
+
 #LITERAL
 <center>
 #LITERAL
@@ -23,7 +26,7 @@ This is a DRAFT version only; Feedback welcome! Visit
   This is the specification for the Local Names XML-RPC Query Interface
   (LNXRQueryI).
 
- 
+
   BACKGROUND
   ==========
 
@@ -109,12 +112,12 @@ This is a DRAFT version only; Feedback welcome! Visit
   wanted to make a query server that programatically converted paths
   into URLs, and that did not make use of a namespace description to do
   so, you can do that.
-  
+
   There is a section at the end of this document called
   "Considerations," which goes into some of these issues in
   detail. Another section, "Scenarios," describes how you might
   want to use the API, for different types of servers.
-  
+
   Functions can produce errors; there's a section on "Error Codes"
   below. When the specification for a function says "return error code
   -201," it means to return the tuple (-201, "record not found").
@@ -243,7 +246,7 @@ This is a DRAFT version only; Feedback welcome! Visit
   you should use these error #'s. You should probably use these error
   strings as well, but they are more maleable. Your server may do
   something special, and perhaps a different error string would be
-  better. You make the call. 
+  better. You make the call.
 
     error #  string
           0  "OK"
@@ -253,6 +256,7 @@ This is a DRAFT version only; Feedback welcome! Visit
          -4  "(error custom to server - replace this text per-error)"
        -200  "bad record type- valid: LN, NS, X, PATTERN"
        -201  "record not found"
+       -202  "insufficient PATTERN arguments" TODO: propogate into returns
        -300  "cannot read namespace description"
        -301  "unsupported style"
        -302  "not cached"
@@ -291,25 +295,33 @@ This is a DRAFT version only; Feedback welcome! Visit
   A "lookup path" refers to the path followed to resolve a lookup
   query. The lookup path takes the form of a list of strings.
 
+  Usually it works like so:
+
   ["...", "...", "...", ..., "...", "..."]
    |<------------+--------------->| |<->|
-      names of namespaces           final name
+      namespace links               final name
 
-  Lookups begin in one namespace, specified by giving the URL of it's
+  Lookup begins in one namespace, specified with a URL, outside the
+  lookup path.
+
+  The names of the namespaces ("namespace links,") label NS records to
+  follow.  final name identifies the name of a record (a local name, a
+  namespace link, a pattern link, or extension data) in the last
   namespace description.
 
-  The names of the namespaces, (before the final name in the lookup
-  path,) usually name NS records to follow. That last one, (just before
-  the final name in the lookup path,) may identify a PATTERN, instead of
-  an NS record.
-
-  The final name identifies the name of a record in the last namespace
-  description, or a name to be substituted into a template URL (found in
-  a PATTERN.)
-
-  Why so vague? Why do I say "usually" instead of "always"?
+  Why so vague? Why do I say "usually" instead of "always?"
 
   Because how a lookup path is used depends on the query style in use.
+
+  Also, there's the special treatment of pattern links:
+
+  ["...", "...", "...", ..., "...", "...", "...", "..."]
+   |<------------+--------------->| |<->|  |<-------->|
+      namespace links              pattern   pattern
+                                    link    arguments
+
+  If a pattern link is found in the lookup path, everything after it is
+  treated as a pattern argument.
 
 
   QUERY STYLE:
@@ -317,7 +329,7 @@ This is a DRAFT version only; Feedback welcome! Visit
   We have never settled on one way to resolve Local Names, given
   namespace descriptions, a starting namespace description, and a lookup
   path. Instead, we have left this open, and made some recommendations.
-  
+
   An implementation of the Local Names XML-RPC Query Interface can
   support several different query styles. An interface implementation
   must support AT LEAST ONE query style.
@@ -331,6 +343,8 @@ This is a DRAFT version only; Feedback welcome! Visit
   some URL in a given namespace, are implemented as query styles. See
   "traditional-R", defined below, for an example.
 
+  Style identifiers are case insensitive strings.
+
 
   DEFAULT QUERY STYLE:
 
@@ -338,6 +352,37 @@ This is a DRAFT version only; Feedback welcome! Visit
 
   If a client has not been configured to point to a particular style, it
   must use "default" for the style argument.
+
+
+  RELATIVE URL:
+
+  Local names may bind names to relative URLs and pattern links may bind
+  link keys to relative URL templates. If the URL begins with "http://",
+  it is absolute. But if it does not, then it may be interpreted (by the
+  query style) as relative.
+
+  It's up to the query style how to handle a relative URL.
+
+  The basic reltive URL handling behavior goes like so: Take the URL for
+  the namespace description itself. Remove everything after the final
+  slash (/). Append the relative URL to that.
+
+  Note that the author is ignorant of the general form of URLs, and this
+  behavior should comply with RFC specifications. This part of this
+  specification is likely to change in the future as the author learns
+  more.
+
+  Example lookup:
+
+  Lookup:                        example name
+  URL of Namespace Description:  http://example.com/foo/description.txt
+  Local name record found:       LN "example name" "bar/robots.txt"
+
+  Basic behavior for handling relative URL:
+  
+  URL of Namespace Description:  http://example.com/foo/description.txt
+  URL minus after slash:         http://example.com/foo/
+  Final URL:                     http://example.com/foo/bar/robots.txt
 
 
   TRADITIONAL QUERY STYLES:
@@ -378,20 +423,10 @@ This is a DRAFT version only; Feedback welcome! Visit
           namespaces that it is linked to.)
 
           If there is still no match, return error code -201.
-     
-     NO: (continue)
-
-  3. Is there a PATTERN record with this exact name, and is the next
-     name the final name in the lookup path?
-
-     YES: If the URL template is a relative URL template, calculate the
-          full URL template. Regardless, substitute the final name of
-          the lookup path into the URL template. Return the result as a
-          string.
 
      NO: (continue)
 
-  4. Is there an NS record with this exact name?
+  3. Is there an NS record with this exact name?
 
      YES: transition to using the namespace described at the URL,
           transition to evaluating the next name in the lookup path, and
@@ -399,14 +434,23 @@ This is a DRAFT version only; Feedback welcome! Visit
 
      NO: (continue)
 
-  5. Is there a PATTERN record with a loose match to this name, and is
-     the next name the final name in the lookup path?
+  4. Is there a PATTERN record with this exact name?
+
+     YES: If the URL template is a relative URL template, calculate the
+          full URL template. Regardless, substitute the rest of the
+          lookup path into the URL template as pattern arguments. Return
+          the result as a string.
+     
+     NO: (continue)
+
+  5. Is there an NS record with a loose match to this name?
 
      YES: (just like 3. YES)
 
      NO: (continue)
 
-  6. Is there an NS record with a loose match to this name?
+  6. Is there a PATTERN record with a loose match to this name, and is
+     the next name the final name in the lookup path?
 
      YES: (just like 4. YES)
 

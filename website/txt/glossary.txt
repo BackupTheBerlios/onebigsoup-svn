@@ -601,11 +601,12 @@ $name relative URL template
 $name relative URI template
 == URL template ==
 
-A '''URI template''' is a [[URI]] that can have a [[name]] substituted
-into it, before it is evalutated.
+A '''URI template''' is a [[URI]] that can have a [[name]] (or several
+names) substituted into it, before it is evalutated.
 
 Any occurances of "$NAME" in the URI template are replaced with a given
-name.
+name. For multiple pattern arguments, you can use "$ARGn", where "n" is
+a number, starting counting from 1.
 
 Suppose the URI template were "http://example.com/$NAME", and the name
 was "foo", then the resulting URI would be "http://example.com/foo".

@@ -4,17 +4,16 @@
   ======================================
 
 
-  This is a Local Names resolver server. Read the server.py module
-  docstring for more information.
+  lnxrqs.py is a Local Names Query Server. It implements the Local
+  Names XML-RPC Query Interface (LNXRQueryI).
 
-  REQUIREMENTS:
-   * core Local Names libraries (found in /lncore)
-   * configure server.py -- variables commented with "# CONFIGURE"
 
-	       /!\  THIS SERVER DOES NOT FOLLOW A   /!\
-	      /!\  SPECIFIED QUERY SERVER INTERFACE  /!\
+  INSTALLING
+  ----------
+  
+  Instructions current to: 2005-11-05
 
-  That is, don't build on top of this server too much! We're going to
-  huck it, in exchange for a server that DOES follow a specified query
-  server interface- the "Local Names XML-RPC Query Interface."
-
+  1. Create a directory. (Or perhaps reuse an existing CGI directory.)
+  2. Copy lnxrqs.py to it.
+  3. Copy xrcgi.py to it. (found in /other/xrcgi)
+  4. Make sure file permiss

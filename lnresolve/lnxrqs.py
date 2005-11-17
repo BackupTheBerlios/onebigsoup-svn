@@ -3,6 +3,10 @@
 You must put xrserve.py or xrcgi.py in the same directory as this module
 in order to run the server or use this as a CGI.
 
+This module is made to be called via xrcgi.py, (or xrserve.py) the
+code for which can be found on the PythonInfo wiki:
+http://wiki.python.org/moin/AutoXmlRpcCgi
+
 DOC
 
 DOC
@@ -39,9 +43,10 @@ def find(ns_url, find_path, record_type, style_name):
 
     DOC
     """
-    if style_name not in lncore.styles:
-        return (-301, "unsupported style: %s")
-    resolver = lncore.style_named(style_name)
+    resolver_class = lncore.find_style(style_name)
+    if resolver_class is None:
+        return (-301, "unsupported style: %s" % style_name)
+    resolver = resolver_class(store)
     return resolver.find(ns_url, find_path, record_type)
 
 
@@ -74,7 +79,7 @@ def get_cached_text(ns_url):
     For additional cache information, call lnquery.get_server_info.
     """
     result = store.get_cached_text(ns_url)
-    if result == None:
+    if result is None:
         return (-302, "not cached")
     return (0, "ok")
 

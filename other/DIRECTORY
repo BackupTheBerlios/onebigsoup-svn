@@ -8,7 +8,7 @@
 ###|   /---\
 ###|   |###|       xrserve  -- web to Python by XML-RPC gateway (server)
 ###|   |###|
-###|   |###|
+###|   |###|       testserve  -- a mini web server used while testing
 ###\---/###|
 ###########|
 ###/---\###|
