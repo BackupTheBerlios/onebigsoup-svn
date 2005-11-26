@@ -12,7 +12,7 @@
        /   ._.o.
       |  .o/.o-_o   lnlink -- XHTML Local Names linker
  o   / 	o-'o  o	\.
-.|.  |  /o	'o
+.|.  |  /o	'o  lnredirect -- Local Names browser redirection server
   \o \./
   o|. |
    .\ |	 o.o.       website -- project website builder
