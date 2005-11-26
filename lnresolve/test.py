@@ -1,60 +1,51 @@
 """Test Local Names XML-RPC Server.
 
-Tests don't run on an actual XML-RPC query server; Rather, they run on
-the module that xrserver.py or xrcgi.py would publish. This demonstrates
-an interesting advantage of xrserver.py and xrcgi.py: You can "test the
-server" without actually running the server.
+Running this test requires a particular server configuration.
 
-The lnxrqs's default store is overridden. In it's place, a Store that
-serves two locally defined namespaces. The namespace description at
-"http://example.com/" is the basic_text, and the namespace description
-at "http://example.net/" is the neighbor_text.
+You need:
+* $SVN/other/testserve directory, where $SVN is a onebigsoup project's
+  subversion repository checkout.
+* run the testserve.py script, serving on port 8000.
+* run the resolver in here, on port 8080.
+** I recommend using "xrserve.py --server=localhost --port=8080".
+
+For tests of the lncore that don't require the XML-RPC server, use
+$SVN/lncore/test.py. That should pretty thoroughly check out the basic
+Local Names functionality.
+
+This testing code is for testing network circuits. It doesn't test
+foreign code out in the wild, yet (2005-11-17,) but it
+should. (TODO:CHECK.)
 
 DOC
 """
 
 import unittest
 
-import lncore
-import lnxrqs
+import xmlrpclib
 
 
-basic_text = u"""
-X "VERSION" "1.2"
-LN "foo" "http://example.com/"
-LN "bar" "http://example.com/"
-X "FINAL" "http://example.com/$NAME"
-NS "neighbor" "http://example.net/"
-PATTERN "pat" "http://example.com/$ARG1/$ARG2/"
-"""
+URL_BASE = "http://localhost:8000"
+LNXRQUERYS_URL = "http://localhost:8080/"
 
-'''Basic namespace description for use in simple tests.'''
-
-neighbor_text = u"""
-X "VERSION" "1.2"
-LN "baz boz" "http://example.net/bazboz/"
-"""
-
-'''Neighbor namespace description for testing namespace links.'''
+EXAMPLE_COM = URL_BASE + "/example.com.txt"
 
 
-def return_basic_namespaces(url):
-    """Simple namespace builder, used during tests.
+class UsesLNXRQueryS(unittest.TestCase):
     
-    Always return basic_text.
+    """DOC
     
-    Why? Because I do most of my testing in the bus, without access
-    to the Internet. So I need a url-to-text builder that doesn't
-    require Internet access. Hence this function. It pretends to be
-    the Internet, returning text in response to url requests. In
-    this case, it always returns basic_text.
+    DOC
+    
+    DOC
     """
-    if url == "http://example.net/":
-        return neighbor_text
-    return basic_text
+    
+    def setUp(self):
+        """DOC"""
+        self.server = xmlrpclib.ServerProxy(LNXRQUERYS_URL)
 
 
-class LookupTest(unittest.TestCase):
+class LookupTest(UsesLNXRQueryS):
     
     """Test query server lookup function.
     
@@ -65,18 +56,20 @@ class LookupTest(unittest.TestCase):
     
     L = [("foo", "http://example.com/"),
          ("bar", "http://example.com/"),
-         ("foo ", "http://example.com/"),
+         ("foo ", "http://example.com/"),  # approximate lookup
          (" bar ", "http://example.com/"),
          ("baz boz", "http://example.net/bazboz/")]
+    
+    TEST_URL = URL_BASE + "/example.com.txt"
     
     def testBasicList(self):
         """Perform lookups found in basic test list."""
         for (name, should_result) in LookupTest.L:
-            result = lnxrqs.lookup("http://example.com/", name)
-            assert result == (0, should_result), (name, result)
+            result = self.server.lnquery.lookup(EXAMPLE_COM, name)
+            assert result == [0, should_result], (name, result)
 
 
-class FindTest(unittest.TestCase):
+class FindTest(UsesLNXRQueryS):
     
     """Test query server find function.
     
@@ -97,17 +90,18 @@ class FindTest(unittest.TestCase):
     def testBasicList(self):
         """Perform lookups found in basic test list."""
         for (find_path, record_type, should_result) in FindTest.L:
-            result = lnxrqs.find("http://example.com/", find_path,
-                                 record_type, "traditional")
-            assert result == (0, should_result), (find_path, result)
-
+            result = self.server.lnquery.find(EXAMPLE_COM, find_path,
+                                              record_type,
+                                              "traditional")
+            assert result == [0, should_result], (find_path, result)
+    
     def testManyList(self):
         """Perform all lookups in basic test list at once."""
         mini_list = [(x,y,z) for (x,y,z) in FindTest.L if y == "LN"]
         queries = [x for (x,y,z) in mini_list]
-        should_results = [(0, z) for (x,y,z) in mini_list]
-        results = lnxrqs.find_many("http://example.com/", queries,
-                                   "LN", "traditional")
+        should_results = [[0, z] for (x,y,z) in mini_list]
+        results = self.server.lnquery.find_many(EXAMPLE_COM, queries,
+                                                "LN", "traditional")
         assert results == should_results, (results, should_results)
 
 
