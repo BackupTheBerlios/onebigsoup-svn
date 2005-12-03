@@ -57,6 +57,7 @@ Local Names Store Server (LNSS)
 Local Names Query Server (LNQS)
 * abbreviated "query server," ok after first use
 * we used to say "name server," but this is too confusing-- don't do it!
+* we've also called this "resolver..." (ex: lnresolve)
 
 Old Style Local Names Query Server (OSLNQS)
 * the one we're using right now,...
@@ -104,7 +105,7 @@ specific names:
 
 * Jonathan Roes' Local Names Store Server (lnstore)
 * Brian Templeton's del.icio.us to Local Names converter (lndelicious)
-* Old Style Local Names Query Server (OSLNQS, current lnresolve)
+* Old Style Local Names Query Server (OSLNQS, old lnresolve)
 
 
 == Namespace Descriptions ==
