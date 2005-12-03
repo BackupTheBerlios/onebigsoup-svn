@@ -1,0 +1,74 @@
+
+
+  Welcome to the Local Names project!
+
+
+  Let's get you started!
+
+  1. Go to the "lncore" directory, and set things up.
+
+       cd "$ONEBIGSOUP/lncore"
+       python setup.py install
+
+  2. Create a directory somewhere.
+
+       DIR_QUERYSERVER="/tmp/queryserver"
+       mkdir "$DIR_QUERYSERVER"
+
+  3. Copy in the following files:
+
+       cp "$ONEBIGSOUP/other/xrserve/xrserve.py" "$DIR_QUERYSERVER"
+       cp "$ONEBIGSOUP/lnresolve/lnxrqs.py" "$DIR_QUERYSERVER"
+
+  4. Run the query server!
+
+       cd "$DIR_QUERYSERVER"
+       python 2.3 xrserve.py --host=127.0.0.1 --port=8000
+
+  5. Hit it with a web browser!
+
+       http://localhost:8000/
+
+     You should see the query server interface.
+
+  6. Hit it with Python!
+
+       Python 2.4.1 (#65, Mar 30 2005, 09:13:57)...
+       Type "help", "copyright", "credits" or "license" for more...
+       >>> import xmlrpclib
+       >>> import pprint
+       >>> server = xmlrpclib.ServerProxy("http://localhost:8000/")
+       >>> pprint.pprint(server.lnquery.get_server_info())
+       {'CACHE': [],
+        'IMPLEMENTATION': 'OBS-LNQS',
+        'INTERFACE': 'v1 Local Names Query Interface',
+        'STYLES': [['traditional',
+                    'This is the normal way of resolving names,
+       described in the Local Names XML-RPC Query Interface
+       specification.']]}
+       >>>
+
+  7. Are you connected to the Internet, and have a namespace description
+     out there somewhere? If so, try this!
+
+       >>> server.lnquery.lookup("http://example.net/namespace.txt",
+                                 "foo")  # term to look up
+       [0, 'http://example.com/foo/bar/baz/']
+  
+  
+  What you have just setup is called, in the formal language,
+  a "Local Names XML-RPC Query Interface Server"
+
+  The formal interface description for the query server is kept at:
+
+    $ONEBIGSOUP/website/txt/lnxrqueryi.txt
+
+  It can also be found on the Local Names website:
+
+    http://ln.taoriver.net/
+
+
+  Let's review what you did:
+  * You installed "lncore."
+  * You installed a query server.
+  * 
