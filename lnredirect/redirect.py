@@ -10,8 +10,8 @@ The server redirects the client web browser to a web page.
 
 Example URL
 
-  http://example.net/redirect.cgi?namespace=http://example.com/ns.txt
-                                 &path=foo:bar:baz
+  http://example.net/redirect.py?namespace=http://example.com/ns.txt
+                                &path=foo:bar:baz
 
 Install the script by placing the CGI in a directory.
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         print BAD_QUERY_RESPONSE
     else:
         result = server.lnquery.find(ns_url, path, "LN", "traditional")
-        if result[0] != "0":
+        if result[0] != 0:
             print "Content-type: text/plain"
             print
             print "There was a problem while looking up the name:"
