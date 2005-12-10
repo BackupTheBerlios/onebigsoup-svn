@@ -11,7 +11,8 @@ quote  -- DOC
 unquote  -- DOC
 Namespace  -- DOC
 Store  -- DOC
-Traditional  -- DOC
+Traditional  -- Traditional Resolution Style
+SisterSites  -- Sister-Sites Resolution Style
 Line  -- DOC
 OrderedDictionary  -- DOC
 KeyHashOrderedDictionary  -- DOC
@@ -552,6 +553,130 @@ class Traditional:
 
 
 styles.append(Traditional)
+
+
+class SisterSites:
+    
+    """Sister Sites style resolution.
+
+    Sister Sites is a thing where wiki "sister" with each other. If
+    there's a page on one wiki, and a page with the same (or very
+    similar) name on another wiki, then there's a link at the bottom of
+    them that let you see the same page on the sister wiki.
+    
+    Sister Sites style resolution is a tool for finding similarly named
+    wiki. It works the same as Traditional style resolution, but with
+    the following major differences:
+
+    * PATTERNs are not used.
+    * NS links are not followed up, ever.
+    * X "FINAL" is ignored.
+
+    Basically: You want to look up names on one wiki, and one wiki only.
+    That tosses out PATTERN and NS. And if the page doesn't exist yet,
+    you don't want to see a link-- so we toss out X "FINAL", as well.
+
+    The most important thing is probably the "loose match" system. In
+    the language of Sister Sites, this is called "name
+    canonicalization." This means that if one site has the same page
+    name as another, just one uses a space and the other doesn't -- that
+    things will still match up.
+
+    NOTICE: THIS CLASS IS NOT AS EFFICIENT AS IT COULD BE.
+    It was written hastily by copying and cutting from Traditional.
+    There is room for optimization, and cutting dead weight.
+    
+    DOC
+    """
+
+    info = ["sistersites",
+            'SisterSites resolution ignores PATTERN, NS, and X "FINAL." '
+            'It is used to find SisterSites matches for wiki pages. '
+            'It is otherwise just like traditional style resolution.']
+    
+    def __init__(self, store):
+        """DOC
+        
+        DOC
+        """
+        self.store = store
+    
+    def bboard(self, ns):
+        """DOC"""
+        bb = ns.get_bboard("SisterSites")
+        if "SETUP" in bb:
+            return bb
+        bb[LN] = KeyHashOrderedDictionary()
+        bb[X] = KeyHashOrderedDictionary()
+        bb[LN].load_from(ns[LN])
+        bb[X].load_from(ns[X])
+        bb["SETUP"] = True
+        return bb
+    
+    def find(self, url, path, record_type):
+        """DOC
+        
+        DOC
+
+        Return -300 if the URL can't be read.
+
+        DOC
+        """
+        if isinstance(path, basestring):
+            path = [path]
+        try:
+            ns = self.store(url)
+        except IOError:
+            return (-300, "cannot read namespace description: %s" % url)
+        
+        if len(path) > 1:
+            return (-201, "SisterSites resolution works in one "
+                          "namespace only.")
+        if len(path) == 1:
+            return self.last_pathentry(url, path[0], record_type)
+
+        if len(path) == 0:
+            return (-201, "Cannot interpret 0-length path.")
+    
+    def last_pathentry(self, url, name, record_type):
+        """DOC
+        
+        DOC
+        """
+        ns = self.store(url)
+        bb = self.bboard(ns)
+        
+        result = self.look_through(url, record_type, name)
+        if result:
+            return (0, result)
+        
+        # It wasn't found.
+        
+        return (-201, "record not found: %s" % name)
+    
+    def look_through(self, url, record_type, key):
+        """Perform a quick look through a namespace, looking for a key.
+        
+        Look for the key first as it is, then key-hashed. If it's not
+        found, return None.
+        
+        NO special treatment here- if it's not found, return None. No
+        looking through neighboring namespaces, or anything like that.
+
+        If the URL can't be loaded, it will just return None.
+        """
+        try:
+            ns = self.store(url)
+        except IOError:
+            return None
+        bb = self.bboard(ns)
+        result = ns[record_type].get(key)
+        if result is not None:
+            return result
+        return bb[record_type].get(key)
+
+
+styles.append(SisterSites)
 
 
 class Line:
