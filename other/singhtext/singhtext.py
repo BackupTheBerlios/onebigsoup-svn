@@ -53,7 +53,7 @@ tokenizing_checks = [
     ("HEADER", re.compile(r"^(=+)(.+)\1$")),
     ("*ITEM", re.compile(r"^(\*+)\s+(.+)$")),  # grouped: LIST
     ("#ITEM", re.compile(r"^(#+)\s+(.+)$")),  # grouped: LIST
-    ("REGION-DELIMITER", re.compile(r"^(#\S+)\s*(.+)?$")),
+    ("REGION-DELIMITER", re.compile(r"^(#\S+)\s*(.+)?$")), # -> REGION
     ("SPECIAL", re.compile(r"^(\$\S+)\s*(.+)?$")),
     ("BLANK", re.compile("^\s*$")),
     ("TEXT", re.compile(r"^(.+)$")),  # grouped: PARAGRAPH
@@ -72,8 +72,10 @@ def tokenize_line(line, start_pos=0):
 
     Returns a tuple of the form:
       (token_type, token_contents, start_pos, end_pos)
+                   ^ mo.groups(), after processing regex
 
     tokenize_one reads tokenizing_checks for info about the token types.
+    Read tokenizing_checks, for info about the token types.
     """
     end_pos = start_pos + len(line)
     for (token_type, regex) in tokenizing_checks:
