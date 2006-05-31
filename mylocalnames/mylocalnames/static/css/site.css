@@ -1,0 +1,101 @@
+td.input_explain {
+  text-align: right;
+  font-size: x-small;
+}
+
+p.fine_print {
+  font-size: x-small;
+  text-align: center;
+  font-family: Times New Roman,Times,serif;
+}
+
+td.input_prompt {
+  border-style: none dashed none none;
+  text-align: right;
+  border-right-width: 1px;
+}
+
+td.input_title {
+  font-size: large;
+  font-weight: bold;
+}
+
+table.ui {
+  border-style: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+body {
+  font-family: Arial,Helvetica,sans-serif;
+  background-color: rgb(255, 255, 255);
+  opacity: 1;
+}
+
+p.activity_bar {
+  margin: 3px 0px;
+  padding: 2px 20px;
+  border-bottom-style: dotted;
+  border-bottom-width: 1px;
+  background-color: rgb(204, 204, 204);
+  opacity: 0.175;
+  font-size: small;
+}
+
+img.title_image {
+  margin: 27px auto;
+  display: block;
+}
+
+code {
+  border-style: dotted;
+  border-width: 1px;
+  padding: 1px 4px;
+  font-family: Courier New,Courier,monospace;
+  color: rgb(0, 0, 153);
+  display: inline;
+  opacity: 1;
+  font-size: small;
+  line-height: 20px;
+  background-color: rgb(255, 255, 153);
+  font-weight: bolder;
+}
+
+h3.toggled {
+  border-style: solid;
+  border-width: 1px;
+  padding: 5px 20px 5px 10px;
+  margin-top: 10px;
+  margin-right: 40px;
+  margin-bottom: 10px;
+  font-family: Arial,Helvetica,sans-serif;
+  text-decoration: none;
+  display: block;
+  max-width: 50%;
+}
+
+h3.toggled:hover {
+  background-color: rgb(255, 255, 153);
+}
+
+h4.toggled {
+  border-style: none none dotted none;
+  border-width: 1px;
+  padding: 3px 10px 3px 5px;
+  margin-top: 5px;
+  margin-right: 20px;
+  margin-bottom: 5px;
+  font-family: Arial,Helvetica,sans-serif;
+  text-decoration: none;
+  display: block;
+  max-width: 40%;
+}
+
+h4.toggled:hover {
+  background-color: rgb(255, 255, 153);
+}
+
+.bookmarklet {
+  border-style: dotted;
+  border-width: 1px;
+}

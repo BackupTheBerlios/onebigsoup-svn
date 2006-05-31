@@ -1,0 +1,2 @@
+db_module=mylocalnames.model
+history_dir=$base/mylocalnames/sqlobject-history

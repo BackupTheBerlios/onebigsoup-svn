@@ -14,10 +14,10 @@
  o   / 	o-'o  o	\.
 .|.  |  /o	'o  lnredirect -- Local Names browser redirection server
   \o \./
-  o|. |
-   .\ |	 o.o.       website -- project website builder
-     \| ._---_.o    
-      | /.o.o o.    other -- things that aren't Local Names
-      |/      ' o
+  o|. |             mylocalnames -- TurboGears website for maintaining
+   .\ |	 o.o.                                                 namespaces
+     \| ._---_.o    website -- project website builder
+      | /.o.o o.    
+      |/      ' o   other -- things that aren't Local Names
+      |             
       |             old  -- Abandon All Hope, Ye Who Enter Here
-      |
