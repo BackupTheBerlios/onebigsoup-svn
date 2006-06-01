@@ -1,18 +1,18 @@
-
-     o                                                 DIRECTORY
-    .|.	   .
-    o\o.  o.--.     lncore -- Local Names core libraries
-     .'-o./o       
-      o. \.         lnresolve -- Basic Local Names resolving server
-     	  |o       
-  o__o	  |.        lnstore -- Local Names Store Servers
- ."o.\o   |o      
- o   o"o /.         lndelicious -- Brian Templeton's del.icio.us to
-      o\/                          Local Names converter
-       /   ._.o.
-      |  .o/.o-_o   lnlink -- XHTML Local Names linker
- o   / 	o-'o  o	\.
-.|.  |  /o	'o  lnredirect -- Local Names browser redirection server
+			      DIRECTORY
+     o
+    .|.	   .        lncore -- Local Names core libraries
+    o\o.  o.--.     
+     .'-o./o        lnresolve -- Basic Local Names resolving server
+      o. \.         
+     	  |o        lnstore -- Local Names Store Servers
+  o__o	  |.        
+ ."o.\o   |o        lndelicious -- Brian Templeton's del.icio.us to
+ o   o"o /.                        Local Names converter
+      o\/                          
+       /   ._.o.    lnlink -- XHTML Local Names linker
+      |  .o/.o-_o   
+ o   / 	o-'o  o	\.  lnredirect -- Local Names browser redirection server
+.|.  |  /o	'o  lndumpcache -- Local Names cache dump
   \o \./
   o|. |             mylocalnames -- TurboGears website for maintaining
    .\ |	 o.o.                                                 namespaces
