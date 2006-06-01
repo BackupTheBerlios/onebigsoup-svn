@@ -71,8 +71,8 @@
           "Quick Searches."</li>
       <li>Click on the "New Bookmark" button.</li>
       <li>For Name, enter: <code>Local Names Lookup</code></li>
-      <li>For Location, copy in: <code>http://ln.taoriver.net/redirect.cgi/?namespace=TODO&amp;path=%s</code></li>
-      <li>For Keyword, enter: <code>rln</code></li>
+      <li>For Location, copy in: <code>http://ln.taoriver.net/redirect?namespace=TODO&amp;path=%s</code></li>
+      <li>For Keyword, enter: <code>ln</code></li>
       <li>For &nbsp;Description, enter: <code>Jump to the
           page by the given name.</code></li>
       <li>Click on "OK."</li>
