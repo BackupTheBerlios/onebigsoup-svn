@@ -3,6 +3,10 @@
 DOC
 
 TODO: adjust tests to use TestStore.
+TODO: 1. extend lines_to_namespace and Namespace to know URL of
+         namespace
+      2. make Namespace.final pass it on to UrlTemplate, for relative
+         addressing.
 
 DOC
 text_to_lines  -- DOC
@@ -180,11 +184,17 @@ def traditional_hash(name):
     return name
 
 
-def basic_relative_url_handling_behavior(relative_url,
-                                         namespace_description_url):
-    """DOC
-
-    DOC
+def basic_rel_url_expansion(relative_url, namespace_description_url):
+    """Basic relative URL substitution.
+    
+    If the URL starts with "http://", then it's an absolute URL.
+    Otherwise, take everything up to the last slash in the namespace
+    description URL, and use that as the basis for fulfilling your
+    relative URL.
+    
+    This PROBABLY isn't the best way to do this, but I don't really know
+    what the proper way would be. Please e-mail Lion Kimbro, if you
+    know, or have any good ideas.
     """
     if relative_url.startswith("http://"):
         return relative_url  # It's actually an absolute URL
@@ -450,9 +460,9 @@ class Traditional:
         """DOC
         
         DOC
-
+        
         Return -300 if the URL can't be read.
-
+        
         DOC
         """
         if isinstance(path, basestring):
@@ -491,7 +501,8 @@ class Traditional:
         if use == "ns":
             return self.find(ns_result, path[1:], record_type)
         elif use == "pattern":
-            return UrlTemplate(pattern_result).replace(path[1:])
+            return UrlTemplate(pattern_result,
+                               url).replace(path[1:])
         else:
             return (-201, "record not found: %s" % path[0])
     
@@ -505,7 +516,7 @@ class Traditional:
         
         result = self.look_through(url, record_type, name)
         if result:
-            return (0, result)
+            return (0, basic_rel_url_expansion(result, url))
         
         # It wasn't found here, so we're going to check the neighbors.
         
@@ -516,7 +527,8 @@ class Traditional:
                 result = self.look_through(neighbor_url,
                                            record_type, name)
                 if result is not None:
-                    return (0, result)
+                    return (0,
+                            basic_rel_url_expansion(result, neighbor_url))
                 explored.add(neighbor_url)
         
         # It wasn't found in neighbors; try X FINAL?
@@ -913,15 +925,23 @@ class UrlTemplate:
     DOC
     """
     
-    def __init__(self, text):
+    def __init__(self, text, namespace_url=None):
         """Initialize URL template with particular text.
-        
-        DOC
+
+	If the namespace_url is None, it won't be able to perform
+        relative address replacements, which is technically against
+        spec. But I'm hacking this in, and I want to make sure it works
+        by older code.
         """
         self.text = text
+        self.namespace_url = namespace_url
     
     def replace(self, args):
-        """DOC"""
+        """Perform $ARG# replacements within the template text.
+        
+        If template has .namespace_url set, it can perform replacements
+        for relative URLs, as well.
+        """
         if args is None:
             args = []
         if not isinstance(args, list):
@@ -937,7 +957,11 @@ class UrlTemplate:
                 text = text.replace(argnum, args[n-1])
                 n = n + 1
             else:
-                return (0, text)
+                if self.namespace_url is None:
+                    return (0, text)
+                else:
+                    nsurl = self.namespace_url  # shorthand
+                    return (0, basic_rel_url_expansion(text, nsurl))
 
 
 def find_style(style_name):
