@@ -23,32 +23,24 @@ $name News and Contacts
 
 Major changes, releases, and news updates are posted to [[news] the
 Local Names website news page,] and [[news RSS] accompanying RSS feed.]
-Posts are made roughly once every 1-6 months.
+Posts are made roughly once every 6-12 months.
 
 Ongoing development is presently (2005-06-16) coordinated on [[Lion:my
 blog] Lion Kimbro's blog,] which has [[Lion:my RSS]an RSS 2.0 news
-feed.] Posts are made roughly once every 1-7 days.
+feed.] Relevant posts are made roughly once every 3-9 months.
 
 Additional contact methods:
 
-'''IRC:''' [[irc://irc.freenode.net/#onebigsoup] irc.feenode.net,
- #onebigsoup.] Activity is low, but everything is read. If you enter the
-room, '''plan to remain logged in for a few days;''' please read
-[[CommunityWiki:InternetRelayChat]] for more information about IRC and
-how we use it, especially if you are unfamiliar with IRC.
-
-The project presently keeps '''no mailing lists,''' for
-[[CommunityWiki:LimitationsOfMailingLists] various reasons.] Either
-speak in IRC, attend a [[WikiTing] Sunday ting,] write on Lion Kimbro's
-blog, write on [[CommunityWiki] CommunityWiki,] call Lion's cell phone,
-call Lion's Skype account, or otherwise get in contact with Lion Kimbro
-or a member of the [[One Big Soup]] effort.
+The project presently keeps '''no mailing lists.''' Either write on
+Lion Kimbro's blog, write on [[CommunityWiki] CommunityWiki,] call
+Lion's cell phone, or otherwise get in contact with Lion Kimbro or a
+member of the [[One Big Soup]] effort.
 
 Lion Kimbro's contact information is on [[Lion:my site] his web
 site.]
 
-"One Big Soup" is the name of the super-project that gave rise to Local
-Names. The goal of One Big Soup is to develop Internet public
+"One Big Soup" was the name of the super-project that gave rise to Local
+Names. The goal of One Big Soup was to develop Internet public
 communication systems by tying together existing Internet technologies
 with new protocols. Read [[CommunityWiki:OneBigSoup]] and [[A Manifesto
 for Collaborative Tools]] for more information.
@@ -371,7 +363,18 @@ Result:   http://foo/barbar--bar</p>
   and interpret "X FINAL."
 </p>
 
+#LITERAL
 
+
+$name Note on Relative URLs
+=== Note on Relative URLs ===
+
+Wherever you can put a URL,] you can also put a
+[[relative URL] relative URL.] The URL is specified relative to the last
+URL path element leading to the [[namespace description]] itself.
+
+
+#LITERAL
 <h3><a name="redefinition">Redefinition</a></h3>
 
 <p class="question">
