@@ -1,9 +1,6 @@
 $set title: Local Names XML-RPC Query Interface
 $name LNXRQueryI
 
-* TODO: Make sure PATTERN propagates into all returns.
-* TODO: Code Relative Path resolution! (Traditional)
-
 #LITERAL
 <center>
 #LITERAL
@@ -152,7 +149,7 @@ This is a DRAFT version only; Feedback welcome! Visit
 
   Return a string value, appropriate to the query style, if it succeeds.
 
-  Can return error codes: -200, -201, -300, -301
+  Can return error codes: -200, -201, -202, -300, -301
 
 
     lnquery.find_many(ns_url, paths, record_type, style)
@@ -256,7 +253,7 @@ This is a DRAFT version only; Feedback welcome! Visit
          -4  "(error custom to server - replace this text per-error)"
        -200  "bad record type- valid: LN, NS, X, PATTERN"
        -201  "record not found"
-       -202  "insufficient PATTERN arguments" TODO: propogate into returns
+       -202  "insufficient PATTERN arguments"
        -300  "cannot read namespace description"
        -301  "unsupported style"
        -302  "not cached"
