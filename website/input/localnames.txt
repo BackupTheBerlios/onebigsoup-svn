@@ -22,12 +22,14 @@ NS "services" .
 LN "XML-RPC" "http://www.xmlrpc.org/"
 
 LN "One Big Soup" "http://onebigsoup.wiki.taoriver.net"
-NS "OneBigSoup" "http://onebigsoup.wiki.taoriver.net/moin.cgi/?action=localnames"
+NS "OneBigSoup" "http://ln.taoriver.net/wrap/onebigsoup"
 .  "OBS" .
 
-NS "WikiFeatures" "http://wikifeatures.wiki.taoriver.net/moin.cgi/?action=localnames"
+NS "WikiFeatures" "http://ln.taoriver.net/wrap/wikifeatures"
 NS "Lion" "http://taoriver.net/tmp/gmail.txt"
-NS "CommunityWiki" "http://wrap.localnames.taoriver.net/spaces/CommunityWiki/"
+LN "CommunityWiki" "http://communitywiki.org/"
+NS "CommunityWiki" "http://ln.taoriver.net/wrap/communitywiki"
+.  "CW" .
 
 # Downloads
 LN "core 1.1" "http://ln.taoriver.net/downloads/core1.1.tgz"
