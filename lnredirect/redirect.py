@@ -46,7 +46,7 @@ if __name__ == "__main__":
     if (ns_url is None) or (path is None):
         print BAD_QUERY_RESPONSE
     else:
-        result = server.lnquery.find(ns_url, path, "LN", "traditional")
+        result = server.lnquery.find(ns_url, path.split(":"), "LN", "traditional")
         if result[0] != 0:
             print "Content-type: text/plain"
             print
