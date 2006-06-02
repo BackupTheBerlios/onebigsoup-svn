@@ -35,7 +35,7 @@ punctuation_re = re.compile(r'[^A-Za-z0-9\s]+', re.UNICODE)
 ws_re = re.compile(r'\s+', re.UNICODE)
 the_re = re.compile(r'\b(?:the|a|an|in|for)\b', re.UNICODE|re.IGNORECASE)
 
-re_column = re.compile(r'\s+"(([^\\"]|\\.)+)"')
+re_column = re.compile(r'\s+("(([^\\"]|\\.)+)"|[.])')
 
 r'''Read a column.
 
@@ -101,10 +101,13 @@ def text_to_lines(text):
     
     DOC
     """
+    prior_record = None
     results = []
     for x in text.splitlines():
-        line = Line(x)
+        line = Line(x, prior_record)
         results.append(line)
+        if line.line_type == Line.RCD:
+            prior_record = line
     return results
 
 
@@ -712,18 +715,20 @@ class Line:
     ERR_TYPE = 5000
     ERR_KEY = 5001
     ERR_VALUE = 5002
+    ERR_DOT = 5003
     err_explanations = {ERR_TYPE: "Unrecognized type of line.",
                         ERR_KEY: "Can't decypher the key.",
-                        ERR_VALUE: "Can't decypher the value."}
+                        ERR_VALUE: "Can't decypher the value.",
+                        ERR_DOT: "No prior line data to fill from."}
     
-    def __init__(self, text=None):
+    def __init__(self, text=None, prior_record=None):
         """DOC
         
         DOC
         """
         self.clear()
         if text is not None:
-            self.decode(text)
+            self.decode(text, prior_record)
     
     def clear(self):
         """Blank the state data."""
@@ -734,7 +739,7 @@ class Line:
         self.text = None  # Original parsed line text
         self.error = None  # Line.ERR_xxx
     
-    def decode(self, text):
+    def decode(self, text, prior_record=None):
         """Decode a line of text, and store it.
         
         Return True if the line is a Local Names namespace description
@@ -748,21 +753,38 @@ class Line:
         elif text[0] == "#":
             self.line_type = Line.CMT
             return True
-        for x in record_types:  # Match
-            if text.startswith(x):
-                self.line_type = Line.RCD
-                self.record_type = x  # Store
+	elif text[0] == ".":
+            if prior_record is None:
+                self.line_type = Line.ERR
+                self.error = Line.ERR_DOT
+                return False
+            self.line_type = Line.RCD
+            self.record_type = prior_record.record_type
+            remainder = text[1:]  # Get text
+        else:
+            for x in record_types:  # Match
+                if text.startswith(x):
+                    self.line_type = Line.RCD
+                    self.record_type = x  # Store
+                    remainder = text[len(self.record_type):]  # Get text
         if self.line_type is None:  # Abort
             self.line_type = Line.ERR  # Not a blank, comment, or record
             self.error = Line.ERR_TYPE
             return False
-	remainder = text[len(self.record_type):]  # Get text
         match = re_column.match(remainder)  # Match
         if match is None:  # Abort
             self.line_type = Line.ERR  # No column 2
             self.error = Line.ERR_KEY
             return False
         self.key = match.group(1)  # Store
+	if self.key == ".":
+            if prior_record is None:
+                self.line_type = Line.ERR
+                self.error = Line.ERR_DOT
+                return False
+            self.key = prior_record.key
+        else:
+            self.key = self.key[1:-1]  # strip the quotation marks
         remainder = remainder[len(match.group(0)):]  # Get text
         match = re_column.match(remainder)  # Match
         if match is None:  # Abort
@@ -770,6 +792,14 @@ class Line:
             self.error = Line.ERR_VALUE
             return False
         self.value = match.group(1)  # Store
+	if self.value == ".":
+            if prior_record is None:
+                self.line_type = Line.ERR
+                self.error = Line.ERR_DOT
+                return False
+            self.value = prior_record.value
+        else:
+            self.value = self.value[1:-1]  # strip the quotation marks
         return True
     
     def __str__(self):
