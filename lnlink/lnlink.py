@@ -197,25 +197,29 @@ class CollectedNames:
         for localname in self.unresolved:
             self.bound[localname] = url
         self.unresolved = set()
-
+    
     def bind_with_LNQS(self, namespace_description_url, xmlrpc_url,
                        separator=":"):
         """Bind unresolved local names with a Local Names Query Server.
-
+	
         Returns set of names that were not resolved.
-
-        xmlrpc_url is a dummy URL, until an LNQS actually exists that
-        you can use.
-        
-        Until the Local Names XML-RPC Query Server Interface (LNXRQSI)
-        is actually set in stone, and an LNQS actually written, this
-        function just defers to _bind_with_OSLNQS.
-
-        Still, this is the recommended function to use.
+	
+        xmlrpc_url is the URL of an Local Names XML-RPC Query Interface.
         """
-        return self.bind_with_OSLNQS(namespace_description_url,
-                                     LIONS_OSLNQS_URL, separator)
-
+        import xmlrpclib
+        ns = xmlrpclib.ServerProxy(xmlrpc_url)
+        request_names = list(self.unresolved)
+        request_paths = []
+        for name in request_names:
+            request_paths.append(name.split(separator))
+        responses = ns.lnquery.find_many(namespace_description_url,
+                                         request_paths, "LN", "default")
+        for (key, value) in zip(request_names, responses):
+            if value[0] == 0:
+                self.bound[key] = value[1]
+                self.unresolved.discard(key)
+        return self.unresolved
+    
     def bind_with_OSLNQS(self, namespace_description_url,
                          xmlrpc_url=LIONS_OSLNQS_URL, separator=":"):
         """Bind unresolved local names using an OSLNQS. (deprecated)
@@ -247,7 +251,7 @@ class CollectedNames:
         request_names = list(self.unresolved)
         request_paths = []
         for name in request_names:
-            request_paths.append(name.split(":"))
+            request_paths.append(name.split(separator))
         urls = nameserver.lookup(request_paths,
                                  namespace_description_url, flags)
         for (key, value) in zip(request_names, urls):

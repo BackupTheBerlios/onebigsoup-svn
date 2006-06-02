@@ -44,9 +44,9 @@ NOT_FOUND_URL = "localname_not_found.html"
 
 LOCALNAMES_SEPARATOR = ":"
 
-OLDSTYLE_NAMESERVER_URL = "http://services.taoriver.net:9090/"
+LNXRQueryI = "http://ln.taoriver.net/lnxrqs"
 
-CONNECTED = False  # SET THIS TO TRUE WHEN DOING REMOTE LOOKUPS
+CONNECTED = True  # SET THIS TO TRUE WHEN DOING REMOTE LOOKUPS
 
 
 class PathNavigationInFilenameException(Exception):
@@ -130,7 +130,7 @@ class ExecutionContext:
     .filesystem_context  -- FileSystemContext to use
     .connected_to_internet  -- True/False, can make use of Internet?
     .localnames_separator  -- local names separator character
-    .oldstyle_xmlrpc_nameserver_url  -- XML-RPC Local Names query server
+    .lnxrqueryi  -- Local Names XML-RPC Query Interface (URL)
     .namespace_description_url  -- remote namespace, for names lookup
     .base_url  -- base URL for output website, with trailing slash
     .not_found_url  -- URL for lookups that can't be resolved
@@ -140,7 +140,7 @@ class ExecutionContext:
         self.filesystem_context = None
         self.connected_to_internet = None
         self.localnames_separator = None
-        self.oldstyle_xmlrpc_nameserver_url = None
+        self.lnxrqueryi = None
         self.namespace_description_url = None
         self.base_url = None
         self.not_found_url = None
@@ -154,7 +154,7 @@ class ExecutionContext:
         self.filesystem_context.init_with_module_defaults()
         self.connected_to_internet = CONNECTED
         self.localnames_separator = LOCALNAMES_SEPARATOR
-        self.oldstyle_xmlrpc_nameserver_url = OLDSTYLE_NAMESERVER_URL
+        self.lnxrqueryi = LNXRQueryI
         self.namespace_description_url = NAMESPACE_DESCRIPTION_URL
         self.base_url = BASE_URL
         self.not_found_url = NOT_FOUND_URL
@@ -289,7 +289,7 @@ class WebsiteBuilder:
             self._filesystem.local_namespace_text())
         if self._context.connected_to_internet:
             self._nameserver = xmlrpclib.ServerProxy(
-                self._context.oldstyle_xmlrpc_nameserver_url)
+                self._context.lnxrqueryi)
         else:
             self._nameserver = None
     
@@ -383,7 +383,7 @@ class WebsiteBuilder:
         if self._context.connected_to_internet:
             collection.bind_with_LNQS(
                 self._context.namespace_description_url,
-                self._context.oldstyle_xmlrpc_nameserver_url,
+                self._context.lnxrqueryi,
                 self._context.localnames_separator)
         print "Unresolved:", collection.unresolved
         collection.bind_unresolved_to_url(self._context.not_found_url)
