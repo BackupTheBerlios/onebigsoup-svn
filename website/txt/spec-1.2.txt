@@ -4,6 +4,7 @@ $name LNNDS
 $name LNNDS v1.2
 $name Local Names Namespace Description Specification
 $name Local Names Namespace Description Specification version 1.2
+$name spec
 
 $name Background
 === Background ===
@@ -13,7 +14,7 @@ understand the main ideas of Local Names.]
 
 This document is the Local Names Namespace Description Specification,
 version 1.2. It is abbreviated "LNNDS v1.2". This document obsoletes 
-[[LNNDS v1.1] LNNDS v1.1.]
+LNNDS.
 
 This specification is maintained by [[Lion:my site] Lion Kimbro,] who is
 available by e-mail at [[mailto:lion@speakeasy.org] lion@speakeasy.org.]
