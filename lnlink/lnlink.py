@@ -44,7 +44,7 @@ import xml.sax.saxutils
 
 
 ignore_suffixes = [".gif", ".jpg", ".png", "/", ".html", ".txt"]
-ignore_prefixes = ["http://", "ftp://", "irc://"]
+ignore_prefixes = ["http://", "ftp://", "irc://", "mailto:"]
 
 LIONS_OSLNQS_URL = "http://services.taoriver.net:9090/"
 
