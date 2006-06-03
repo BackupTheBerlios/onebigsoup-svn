@@ -333,13 +333,9 @@ API was terribly inconsistent. And it's still in use today, because
 indispensible to Lion, and that was written to the original query
 server.
 
-Never use the original Local Names query server, and never use the Old
-Style Local Names Query Server.
+The Old Style Local Names Query Server doesn't exist anymore.
 
-There is a few months here, June 2005, where we work towards the new
-[[Local Names XML-RPC Query Interface] Local Names XML-RPC Query
-Interface,] and then write/adapt an implementation to it. In the
-mean-time, please be patient, or offer your services to help!
+Use the current one, which works by the [[Local Names XML-RPC Query Interface]].
 
 
 $REM ===================================================================
@@ -355,10 +351,7 @@ The '''query interface''' gives programs a way to ask a server to
 resolve names. It is comparable to a [[BIND]] server in the [[Domain
 Name System] Domain Name System.] The query interface is specified in
 the [[Local Names XML-RPC Query Interface] Local Names XML-RPC Query
-Interface specification.] '''The query interface is still being
-determined. By the end of 2005, we should have the specification and a
-working implementation. See [[OBS:TheRadar] the radar] for scheduling
-details.'''
+Interface specification.]
 
 The '''store interface''' gives programs a way to tell a server to bind
 a name to a [[URL] URL,] in some [[namespace] namespace.] The store
@@ -378,8 +371,7 @@ $name Local Names Wrap
 wraps up existing wiki, providing [[namespace description] namespace
 descriptions] for them.
 
-You can find one running at [[http://wrap.localnames.taoriver.net/]
-wrap.localnames.taoriver.net.]
+* [[wrap] Visit Local Names Wrap.]
 
 
 $REM ===================================================================
@@ -623,19 +615,21 @@ lookups, and then redirects the web browser to go to the found address.
 
 Try it out, by following this link:
 
-* [[http://services.taoriver.net:9090/?action=redirect&namespace=http://taoriver.net/tmp/gmail.txt&separator=:&lookup=Robotic Nation Evidence]]
+* [[http://ln.taoriver.net/redirect?namespace=http://ln.taoriver.net/localnames.txt&path=spec]]
 
 Note the following parts in this use:
-* ?action=redirect -- ''redirecting the web browser to another page''
-* &namespace=[[http://taoriver.net/tmp/gmail.txt]] -- ''[[namespace
+* /redirect -- ''redirecting the web browser to another page''
+* ?namespace=[[http://ln.taoriver.net/localnames.txt]] -- ''[[namespace
   description]] to start from''
-* &separator=: -- ''if namespace hopping occurs, this is the separator
-  character''
-* &lookup=Robotic Nation Evidence -- ''the name to look up''
+* &path=spec -- ''the name to look up'' ("spec")
 
 Here's another, that performs some hops:
 
-* [[http://services.taoriver.net:9090/?action=redirect&namespace=http://taoriver.net/tmp/gmail.txt&separator=:&lookup=S:WP:robot]]
+* [[http://ln.taoriver.net/redirect?namespace=http://ln.taoriver.net/localnames.txt&path=S:WP:robot]]
+
+The colon (:) tells it to hop through the namespace. This one starts by
+looking for namespace "S" (short for "services"), then for "WP" (short
+for "Wikipedia"), then looks up "robot" in that space.
 
 
 $REM ===================================================================

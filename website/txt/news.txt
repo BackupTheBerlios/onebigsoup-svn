@@ -1,6 +1,50 @@
 $set title: Local Names News
-[[http://ln.taoriver.net/rss.rdf] (syndicate: RSS 1.0)]
+[[news RSS] (syndicate: RSS 1.0)]
 
+
+$name 20060602
+$name 2006-06-21
+== 2006-06-21: v1.2 Implemented ==
+
+I, [[Lion Kimbro] Lion Kimbro,] finished the v1.2 implemetation. I
+checked the specs, tested the implementation, worked out some bugs,
+and fixed up the website.
+
+[[Local Names]] is now at the point where I am comfortable using it
+daily, and helping people set it up on their computers.
+
+I've revisted Local Names ''now,'' because I'm about to switch primary
+tasks in a major way; I hope to post something to [[my blog]] explaining
+more about where I am going, soon. But I don't believe I'll be back on
+Local Names as my main activity for a long time.
+
+There are some last minute logistics I haven't integrated into the
+website documentation. I list them here:
+
+* The Local Names XML-RPC Query Server is at:
+  [[http://ln.taoriver.net/lnxrqs]]
+** I encourage you to play with it.
+* There is a website for dumping it's cache:
+  [[http://ln.taoriver.net/dumpcache]]
+** So, if you make a [[namespace description] namespace description,]
+   and then make some changes to it, and wonder why links aren't
+   working-- it's because the cache hasn't been dumped yet. Use this
+   webpage to dump the cache.
+* There is an undocumented feature: [[PATTERN]] supports not just
+  "$NAME", but also "$ARG1", "$ARG2", "$ARG3", ... and so
+  on. ("$ARGn").
+** It's just a matter of adding the explanation on how to use them to
+   the relevant specifications.
+** I'll add them to the 1.4 specifications. In the meantime, feel free
+   to rely on them, if you can gather how it works from the source code.
+* There is a ''bug''': [[X FINAL]] [[relative URL]relative URLs] do not
+  work.
+** I know how to fix it. It's just a matter of doing it.
+** If someone wants this and asks me for it, I will fix it.
+
+
+$name 20050621
+$name 2005-06-21
 == 2005-06-21: Site Reworking, Interface Specification ==
 
 The project has undergone a lot of changes! We are now much more focused
@@ -14,6 +58,8 @@ to figure out how we're going to report errors. So, it's almost done!
 We're almost to the fun part: Writing code.
 
 
+$name 20041212
+$name 2004-12-12
 == 2004-12-12: Static Site Up ==
 
 Okay! I'm working on setting up the Local Names static site.

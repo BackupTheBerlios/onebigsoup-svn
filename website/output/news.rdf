@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="us-ascii"?><?xml-stylesheet href="http://www.w3.org/2000/08/w3c-synd/style.css" type="text/css"?>
+<rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/"
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns="http://purl.org/rss/1.0/"
+         xmlns:h="http://www.w3.org/1999/xhtml">
+   <channel rdf:about="http://ln.taoriver.net/news.rdf">
+      <title>
+      Local Names News
+      </title>
+      <link>http://ln.taoriver.net/news.html</link>
+      <description/>
+      <items>
+         <rdf:Seq>
+            <rdf:li rdf:resource="http://ln.taoriver.net/news.html#20041212"/>
+            <rdf:li rdf:resource="http://ln.taoriver.net/news.html#20050621"/>
+            <rdf:li rdf:resource="http://ln.taoriver.net/news.html#20060602"/>
+         </rdf:Seq>
+      </items>
+   </channel>
+   <item rdf:about="http://ln.taoriver.net/news.html#20041212">
+      <title>Static Site Up</title>
+      <link>http://ln.taoriver.net/news.html#20041212</link>
+      <dc:date>2004-12-12</dc:date>
+      <description>The Local Names static site is almost complete.
+        This page is only for major changes. Follow Lion's personal blog
+        for more minute news tracking.
+      </description>
+   </item>
+   <item rdf:about="http://ln.taoriver.net/news.html#20050621">
+      <title>Site Reworking, Interface Specification</title>
+      <link>http://ln.taoriver.net/news.html#20050621</link>
+      <dc:date>2005-06-21</dc:date>
+      <description>The project has undergone many changes. Work
+      focuses on interfaces and specifications. Work focuses on
+      reporting errors, and then: writing code!
+      </description>
+   </item>
+   <item rdf:about="http://ln.taoriver.net/news.html#20060602">
+      <title>v1.2 Implemented</title>
+      <link>http://ln.taoriver.net/news.html#20060602</link>
+      <dc:date>2006-06-02</dc:date>
+      <description>v1.2 is done, and Lion is now going to work on other
+      things for a very long time. Various errata, including a bug
+      report, an undocumented feature, and a link to the standing Local
+      Names XML-RPC Query Server.
+      </description>
+   </item>
+</rdf:RDF>
+

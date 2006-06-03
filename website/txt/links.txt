@@ -3,7 +3,7 @@ $set title: Local Names Links
 $name Namespaces
 === Namespaces ===
 
-* [[servicenames.txt] Services names (Google, Wikipedia, Dictionary,
+* [[S:this] Services names (Google, Wikipedia, Dictionary,
   Technorati Tags, ...)]
 * [[this] Local Names site names]
 
@@ -16,11 +16,8 @@ $name Namespaces
 * [[http://www.python.org/moin/LibraryReferencesNames?action=raw] Python
   namespace]
 
-See also [[http://wrap.localnames.taoriver.net/spaces/] the list of wiki
-wrapped by namespaces] on [[Local Names Wrap]].
-
-See also the [[http://my.localnames.taoriver.net/spaces/] list of
-personal namespaces] over on [[my.LocalNames]].
+See also [[wrap namespaces] the list of wiki wrapped by namespaces] on
+[[Local Names Wrap]].
 
 $name Web Applications
 === Web Applications ===

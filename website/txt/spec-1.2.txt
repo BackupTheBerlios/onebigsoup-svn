@@ -332,7 +332,10 @@ specification.]
 
 <p class="example">X &quot;FINAL&quot; &quot;The Prophet, by Gibran&quot;</p>
 
-<h3><a name="xfinal">X &quot;FINAL&quot;</a></h3>
+#LITERAL
+$name X FINAL
+=== X "FINAL" ===
+#LITERAL
 
 <p>This standard requires the special treatment
    of X &quot;FINAL&quot;.</p>
