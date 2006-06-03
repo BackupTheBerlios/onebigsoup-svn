@@ -35,6 +35,7 @@ punctuation_re = re.compile(r'[^A-Za-z0-9\s]+', re.UNICODE)
 ws_re = re.compile(r'\s+', re.UNICODE)
 the_re = re.compile(r'\b(?:the|a|an|in|for)\b', re.UNICODE|re.IGNORECASE)
 
+# re_column = re.compile(r'\s+"(([^\\"]|\\.)+)"')
 re_column = re.compile(r'\s+("(([^\\"]|\\.)+)"|[.])')
 
 r'''Read a column.
@@ -501,6 +502,9 @@ class Traditional:
         else:
             use = None
         
+        if ns_result is not None:
+            ns_result = basic_rel_url_expansion(ns_result, url)
+        
         if use == "ns":
             return self.find(ns_result, path[1:], record_type)
         elif use == "pattern":
@@ -527,11 +531,14 @@ class Traditional:
         for neighbor_key in ns[NS].order():
             neighbor_url = ns[NS][neighbor_key]
             if neighbor_url not in explored:
-                result = self.look_through(neighbor_url,
+                mod_neighbor_url = basic_rel_url_expansion(neighbor_url,
+                                                           url)
+                result = self.look_through(mod_neighbor_url,
                                            record_type, name)
                 if result is not None:
                     return (0,
-                            basic_rel_url_expansion(result, neighbor_url))
+                            basic_rel_url_expansion(result,
+                                                    mod_neighbor_url))
                 explored.add(neighbor_url)
         
         # It wasn't found in neighbors; try X FINAL?
