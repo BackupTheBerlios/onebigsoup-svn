@@ -22,7 +22,7 @@ def set_namespace_ln(namespace, name, url):
     """
     for local_name in namespace.LNs:
         if local_name.name == name:
-            local_name.name = name
+            local_name.url = url
             return
     local_name = Ln(name=name, url=url, namespace=namespace)
     return
