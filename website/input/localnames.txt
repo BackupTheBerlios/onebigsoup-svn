@@ -13,39 +13,39 @@ X VERSION 1.1
 LN "this" "localnames.txt"
 
 LN "services" "servicenames.txt"
-.  "servicenames" .
+. "servicenames" .
 NS "services" .
-.  "servicenames" .
-.  "S" .
+. "servicenames" .
+. "S" .
 
 
 LN "XML-RPC" "http://www.xmlrpc.org/"
 
 LN "One Big Soup" "http://onebigsoup.wiki.taoriver.net"
 NS "OneBigSoup" "http://ln.taoriver.net/wrap/onebigsoup"
-.  "OBS" .
+. "OBS" .
 
 NS "WikiFeatures" "http://ln.taoriver.net/wrap/wikifeatures"
 NS "Lion" "http://taoriver.net/tmp/gmail.txt"
 LN "CommunityWiki" "http://communitywiki.org/"
 NS "CommunityWiki" "http://ln.taoriver.net/wrap/communitywiki"
-.  "CW" .
+. "CW" .
 
 # Downloads
 LN "core 1.1" "http://ln.taoriver.net/downloads/core1.1.tgz"
-.  "nameserver 1.1" .
+. "nameserver 1.1" .
 # set to whatever is most recent:
-.  "core" .
+. "core" .
 
 LN "core 1.1 documentation" "http://ln.taoriver.net/server1.1.html"
-.  "nameserver 1.1 documentation" .
+. "nameserver 1.1 documentation" .
 
 LN "core libraries v1.0" "http://ln.taoriver.net/downloads/core.tgz"
 
 
 
 LN "Greg Schueler" "http://greg.vario.us/blog/scrawl/localnames.html"
-.  "Greg" .
+. "Greg" .
 LN "Straun" "http://youarenumber6.blogspot.com/"
 LN "Danny Ayers" "http://dannyayers.com/"
 
@@ -53,7 +53,7 @@ LN "Lion Kimbro" "http://www.speakeasy.org/~lion/"
 LN "Lion Kimbro's Blog" "http://lion.taoriver.net/"
 
 LN "Pet Names Markup Language" "http://www.erights.org/elib/capability/pnml.html"
-.  "Pet Names" .
+. "Pet Names" .
 LN "Plexnames" "http://logicerror.com/plexnamesPaper"
 
 LN "Sogudi" "http://www.atamadison.com/w/kitzkikz.php?page=Sogudi"
@@ -72,7 +72,7 @@ LN "BBCode" "http://www.christian-seiler.de/projekte/php/bbcode/index_en.html"
 LN "txt2html" "http://txt2html.sourceforge.net/"
 LN "C2:TextFilter" "http://c2.com/cgi/wiki?TextFilter"
 LN "Domain Name System" "http://en.wikipedia.org/wiki/DNS"
-.  "DNS" .
+. "DNS" .
 LN "BIND" "http://en.wikipedia.org/wiki/BIND"
 LN "REST" "http://www.xfront.com/REST-Web-Services.html"
 
@@ -84,5 +84,6 @@ LN "wrap namespaces" "http://ln.taoriver.net/wrap/spaces"
 LN "redirect" "http://ln.taoriver.net/redirect"
 LN "my.LocalNames" "http://taoriver.net:9000/"
 LN "dumpcache" "http://ln.taoriver.net/dumpcache"
-.  "cachedump" .
+. "cachedump" .
 LN "news RSS" "news.rdf"
+
