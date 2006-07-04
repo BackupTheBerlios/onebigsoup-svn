@@ -14,7 +14,7 @@ understand the main ideas of Local Names.]
 
 This document is the Local Names Namespace Description Specification,
 version 1.2. It is abbreviated "LNNDS v1.2". This document obsoletes 
-LNNDS.
+prior LNNDS.
 
 This specification is maintained by [[Lion:my site] Lion Kimbro,] who is
 available by e-mail at [[mailto:lion@speakeasy.org] lion@speakeasy.org.]
@@ -107,7 +107,7 @@ $name Syntax Key
     <td> non-terminal symbol </td>
   </tr>
   <tr>
-    <td> "..." </td>
+    <td> "blah-blah" </td>
     <td> literal text, as ASCII, without quotes around it </td>
   </tr>
   <tr>
@@ -230,16 +230,16 @@ use. Everything is optional, but X "VERSION" is strongly recommended.
 <p class="example">Text like this is an example.</p>
 #LITERAL
 
-$REM ---------- Laazy lazy lazy lazy. ----------
+#LITERAL
+<p class="foobar">
+    X &quot;VERSION&quot; &quot;1.2&quot;
+</p>
 #LITERAL
 
-<p class="foobar">
-    X &quot;VERSION&quot; 1.2
-</p>
+As is. ''Exactly'' as seen above. ''Exactly.''
 
-<p>
-    As is. Must be on the first line. <i>Exactly</i> as seen above: No quotes, a single space seperating the columns. <i>Exactly.</i>
-</p>
+$REM ---------- Laazy lazy lazy lazy. ----------
+#LITERAL
 
 <p class="foobar">
     X &quot;AUTHOR&quot; &quot;(name)&quot;

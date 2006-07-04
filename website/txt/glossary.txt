@@ -1,7 +1,7 @@
 $set title: Local Names Glossary
 
 These glossary values are canonical for the [[LNNDS v1.2] Local Names
-Namespace Description Specification version 1.2.]
+Namespace Description Specification version 1.2.] 
 
 
 $REM ===================================================================
@@ -653,4 +653,3 @@ These two lines add to the [[extension data]] identified by extension
 key "foo." After these two lines are processed, "foo" is bound to
 whatever it was bound to before, as well as the extension values "bar"
 and "baz."
-
