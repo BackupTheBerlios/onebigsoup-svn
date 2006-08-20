@@ -7,16 +7,24 @@
 <body>
 <center><h1>LocalNames Wrapper</h1></center>
 
-<form method="post" action=".">
+<form method="post" action="wrap">
 <center><table>
-<tr><td> Binding Point: <b> <a href="$webservice_prefix/spaces/">$webservice_prefix/spaces/</a> </b> <input type="text" name="spacename" value="$default_spacename"/> <b>/</b> </td></tr>
+<tr><td> Binding Point: <b> $webservice_prefix/ </b> <input type="text" name="spacename" value="$default_spacename"> </td></tr>
 <tr><td> Names List URL: <input type="text" name="nameslisturl" value="$default_nameslisturl" size="80"/> </td></tr>
+<tr><td> Names List Encoding:
+  <select name="nameslistencoding">
+  <option value="utf-8"$default_utf8>utf-8</option>
+  <option value="latin-1"$default_latin1>latin-1</option>
+  </select>
+</td></tr>
 <tr><td> (or, wiki XML-RPC URL, with getAllPages:) <input type="text" name="xmlrpcurl" value="$default_xmlrpcurl" size="80"/> </td></tr>
 <tr><td> URL Pattern: <input type="text" name="urlpattern" value="$default_urlpattern" size="80"/> </td></tr>
 <tr><td> Final URL Pattern: <input type="text" name="finalurlpattern" value="$default_finalurlpattern" size="80"/> (optional) </td></tr>
 <tr><td> <input type="hidden" name="action" value="bind"/> <input type="submit" value="bind"/> </td></tr>
 </table></center>
 </form>
+
+<center><p><a href="$webservice_prefix/spaces">Want to see spaces that have already been registered?</a></p></center>
 
 #if $msg
 <center><p><b>$msg</b></p></center>

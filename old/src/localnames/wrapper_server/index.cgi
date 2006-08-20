@@ -126,8 +126,9 @@ class WrapLists:
         s.space_data = d[ "list-bindings" ]
     def event_savetodict( s, d ):
         d[ "list-bindings" ] = s.space_data
-    def bind( s, space_name, list_url, xmlrpc_url, entry_pattern, final_pattern=None, xmlrpc_namespace=None ):
+    def bind( s, space_name, list_url, list_encoding, xmlrpc_url, entry_pattern, final_pattern=None, xmlrpc_namespace=None ):
         s.space_data[space_name] = {"url": list_url,
+                                    "encoding": list_encoding,
                                     "xmlrpc-url": xmlrpc_url,
                                     "xmlrpc-namespace": xmlrpc_namespace,
                                     "pattern": entry_pattern,
@@ -143,6 +144,7 @@ class WrapLists:
         results = []
         data = s.space_data[space_name]
         url = data["url"]
+        encoding = data.get("encoding", "utf-8")  # Older version didn't have "encoding"; Remove the "get" when all entries have "encoding."
         pattern = data["pattern"]
         final = data["final"]
         xmlrpc_url = data.get("xmlrpc-url", None)
@@ -176,8 +178,7 @@ class WrapLists:
             else:
                 list_of_names = server.wiki.getAllPages()
         else:
-            page = urllib.urlopen(url)
-            list_of_names = [line.strip("\r\n") for line in page.readlines()]
+            list_of_names = urllib.urlopen(url).read().decode(encoding).splitlines()
             list_of_names = [line for line in list_of_names if line.strip() != ""]
         
         for name in list_of_names:
@@ -227,21 +228,33 @@ class WrapCgiResponse:
         s.text_html()
         template = Cheetah.Template.Template(file="front_page.tmpl")
         d=s.wrap.cgidata.values(["action", "spacename", "nameslisturl",
-                                 "xmlrpcurl", "finalurlpattern",
-                                 "urlpattern",])
+                                 "nameslistencoding", "xmlrpcurl",
+                                 "finalurlpattern", "urlpattern",])
         if d["action"] == "bind":
             spacename = d["spacename"]
             nameslisturl = d["nameslisturl"]
+            nameslistencoding = d["nameslistencoding"]
             xmlrpcurl = d["xmlrpcurl"]
             urlpattern = d["urlpattern"]
             finalurlpattern = d["finalurlpattern"]
             
             webservice_prefix = WEBSERVICE_PREFIX
-            template.msg = """bound space <a href="%(webservice_prefix)s/%(spacename)s">&quot;%(spacename)s&quot;</a> to list <a href="%(nameslisturl)s">%(nameslisturl)s</a>""" % locals()
+            template.msg = """bound space <a href="%(webservice_prefix)s/%(spacename)s">&quot;%(spacename)s&quot;</a> to list <a href="%(nameslisturl)s">%(nameslisturl)s</a> w/ encoding %(nameslistencoding)s""" % locals()
             if xmlrpcurl:
                 template.msg = """bound space <a href="%(webservice_prefix)s/%(spacename)s">&quot;%(spacename)s&quot;</a> to list at XML-RPC url <a href="%(xmlrpcurl)s">%(xmlrpcurl)s</a> (getAllNames)""" % locals()
             template.default_spacename = spacename
             template.default_nameslisturl = nameslisturl
+            # This works, but is terribly ugly.  If you add more
+            # encodings, render out the selection programmatically, or
+            # use a template loop, or SOMETHING.
+            if nameslistencoding == "utf-8":
+                template.default_utf8 = " default"
+            else:
+                template.default_utf8 = ""
+            if nameslistencoding == "latin-1":
+                template.default_latin1 = " default"
+            else:
+                template.default_latin1 = ""
             template.default_xmlrpcurl = xmlrpcurl
             template.default_urlpattern = urlpattern
             template.default_finalurlpattern = finalurlpattern
@@ -265,11 +278,13 @@ class WrapCgiResponse:
                     for function_name in methods:
                         if ".getAllPages" in function_name:
                             xmlrpc_namespace = ".".join( function_name.split(".")[:-1] )
-            s.wrap.lists.bind(spacename, nameslisturl, xmlrpcurl, urlpattern, finalurlpattern_fixed, xmlrpc_namespace)
+            s.wrap.lists.bind(spacename, nameslisturl, nameslistencoding, xmlrpcurl, urlpattern, finalurlpattern_fixed, xmlrpc_namespace)
         else:
             template.msg = None
             template.default_spacename = ""
             template.default_nameslisturl = "http://"
+            template.default_utf8 = " default"
+            template.default_latin1 = ""
             template.default_xmlrpcurl = ""
             template.default_urlpattern = "http://...$NAME"
             template.default_finalurlpattern = ""
