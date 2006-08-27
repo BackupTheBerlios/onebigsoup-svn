@@ -1,22 +1,22 @@
 			      DIRECTORY
      o
-    .|.	   .        lncore -- Local Names core libraries
-    o\o.  o.--.     
-     .'-o./o        lnresolve -- Basic Local Names resolving server
-      o. \.         
-     	  |o        lnstore -- Local Names Store Servers
-  o__o	  |.        
+    .|.	   .        MOST IMPORTANT:
+    o\o.  o.--.     * lncore -- Local Names core libraries
+     .'-o./o        * lnresolve -- basic resolver ("query server")
+      o. \.         * lnstore -- basic store server
+     	  |o        
+  o__o	  |.        OTHER THINGS, LOCAL NAMES:
  ."o.\o   |o        lndelicious -- Brian Templeton's del.icio.us to
  o   o"o /.                        Local Names converter
-      o\/                          
-       /   ._.o.    lnlink -- XHTML Local Names linker
-      |  .o/.o-_o   
- o   / 	o-'o  o	\.  lnredirect -- Local Names browser redirection server
-.|.  |  /o	'o  lndumpcache -- Local Names cache dump
-  \o \./
-  o|. |             mylocalnames -- TurboGears website for maintaining
-   .\ |	 o.o.                                                 namespaces
-     \| ._---_.o    website -- project website builder
+      o\/           lnlink -- links <a href="local names"> in XHTML
+       /   ._.o.    lnredirect -- server that redirects web browsers
+      |  .o/.o-_o   lndumpcache -- website to dump query server caches
+ o   / 	o-'o  o	\.  lnwordpress -- WordPress plugin
+.|.  |  /o	'o  mylocalnames -- TurboGears website for maintaining
+  \o \./                                                      namespaces
+  o|. |             website -- ln.taoriver.net website builder
+   .\ |	 o.o.       
+     \| ._---_.o    
       | /.o.o o.    
       |/      ' o   other -- things that aren't Local Names
       |             
