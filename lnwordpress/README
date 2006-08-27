@@ -1,0 +1,15 @@
+
+  ==================================
+  |  Local Names WordPress Plugin  |
+  ==================================
+
+
+  This is where the Local Names WordPress Plugin development happens.
+
+  Use "make release" to make the release tarball.
+
+  Note that "readme.txt" is the readme that shows up in the release.
+  It contains the notes on how to install the plugin, as per WordPress
+  convention.
+
+
