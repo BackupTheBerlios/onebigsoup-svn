@@ -54,6 +54,11 @@
        >>> server.lnquery.lookup("http://example.net/namespace.txt",
                                  "foo")  # term to look up
        [0, 'http://example.com/foo/bar/baz/']
+
+     (NOTE: If **not**, follow the steps in Addendum A, at the end of
+            this tutorial, and then come back here.
+            Use your "Namespace Description URL" in place of
+            "http://example.net/namespace.txt")
   
   
   What you have just setup is called, in the formal language,
@@ -71,4 +76,127 @@
   Let's review what you did:
   * You installed "lncore."
   * You installed a query server.
-  * 
+  * You looked at it on the web.
+  * You looked at it from Python.
+
+
+	     == ADDENDUM A:  Make Your Own Namespace! ==
+
+  Whoah! You don't have a namespace yet?
+
+  This is super-easy, super-simple.
+
+  1. Make a new text file, called "my_namespace.txt".
+
+    emacs my_namespace.txt
+
+  2. Copy the following into it:
+
+-------------------------- my_namespace.txt ---/ cut here /-------------
+X "VERSION" "1.2"
+
+X "AUTHOR" "John Doe"
+X "PREFERRED-NAME" "John Doe's Own Namespace"
+
+LN "My Blog" "http://your.blog.here.net/"
+
+LN "Slashdot" "http://slashdot.org/"
+LN "Kuro5hin" "http://kuro5hin.org/"
+LN "FreshMeat" "http://freshmeat.net/"
+
+NS "Local Names" "http://ln.taoriver.net/localnames.txt"
+-----------------------------------------------/ cut here /-------------
+
+  3. Replace "John Doe" with your name.
+
+    M-x replace-string(ret) John Doe(ret) Your Name(ret)
+
+  4. Add some more links.
+
+    C-n C-n C-n C-n C-n
+    LN "new name" "http://example.net"(ret)
+    C-x C-s
+    C-x C-c
+
+
+		       --- interlude begins ---
+
+      "Wait, what's up with that last one?"
+      "Why does it say "NS," not "LN?"
+
+            - That's something **really cool,**
+              ...but it's secret, right now.
+              Figure it out, later.
+
+            - Just use "LN" for the links you want to add,
+              for now.
+
+			--- interlude end ---
+
+
+  5. Put my_localnames.txt on the web.
+
+    mv my_localnames.txt "$MY_WEB_SERVING_DIR"
+
+  6. Make sure you can see it in your web browser.
+
+    lynx http://localhost/my_localnames.txt
+
+
+				NOTE:
+
+      In this example, I used "localhost," but in reality, you
+      **almost certainly** want to put your Local Names on the
+      web.
+
+      A lot of the **really cool** things in Local Names (like
+      letting others connect to your Local Names namespace, using
+      your names on other people's sites, using other people's
+      nameservers) require that your namespace description is
+      publicly visible.
+
+
+  7. Write down the URL!
+
+    The URL of your namespace, (in the example,
+    "http://localhost/my_localnames.txt",) is called your "Namespace
+    Description URL."
+
+
+  When you go back to the main tutorial, try looking up the following!
+
+  checkbox;                           why I'm asking you
+  check after     local name           to look this one
+  you did it                                  up
+
+     [ ]          "Slashdot"         . make sure it works
+     [ ]          "SlaSHdOt"         . how does it handle case?
+     [ ]          "  Slashdot  "     . how does it handle white space?
+     [ ]          "Kuro5hin"         . another name
+
+     [ ]          "My Blog"          . a name YOU chose!
+
+     [ ]          "NS record"        . wha- ... what the- ...
+                                       why does THIS work?!
+
+
+  That last one is something of a mystery, is it not?
+
+  Can you figure it out?
+
+    HINT:  Look at "http://ln.taoriver.net/localnames.txt"
+           in your web browser.
+
+  If you want to experiment with another NS record, feel free to link to
+  my **own** personal namespace:
+
+------------------------ add this line to my_namespace.txt -------------
+NS "Lion" "http://taoriver.net:9000/description?namespace=lion"
+------------------------------------------------------------------------
+
+  Then, try looking up the following words, through YOUR namespace:
+
+  [ ]  "Joomla"
+  [ ]  "OpenOffice"
+  [ ]  "Tachikoma"
+
