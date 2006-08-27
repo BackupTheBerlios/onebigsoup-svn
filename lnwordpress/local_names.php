@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Local Names
-Plugin URI: http://ln.taoriver.net/
+Plugin URI: http://ln.taoriver.net/wordpress.html
 Description: A plugin that replaces text, when you submit content. Look under "Options" to customize.
 Author: Lion Kimbro
 Version: 1.0
@@ -32,7 +32,7 @@ Author URI: http://lion.taoriver.net/
 
 require_once(ABSPATH . WPINC . '/class-IXR.php');
 
-function array_to_string($array) {
+function ln_array_to_string($array) {
 	foreach ( $array as $index => $val ) {
 		$val2 .= $index;
 		$val2 .= ', ';
@@ -42,7 +42,7 @@ function array_to_string($array) {
 	return $val2;
 }
 
-function array_of_arrays_to_string($aoa) {
+function ln_array_of_arrays_to_string($aoa) {
 	$ret = '[';
 	foreach ( $aoa as $index => $array ) {
 		$ret .= '[';
@@ -60,7 +60,7 @@ function array_of_arrays_to_string($aoa) {
 
 // Return an array of URLs, given the results of a LNXRQueryI find_many.
 // For those lookups that failed, return just: 'lookup_failed'.
-function process_find_many_results($results) {
+function ln_process_find_many_results($results) {
 	$out = array();
 	foreach ( $results as $index => $error_and_string ) {
 		if ( 0 == $error_and_string[0] ) {
@@ -73,7 +73,7 @@ function process_find_many_results($results) {
 	return $out;
 }
 
-class LKStringFeeder {
+class LNStringFeeder {
 	public function __construct($inStrings) {
 		$this->feed = $inStrings;
 	}
@@ -95,18 +95,18 @@ class LKStringFeeder {
 	}
 }
 
-function lk_ensure_options_set() {
+function ln_ensure_options_set() {
 	add_option('local_names', array('LNXRQI' => 'http://taoriver.net:8123/', 'ns_url' => 'http://ln.taoriver.net/servicenames.txt'), 'Local Names options -- LNXRQueryI, and Namespace URL');
 	return get_option('local_names');
 }
 
-function lk_update_option_values($LNXRQI, $ns_url) {
+function ln_update_option_values($LNXRQI, $ns_url) {
 	update_option('local_names', array('LNXRQI' => $LNXRQI, 'ns_url' => $ns_url));
 	return get_option('local_names');
 }
 
-function lk_change_content($content) {
-	$option_values = lk_ensure_options_set();
+function ln_change_content($content) {
+	$option_values = ln_ensure_options_set();
 	// $pattern = '/\\[\\[([^]]+)\\]\\]/i';
         $pattern = '/\\[\\[([^\\]|]+)(|[^\\]]+)?\\]\\]/i';
 	preg_match_all($pattern, $content, $out, PREG_PATTERN_ORDER);
@@ -126,20 +126,20 @@ function lk_change_content($content) {
                 $err_msg .= '<p><font color="red">client-IXR.php reports: <b>' . $client->error->message . '</b></font></p>';
                 return $err_msg . $content;
 	}
-	$results = process_find_many_results($client->getResponse());
-	$content = preg_replace_callback($pattern, array(new LKStringFeeder($results), 'replace_w_link'), $content);
+	$results = ln_process_find_many_results($client->getResponse());
+	$content = preg_replace_callback($pattern, array(new LNStringFeeder($results), 'replace_w_link'), $content);
 	
 	// DEBUGGING:
-	// $content = $content . array_to_string($results);
+	// $content = $content . ln_array_to_string($results);
 	
 	return $content;
 }
 
 function ln_options_subpanel() {
-	$option_values = lk_ensure_options_set();
+	$option_values = ln_ensure_options_set();
 	if ( isset($_POST['info_update']) ) {
 		if ( isset($_POST['LNXRQI']) and isset($_POST['ns_url']) ) {
-			$option_values = lk_update_option_values($_POST['LNXRQI'], $_POST['ns_url']);
+			$option_values = ln_update_option_values($_POST['LNXRQI'], $_POST['ns_url']);
 			?>
                         <div class="updated">
                         <p>Local Names XML-RPC Query Interface URL set to: <b><?php _e($option_values['LNXRQI']); ?></b></p>
@@ -187,13 +187,13 @@ function ln_options_subpanel() {
  </div><?php
 }
 
-function lk_options_page() {
+function ln_options_page() {
 	if ( function_exists('add_options_page') ) {
 		add_options_page('lnsubpaneltitle', 'Local Names', 10, basename(__FILE__), 'ln_options_subpanel');
 	}
 }
 
-add_filter('content_save_pre', 'lk_change_content');
-add_action('admin_menu', 'lk_options_page');
+add_filter('content_save_pre', 'ln_change_content');
+add_action('admin_menu', 'ln_options_page');
 
 ?>
