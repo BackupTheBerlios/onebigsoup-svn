@@ -74,8 +74,7 @@ function ln_process_find_many_results($results) {
 }
 
 class LNStringFeeder {
-	//public function __construct($inStrings)  -- PHP 5 only
-	public function LNStringFeeder($inStrings) {
+	function LNStringFeeder($inStrings) {
 		$this->feed = $inStrings;
 	}
 	function next_result() {
