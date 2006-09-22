@@ -25,8 +25,7 @@
 // @include       *
 // ==/UserScript==
 
-var startswithbracketsre = /^\[\[/;
-var lnre = /\[\[(.+?)\]\]/;
+var lnre = /\[\[[^\]]+\]\]/g; // a much better regex, courtesy of Woosta@freenode##javascript
 var answerre = /<value><string>(.+?)<\/string><\/value>/;
 
 var lastword = "";
@@ -38,35 +37,28 @@ if (!GM_xmlhttpRequest) {
 } else {
     allTextareas = document.getElementsByTagName('textarea');
     for (var i = 0; i < allTextareas.length; i++) {
-	allTextareas[i].addEventListener('keypress', keyhandler, true);
+	allTextareas[i].addEventListener('keydown', keyhandler, true);
     }
 }
 
 function keyhandler(e) {
-	if ( (e.which == 32) && (lastword.length > 0) ) { // spacebar
-		if (lnre.exec(lastword)) {
-			var oldword = lastword.replace('[[','').replace(']]','');
+	if (e.which == 32) { // spacebar
+		var matches = e.target.value.match(lnre);
+		
+		for (var i = 0; i < matches.length; i++) {
+			match = matches[i].replace('[[',"").replace(']]',"");
+
 			GM_xmlhttpRequest({ 
 				method: 'POST',
 				url: 'http://ln.taoriver.net:8123/',
 				headers: {'User-Agent': 'Greasemonkey', 'Accept': 'application/xml,text/xml'},
-				data: '<?xml version="1.0"?><methodCall><methodName>lnquery.lookup</methodName><params><param><string>'+namespace_url+'</string></param><param><string>'+lastword+'</string></param></params></methodCall>',
+				data: '<?xml version="1.0"?><methodCall><methodName>lnquery.lookup</methodName><params><param><string>'+namespace_url+'</string></param><param><string>'+matches[i]+'</string></param></params></methodCall>',
 				onload: function (details) { 
 						var url = details.responseText.match(answerre)[1];
 //						alert('url for '+oldword+': ' + details.responseText);
-						e.target.value = e.target.value.replace(new RegExp("\\[\\["+oldword+"\\]\\]", "gim"), '<a href="'+url+'">'+oldword+'</a>');
+						e.target.value = e.target.value.replace(new RegExp("\\[\\["+match+"\\]\\]", "gim"), '<a href="'+url+'">'+match+'</a>');
 					}
 			});
-
-			lastword = "";
-		} else {
-			if (!startswithbracketsre.exec(lastword)) {
-				lastword = "";
-			} else {
-				lastword += " ";
-			}
 		}
-	} else {
-		lastword += String.fromCharCode(e.which);
 	}
 }
