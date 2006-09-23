@@ -1,22 +1,13 @@
-// A quick (well, I was up until about 8am writing it, but... any NORMAL 
-// person would have done this quickly ;]) script to convert LocalNames 
-// in a [[my local name here]] format into an <a href> for your blog,
-// or whatever textareas you have.
+// This script will convert LocalNames from [[your local name here]] format 
+// into an <a href> for every textarea on every page you visit.  You can use
+// it to write LocalNames in your blog, your web-based IM client, and your 
+// web-based e-mail client!
 // 
+// You're going to want to scroll down so you can set a couple of
+// configuration settings.
+// 
+// If you have any questions or run into any problems, feel free to e-mail me.
 // -- Jonathan Roes <jonathan.roes@gmail.com>
-//
-// --------------------------------------------------------------------
-//
-// This is a Greasemonkey user script.  To install it, you need
-// Greasemonkey 0.3 or later: http://greasemonkey.mozdev.org/
-// Then restart Firefox and revisit this script.
-// Under Tools, there will be a new menu item to "Install User Script".
-// Accept the default configuration and install.
-//
-// To uninstall, go to Tools/Manage User Scripts,
-// select "LocalNames Link", and click Uninstall.
-//
-// --------------------------------------------------------------------
 //
 // ==UserScript==
 // @name          LocalNames Link
@@ -25,40 +16,61 @@
 // @include       *
 // ==/UserScript==
 
-var lnre = /\[\[[^\]]+\]\]/g; // a much better regex, courtesy of Woosta@freenode##javascript
-var answerre = /<value><string>(.+?)<\/string><\/value>/;
+// Stuff you will want to change 
+//----------------------------------------------------------------------
 
-var lastword = "";
-var allTextareas;
+// namespace_url: the URL of your LocalNames namespace
 var namespace_url = 'http://taoriver.net:9000/description?namespace=jroes';
 
+// localname_server: the LocalNames resolving server you want to use.  you can
+// probably leave this set to the default
+var localname_server = 'http://ln.taoriver.net:8123/';
+
+var lnre = /\[\[[^\]]+\]\]/g; 
+var answerre = /<value><string>(.+?)<\/string><\/value>/;
+
 if (!GM_xmlhttpRequest) {
-    alert('Your Greasemonkey is out of date.  Please update it before using this script.');
+	alert('Your Greasemonkey is out of date.  Please update it before using this script.');
 } else {
-    allTextareas = document.getElementsByTagName('textarea');
-    for (var i = 0; i < allTextareas.length; i++) {
-	allTextareas[i].addEventListener('keydown', keyhandler, true);
-    }
+	window.addEventListener('keydown', keyhandler, true);
 }
 
 function keyhandler(e) {
-	if (e.which == 32) { // spacebar
+	if (e.which == 32 && e.target.nodeName.toLowerCase() == "textarea") { // spacebar
 		var matches = e.target.value.match(lnre);
 		
-		for (var i = 0; i < matches.length; i++) {
-			match = matches[i].replace('[[',"").replace(']]',"");
+		if (matches) {
+			for (var i = 0; i < matches.length; i++) {
+				match = matches[i].replace('[[','').replace(']]','');
 
-			GM_xmlhttpRequest({ 
-				method: 'POST',
-				url: 'http://ln.taoriver.net:8123/',
-				headers: {'User-Agent': 'Greasemonkey', 'Accept': 'application/xml,text/xml'},
-				data: '<?xml version="1.0"?><methodCall><methodName>lnquery.lookup</methodName><params><param><string>'+namespace_url+'</string></param><param><string>'+matches[i]+'</string></param></params></methodCall>',
-				onload: function (details) { 
-						var url = details.responseText.match(answerre)[1];
-//						alert('url for '+oldword+': ' + details.responseText);
-						e.target.value = e.target.value.replace(new RegExp("\\[\\["+match+"\\]\\]", "gim"), '<a href="'+url+'">'+match+'</a>');
-					}
-			});
+				GM_xmlhttpRequest({ 
+					method: 'POST',
+					url: localname_server,
+					headers: {'User-Agent': 'Greasemonkey', 'Accept': 'application/xml,text/xml'},
+					data: '<?xml version="1.0"?><methodCall><methodName>lnquery.lookup</methodName><params><param><string>'+namespace_url+'</string></param><param><string>'+matches[i]+'</string></param></params></methodCall>',
+					onload: function (details) { 
+							var url = details.responseText.match(answerre)[1];
+							// we should be using the error code here instead
+							if (url.indexOf("record not found") == -1) {
+								// save our replacement text and calculate new position
+								replacementtext = '<a href="'+url+'">'+match+'</a>';
+								var matchre = new RegExp("\\[\\["+match+"\\]\\]", "gim");
+
+								// if we are going to replace something past the selection...
+								var matcharray = matchre.exec(e.target.value);
+
+								if (matcharray) {
+									var newposition = (e.target.selectionStart - (matcharray.index + (match.length+4))) + (matcharray.index + replacementtext.length);
+								
+									e.target.value = e.target.value.replace(matchre, replacementtext);
+									// set the new position
+									e.target.selectionStart = newposition;
+									e.target.selectionEnd = newposition;
+								}
+							}
+						}
+				});
+			}
 		}
 	}
 }
