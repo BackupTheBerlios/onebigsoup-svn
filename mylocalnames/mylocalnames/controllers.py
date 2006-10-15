@@ -6,13 +6,38 @@ from sqlobject import SQLObjectNotFound
 
 import cherrypy
 
+import xmlrpclib
+
 
 INCORRECT_PASSWORD_MSG = "Incorrect password."
 
 TEXT_PLAIN = "text/plain; charset=utf-8"
 
+LNXRQSs = [xmlrpclib.ServerProxy(x) for x in ["http://taoriver.net:8123/", "http://ln.taoriver.net/lnxrqs"]]
 
-def set_namespace_ln(namespace, name, url):
+WEBSITE_PREFIX = "http://taoriver.net:9000"
+
+
+# new naming convention:
+# a_  -- means "by the new naming convention"
+# a_mnamespace  -- a model.Namespace
+# a_mln  -- a model.LocalName
+# a_mns  -- a model.NameSpace
+# a_nsname  -- a name of a namespace ("lion")
+# a_nsurl  -- a full namespace URL ("http://example.net/description&namespace=lion")
+# a_lnname  -- a name of a local name ("slashdot")
+# a_lnurl  -- a URL that is bound to a local name, or intended to be bound to a local name
+
+
+def dump_caches(a_nsname):
+    print "dump_caches", a_nsname
+    for lnxrqs in LNXRQSs:
+	a_nsurl = WEBSITE_PREFIX + "/description?namespace=" + a_nsname
+	print a_nsurl
+    	print lnxrqs.lnquery.dump_cache(a_nsurl)
+
+
+def set_namespace_ln(a_mnamespace, a_lnname, a_lnurl):
     """Set a namespace's local name to a url.
     
     The namespace is a model.Namespace instance, the name and url are
@@ -20,15 +45,19 @@ def set_namespace_ln(namespace, name, url):
     
     Ensure that a local name isn't repeated.
     """
-    for local_name in namespace.LNs:
-        if local_name.name == name:
-            local_name.url = url
-            return
-    local_name = Ln(name=name, url=url, namespace=namespace)
+    print "set_namespace_ln", a_mnamespace, a_lnname, a_lnurl
+    renamed = False
+    for a_mlnOther in a_mnamespace.LNs:
+        if a_mlnOther.name == a_lnname:
+            a_mlnOther.url = a_lnurl
+            renamed = True
+    if not renamed:
+        a_mlnNew = Ln(name=a_lnname, url=a_lnurl, namespace=a_mnamespace)
+    dump_caches(a_mnamespace.name)
     return
 
 
-def set_namespace_ns(namespace, link_key, link_url):
+def set_namespace_ns(a_mnamespace, a_nsname, a_nsurl):
     """Set a namespace's link key to a url.
     
     The namespace is a model.Namespace instance, the link_key and
@@ -36,11 +65,14 @@ def set_namespace_ns(namespace, link_key, link_url):
     
     Ensure that a link key isn't repeated.
     """
-    for ns_link in namespace.NSs:
-        if ns_link.name == link_key:
-            ns_link.url = link_url
-            return
-    ns_link = Ns(name=link_key, url=link_url, namespace=namespace)
+    renamed = False
+    for a_mnsOther in a_mnamespace.NSs:
+        if a_mnsOther.name == a_nsname:
+            a_mnsOther.url = a_nsurl
+            renamed = True
+    if not renamed:
+        a_mnsNew = Ns(name=a_nsname, url=a_nsurl, namespace=a_mnamespace)
+    dump_caches(a_mnamespace.name)
     return
 
 
@@ -57,7 +89,7 @@ class Root(controllers.Root):
         return dict(now=time.ctime())
     
     @turbogears.expose(html="mylocalnames.templates.namespace")
-    def namespace(self, namespace, password,
+    def namespace(self, namespace, password="",
                   linkkey=None, linkurl=None,
                   deltype=None, delname=None):
         
@@ -95,7 +127,8 @@ class Root(controllers.Root):
                           "&url='+escape(o)" % (store_name_url,
                                                 namespace, password)
         
-        return {"namespace": namespace,
+        return {"website_prefix": WEBSITE_PREFIX,
+                "namespace": namespace,
                 "password": password,
                 "description_url": description_url,
                 "bookmarklet_url": bookmarklet_url}
@@ -145,9 +178,12 @@ class Root(controllers.Root):
     
     @turbogears.expose()
     def submit_name(self, namespace, password, name, url):
-        ns = Namespace.byName(namespace)
-        if ns.password != password:
+	a_nsname = namespace
+	a_lnname = name
+	a_lnurl = url
+        a_mnamespace = Namespace.byName(a_nsname)
+        if a_mnamespace.password != password:
             incorrect_password_routine()
-        set_namespace_ln(ns, name, url)
-        raise cherrypy.HTTPRedirect(url)
+        set_namespace_ln(a_mnamespace, a_lnname, a_lnurl)
+        raise cherrypy.HTTPRedirect(a_lnurl)
 

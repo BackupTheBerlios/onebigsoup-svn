@@ -71,7 +71,7 @@
           "Quick Searches."</li>
       <li>Click on the "New Bookmark" button.</li>
       <li>For Name, enter: <code>Local Names Lookup</code></li>
-      <li>For Location, copy in: <code>http://ln.taoriver.net/redirect?namespace=TODO&amp;path=%s</code></li>
+      <li>For Location, copy in: <code>http://ln.taoriver.net/redirect?namespace=${website_prefix}${description_url}&amp;path=%s</code></li>
       <li>For Keyword, enter: <code>ln</code></li>
       <li>For &nbsp;Description, enter: <code>Jump to the
           page by the given name.</code></li>
@@ -103,13 +103,9 @@
   <h3 class="toggled" onclick="toggle_display('blog')">Automate Linking in your Blog!</h3>
   <div id="blog">
 
-    <p>(PENDING)</p>
+    <p>There is a <a href="http://ln.taoriver.net/wordpress.html">Plugin for WordPress!</a></p>
 
-    <p>After this website is done, I will write a WordPress plugin, for
-       making use of Local Names.</p>
-
-    <p>With this plugin, you'll be able to form links by name, rather
-       than URL.</p>
+    <p>With this plugin, you can form links by your Local Names, rather than URL.</p>
   </div>
 
   <h2>Additional Functionality</h2>
