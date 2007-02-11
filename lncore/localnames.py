@@ -1,5 +1,8 @@
 """Local Names v1.1 Server
 
+DOC
+
+isotime -- return time in ISO8601
 dump_cache -- dump cache entry
 preferred_names -- list names of cached namespaces
 namespace_from_text -- render namespace dictionary from text
