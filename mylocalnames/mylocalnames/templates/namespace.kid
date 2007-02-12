@@ -9,10 +9,8 @@
 
 <body>
   <p class="activity_bar">
-  <b>Local Names:</b> <a href="/">Edit Namespace</a>
+    <a href="/">My Local Names:</a>
     <b>(${namespace})</b>
-    &mdash; <a href="wrap.html">Wrap Wiki</a>
-    &mdash; <a href="help.html">Help</a>
   </p>
 
   <h2>Welcome!</h2>
@@ -46,13 +44,11 @@
     </blockquote>
 
     <p>Once you've installed the bookmarklet, try it out-
-       click on it, from the bookmarks toolbar.</p>
+       visit a web page, any web page, and then click
+       on the "Name this page" bookmarklet.</p>
 
     <p>It should ask you to name this page;
-       I recommend naming this page "edit."</p>
-
-    <p>Visit some other pages on the Internet, and then push the
-       "Name this page" bookmarklet.</p>
+       Think of something.  Submit it.</p>
 
     <p>You are naming pages!</p>
   </div>
@@ -71,7 +67,7 @@
           "Quick Searches."</li>
       <li>Click on the "New Bookmark" button.</li>
       <li>For Name, enter: <code>Local Names Lookup</code></li>
-      <li>For Location, copy in: <code>http://ln.taoriver.net/redirect?namespace=${website_prefix}${description_url}&amp;path=%s</code></li>
+      <li>For Location, copy in: <code>http://ln.taoriver.net/redirect?namespace=${description_url}&amp;path=%s</code></li>
       <li>For Keyword, enter: <code>ln</code></li>
       <li>For &nbsp;Description, enter: <code>Jump to the
           page by the given name.</code></li>
@@ -237,6 +233,10 @@ namespace description.</td>
           <input name="deltype" value="NS" type="radio">
           link key (NS)</input>
           </p>
+          <p>
+          <input name="deltype" value="PATTERN" type="radio">
+          pattern (PATTERN)</input>
+          </p>
         </td>
       </tr>
 
@@ -273,13 +273,6 @@ namespace description.</td>
 </div>
 
 <p>Your namespace description is at: <a href="${description_url}">${description_url}</a></p>
-
-<p class="fine_print"><a href="http://ln.taoriver.net/">Local
-Names</a> is a
-community Open Source / Free Software
-project started by <a href="http://www.speakeasy.org/%7Elion/">Lion
-Kimbro.</a>
-Source code is available via project SVN repository.</p>
 
 </body>
 </html>

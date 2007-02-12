@@ -9,10 +9,7 @@
 
 <body>
 
-<p class="activity_bar">
-<b>Local Names:</b> <b>Edit Namespace</b>
-&mdash; <a href="wrap.html">Wrap Wiki</a>
-&mdash; <a href="help.html">Help</a></p>
+<p class="activity_bar"><b>My Local Names</b></p>
 
 <img style="width: 383px; height: 200px;"
      alt="Name a website,... ...and refer to it in your blog!"
@@ -68,10 +65,7 @@
 
 </form>
 
-<p class="fine_print"><a href="http://ln.taoriver.net/">Local Names</a>
-is a community Open Source / Free Software
-project led by <a href="http://www.speakeasy.org/%7Elion/">Lion Kimbro.</a>
-Source code is available via project SVN repository.</p>
+<center><p><a href="/all_namespaces">Root Namespace Description</a></p></center>
 
 </body>
 </html>

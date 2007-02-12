@@ -15,5 +15,11 @@
     <div py:if="tg_flash" class="flash" py:content="tg_flash"></div>
     
     <div py:replace="item[:]"/>
+
+<p class="fine_print"><a href="http://ln.taoriver.net/">Local Names</a>
+is a community Open Source / Free Software
+project led by <a href="http://www.speakeasy.org/%7Elion/">Lion Kimbro.</a>
+Source code is available via project SVN repository.</p>
+
 </body>
 </html>
