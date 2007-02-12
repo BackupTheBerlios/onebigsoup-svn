@@ -39,11 +39,9 @@ def nsname_to_nsurl(a_nsname):
 
 
 def dump_caches(a_nsname):
-    print "dump_caches", a_nsname
     for lnxrqs in LNXRQSs:
 	a_nsurl = nsname_to_nsurl(a_nsname)
-	print a_nsurl
-    	print lnxrqs.lnquery.dump_cache(a_nsurl)
+    	lnxrqs.lnquery.dump_cache(a_nsurl)
 
 
 def set_namespace_ln(a_mnamespace, a_lnname, a_lnurl):
