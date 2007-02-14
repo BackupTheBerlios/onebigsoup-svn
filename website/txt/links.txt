@@ -22,11 +22,11 @@ See also [[wrap namespaces] the list of wiki wrapped by namespaces] on
 $name Web Applications
 === Web Applications ===
 
-* [[Web Browser Redirect]] - [[OBS:UsingLocalNamesInFirefox] jump to
-  websites] by name from the address bar.
-* [[Local Names Wrap]] - generate a namespace description from a wiki.
+* [[Web Browser Redirect]] - jump to websites by name from the address
+  bar
+* [[Local Names Wrap]] - generate a namespace description from a wiki
 * [[my.LocalNames]] - build and maintain a personal namespace
-  description.
+  description
 
 === Other Peoples' Words ===
 
@@ -40,10 +40,14 @@ $name Web Applications
 === Development ===
 
 * [[http://lion.taoriver.net/] Lion Kimbro's blog] - main developer & coordinator
-* [[http://onebigsoup.wiki.taoriver.net/] One Big Soup] - wiki used for development
-* [[OneBigSoup:LocalNames]] - wiki page dedicated to Local Names
-* [[OneBigSoup:OneBigSoupTeam]] - people who have involved themselves in
-  Local Names, or other One Big Soup work.
+
+Also, people who have contributed in some way, big or small, in
+alphabetical order: [[Brian Templeton]], [[Christophe Ducamp]],
+[[Dave Menninger]], [[Greg Schueler]], [[Heather James]],
+[[Jonathan Roes]], [[Mattis Manzel]], MooKitty (of WordPress,)
+Piranha / Pir, [[Sean Palmer]], and many others, whos names I haven't
+put here yet.
+
 
 $name Related Work
 === Related Work ===

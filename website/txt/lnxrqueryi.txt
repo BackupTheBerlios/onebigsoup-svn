@@ -1,5 +1,7 @@
-$set title: Local Names XML-RPC Query Interface
-$name LNXRQueryI
+$set title: Local Names XML-RPC Query Interface Specification
+$name Local Names XML-RPC Query Interface Spec
+$name LNXRQueryI Specification
+$name LNXRQueryI Spec
 
 #LITERAL
 <center>
@@ -9,8 +11,9 @@ $name LNXRQueryI
 </center>
 #LITERAL
 
-This is a DRAFT version only; Feedback welcome! Visit
-[[OBS:LnQueryInterface]] if you have any comments or criticism.
+This version is relatively stable; It has been stable for several
+months, and used by a small handful of people.  That said, feedback is
+still welcome.  Write to [[Lion Kimbro]] with comments or criticism.
 
 #LITERAL
 <br> </br>

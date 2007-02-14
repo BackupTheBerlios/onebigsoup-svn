@@ -125,12 +125,11 @@ Subject namespaces:
 
 == Special Websites ==
 
-* my.LocalNames (website)
+* My Local Names (website)
 * Web Browser Redirect (website)
 * Local Names Wrap (website)
 
-You can say "my.LocalNames..." or you can say "the my.LocalNames
-website."
+It used to be "my.LocalNames," but that was dumb.
 
 
 == Activities ==

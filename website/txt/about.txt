@@ -39,9 +39,7 @@ Even things like media players, (which can play files located at URLs,)
 or [[RDF]] descriptions, could be trained to work with Local Names.
 
 Presently, it is possible (though difficult) to use Local Names with
-[[Firefox]], and many wiki by [[WikiFeatures:InterLink]InterLink.] (You
-can follow [[OBS:TheRadar]our implementation plan,] which casts into
-2006.)
+[[Firefox]], and many wiki by [[InterLink.]]
 
 
 $name The Basics
@@ -103,16 +101,16 @@ $name Linking Namespaces
 It's very useful to link namespaces to namespaces.
 
 We discovered this in [[wiki] wiki,] when we invented
-[[WikiFeatures:InterLink] the InterLink.] That is, in many
-[[WikiFeatures:WikiEngine] wiki engines,] you can link to pages in other
+[[InterLink] the InterLink.] That is, in many
+[[WikiEngine] wiki engines,] you can link to pages in other
 wiki. You do with with a format something like:
 
 #CODE
-WikiFeatures:RecentChanges
+CommunityWiki:RecentChanges
 #CODE
 
-...which links to [[WikiFeatures:RecentChanges]
-WikiFeatures:RecentChanges.]
+...which links to [[CommunityWiki:RecentChanges]
+CommunityWiki:RecentChanges.]
 
 It's very convenient, and you come to expect it.
 

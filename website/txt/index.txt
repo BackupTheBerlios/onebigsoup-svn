@@ -16,9 +16,14 @@ That is, two namespaces may bind "Fred" in different ways.
 $name Site Contents
 === Site Contents ===
 
+'''NEW:'''
+
+* [[Using Local Names]] -- about how to use Local Names yourself!
+
 #LITERAL
 <table>
 <tr><td><a href="about">About</a></td><td>introduction to Local Names</td></tr>
+<tr><td><a href="using">Using Local Names</a></td><td>how to use Local Names</td></tr>
 <tr><td><a href="news">News</a></td><td>major updates, RSS feed</td></tr>
 <tr><td><a href="links">Links</a></td><td>direct or tangential</td></tr>
 <tr><td><a href="glossary">Glossary</a></td><td>terminology for Local Names</td></tr>

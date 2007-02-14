@@ -236,6 +236,96 @@ interface] Local Names interface.]
 
 $REM ===================================================================
 
+$name Redirect Server
+$name Redirection Server
+$name Browser Redirection Server
+$name Web Browser Redirection Server
+$name Local Names Redirection Server
+$name Local Names Browser Redirection Server
+== Local Names Web Browser Redirection Server ==
+
+It's a server that performs web [[browser redirection.]]
+
+We use it to make someone's web browser go to a page named with a
+[[local name]].
+
+Basically, someone asks the server for a page "foo," the server finds out where "foo" is on the Internet, and then returns the URL.
+
+
+A Local Names Web Browser Redirection Server ("Redirect Server" for
+short,) redirects a user's web browser in response to a name-resolution
+request.
+
+
+A Local Names Web Browser Redirection Server is a web server that
+uses [[Location]Location:] in an HTTP response to redirect a web browser.
+
+
+$REM ===================================================================
+
+$name Local Names XML-RPC Query Interface
+$name LNXRQueryI
+$name LNXRQI
+== Local Names XML-RPC Query Interface ("LNXRQueryI") ==
+
+An [[XML-RPC]] interface that is accessed to retrieve information from a
+[[Local Names Query Server]] that supports the interface.
+
+A particular LNXRQueryI is represented with a URL.
+
+For example:
+* [[http://ln.taoriver.net/lnxrqs]]
+* [[http://taoriver.net:8123]]
+
+Both of these, (if they are working right now,) are LNXRQueryI.
+
+The interface is fully specified in the [[Local Names XML-RPC Query Interface Specification]].
+
+The interface supports the following:
+
+* lookup a name in a namespace
+* resolve a name by [[query path]]
+* resolve multiple names at once (without box-car overhead)
+* dump the query server's cache of a namespace
+* retrieve a list of cached namespaces
+* retrieve general server information
+
+$REM ===================================================================
+
+$name Local Names XML-RPC Store Interface
+$name LNXRStoreI
+$name LNXRSI
+== Local Names XML-RPC Store Interface ("LNXRStoreI") ==
+
+An [[XML-RPC]] interface that is accessed to store information in a
+[[Local Names Store Server]] that supports the interface.
+
+
+$REM ===================================================================
+
+$name Local Names XML-RPC Query Server
+$name Local Names Query Server
+$name Query Server
+$name LNXRQueryS
+$name Resolver
+== Local Names Query Server ==
+
+(TODO)
+
+
+$REM ===================================================================
+
+$name Local Names XML-RPC Store Server
+$name Local Names Store Server
+$name Store Server
+$name LNXRStoreS
+== Local Names Store Server ==
+
+(TODO)
+
+
+$REM ===================================================================
+
 $name name
 == name ==
 
@@ -376,6 +466,14 @@ descriptions] for them.
 
 $REM ===================================================================
 
+$name lookup path
+== lookup path ==
+
+(TODO)
+
+
+$REM ===================================================================
+
 $name namespace
 == namespace ==
 
@@ -477,6 +575,16 @@ URL template "http://example.net/$NAME".
 
 Read the [[glossary]] entry on [[pattern]] for information on how
 patterns are used.
+
+
+$REM ===================================================================
+
+$name query path
+$name path
+
+== query path ==
+
+(TODO)
 
 
 $REM ===================================================================
@@ -607,20 +715,33 @@ was "foo", then the resulting URI would be "http://example.com/foo".
 $REM ===================================================================
 
 $name Web Browser Redirect
-== Web Browser Redirect ==
+$name Browser Redirection
+$name Web Browser Redirection
+$name Browser Redirect
+== Web Browser Redirection ==
 
-'''Web Browser Redirect''' refers to specific server software. The
-software interprets specially formatted HTTP requests as Local Names
-lookups, and then redirects the web browser to go to the found address.
+'''Web Browser Redirection''' is a technique used by a [[Redirection
+Server]] to send a user's web browser to the [[URL]] bound to a
+particular [[local name.]]
 
-Try it out, by following this link:
+It works like so:
+
+# The user sends a specially formatted request, to a [[Web Browser Redirection Server]].
+# The server extracts a [[lookup path]] from the submitted URL.
+# The server uses a [[Local Names XML-RPC Query Server]] to resolve the [[lookup path]] to a bound [[URL.]]
+# The server sends an HTTP response with a [[Location]Location:] header field, pointing to the bound URL.
+# The web browser jumps to the bound URL.
+
+In this way, the user can jump to web pages by local name.
+
+You can try it out, using [[redirect] a functioning redirect server:]
 
 * [[http://ln.taoriver.net/redirect?namespace=http://ln.taoriver.net/localnames.txt&path=spec]]
 
 Note the following parts in this use:
-* /redirect -- ''redirecting the web browser to another page''
+* /redirect -- ''the Apache path to the redirection CGI script''
 * ?namespace=[[http://ln.taoriver.net/localnames.txt]] -- ''[[namespace
-  description]] to start from''
+  description]] to start the [[lookup path]] from''
 * &path=spec -- ''the name to look up'' ("spec")
 
 Here's another, that performs some hops:
@@ -628,7 +749,7 @@ Here's another, that performs some hops:
 * [[http://ln.taoriver.net/redirect?namespace=http://ln.taoriver.net/localnames.txt&path=S:WP:robot]]
 
 The colon (:) tells it to hop through the namespace. This one starts by
-looking for namespace "S" (short for "services"), then for "WP" (short
+looking for namespace "S" (short for [["services"]]), then for "WP" (short
 for "Wikipedia"), then looks up "robot" in that space.
 
 
