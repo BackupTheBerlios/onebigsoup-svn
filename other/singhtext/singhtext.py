@@ -2,7 +2,7 @@
 
 Headers:  == Heading 2 ==
 Paragraphs:  Continuous text; Blank lines segregate paragraphs.
-Bold and Italic:  '''bold''' ''italic''
+Bold and Italic and Code:  '''bold''' ''italic'' {{{code}}}
 Links:  [[http://example.com/]]  [[http://example.com/] link text]
 
 Lists:  * first
@@ -24,7 +24,7 @@ text_to_paragraph  -- group TEXT lines into PARAGRAPHs
 group_list_items  -- group ITEMs into LISTs.
 join_by_pairs  -- place START and END markers in a list
 html_escape  -- &entities;
-bold_and_italics  -- '''bold''', ''italics''
+bold_and_italics_and_code  -- '''bold''', ''italics'', {{{code}}}
 hyperlink  -- [[links]] to <a hrefs>
 treat  -- &entity;, '''bold''', ''italic'', and [[link]]
 tokens_to_html  -- produce HTML lines
@@ -65,6 +65,9 @@ link_regex = link_regex.replace("]", "\\]")  # ] isn't a character class
 link_re = re.compile(link_regex, re.DOTALL | re.MULTILINE)
 
 special_set_re = re.compile("(\S+):\s*(.+)")  # $set (foo): (bar)
+
+
+code_re = re.compile("([{][{][{][^}]+[}][}][}])")
 
 
 def tokenize_line(line, start_pos=0):
@@ -273,8 +276,8 @@ def html_escape(text):
     return "".join(L)
 
 
-def bold_and_italics(text):
-    """Perform '''bold''' and ''italics'' replacements.
+def bold_and_italics_and_code(text):
+    """Perform '''bold,''' ''italics,'' & {{{CODE}}} replacements.
 
     Note that, this assumes you've already called html_escape.
     """
@@ -282,6 +285,9 @@ def bold_and_italics(text):
     text = join_by_pairs(L, "<b>", "</b>")
     L = text.split("&apos;&apos;")
     text = join_by_pairs(L, "<i>", "</i>")
+    text = code_re.sub(lambda mo: "<code>"
+                                  + mo.groups(1)[0][3:-3]
+                                  + "</code>", text)
     return text
 
 
@@ -306,7 +312,7 @@ def treat(text):
 
     This is a convenience function.
     """
-    return hyperlink(bold_and_italics(html_escape(text)))
+    return hyperlink(bold_and_italics_and_code(html_escape(text)))
 
 
 def tokens_to_html(tokens):
