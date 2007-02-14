@@ -22,13 +22,10 @@ NS "services" .
 LN "XML-RPC" "http://www.xmlrpc.org/"
 
 LN "One Big Soup" "http://onebigsoup.wiki.taoriver.net"
-NS "OneBigSoup" "http://ln.taoriver.net/wrap/onebigsoup"
-. "OBS" .
 
-NS "WikiFeatures" "http://ln.taoriver.net/wrap/wikifeatures"
 NS "Lion" "http://taoriver.net/tmp/gmail.txt"
 LN "CommunityWiki" "http://communitywiki.org/"
-NS "CommunityWiki" "http://ln.taoriver.net/wrap/communitywiki"
+NS "CommunityWiki" "http://www.communitywiki.org/cw?action=ln"
 . "CW" .
 
 # Downloads
@@ -87,3 +84,40 @@ LN "dumpcache" "http://ln.taoriver.net/dumpcache"
 . "cachedump" .
 LN "news RSS" "news.rdf"
 
+
+LN "WordPress" "http://wordpress.org/"
+LN "GPL" "http://www.gnu.org/copyleft/gpl.html"
+LN "Free Software" "http://www.gnu.org/philosophy/free-sw.html"
+LN "de facto" "http://en.wikipedia.org/wiki/De_facto"
+LN "wiki" "http://en.wikipedia.org/wiki/Wiki"
+LN "bookmarklet" "http://www.squarefree.com/bookmarklets/"
+LN "OddMuse" "http://www.oddmuse.org/"
+LN "IRC" "http://www.irchelp.org/"
+LN "7-zip" "http://www.7-zip.org/"
+
+LN "WordPress Plugin Download" "lnwordpress.tgz"
+
+LN "Subversion Server" "http://onebigsoup.wiki.taoriver.net/moin.fcg/SubversionServer"
+LN "Location:" "http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.30"
+
+LN "Greasemonkey" "http://greasemonkey.mozdev.org/index.html"
+LN "Local Names Greasemonkey Script" "http://jroes.sosdg.org/lnlink.user.js"
+LN "Textarea Example" "http://www.htmlref.com/examples/chapter12/textarea.html"
+
+LN "Slashdot" "http://www.slashdot.org/"
+LN "GMail" "http://mail.google.com/"
+
+LN "InterLink" "http://wikifeatures.wiki.taoriver.net/moin.fcg/InterLink"
+LN "WikiEngine" "http://wikifeatures.wiki.taoriver.net/moin.fcg/WikiEngine"
+
+LN "Brian Templeton" "http://bpt.tunes.org/"
+LN "bpt" .
+LN "Dave Menninger" "http://198lane.homelinux.com/~dave/"
+LN "Greg Schueler" "http://greg.vario.us/"
+LN "Heather James" "http://nearlythere.com/"
+LN "Jonathan Roes" "http://jonathanroes.blogspot.com/"
+LN "jroes" .
+LN "Sean Palmer" "http://inamidst.com/sbp/"
+LN "sbp" .
+
+LN "Location" "http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.30"

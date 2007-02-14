@@ -1,0 +1,212 @@
+$set title: Using Local Names
+$name Using
+
+$name How to Use Local Names
+== How do I Use Local Names? ==
+
+There are several things you can do now.
+
+* '''Firefox''' -- name & jump to pages
+* '''GreaseMonkey''' -- automatically write <a href>'s around Local Names
+* '''WordPress''' -- use Local Names in blog entries
+
+$name Jump to Pages
+$name Firefox: Jump to Pages
+$name Jump to a Page
+== FireFox: Jump to Pages ==
+
+'''What It Is'''
+
+You can configure [[FireFox]] to automatically jump to named pages.
+
+So instead of typing "http://ln.taoriver.net/", you instead type "ln
+Local Names", and it takes you here.
+
+Or, instead of typing "http://youtube.com/watch?v=PnCVZozHTG8" in the
+address bar, you just type, "ln pancakes", and it takes you there.
+
+'''How To Install It'''
+
+# Start [[FireFox.]]
+# Under "Bookmarks," choose "Manage Bookmarks."
+# In the folder tree, open up "Bookmarks," and then select "Quick Searches."
+# Click on the "New Bookmark" button.
+# For Name, enter: {{{Local Names Lookup}}}
+# For Location, enter: {{{http://ln.taoriver.net/redirect?namespace=}}}''YOUR-NAMESPACE-URL-HERE''{{{&path=%s}}}
+# For Keyword, enter: {{{ln}}}
+# For Description, enter: {{{Jump to the page by the given name.}}}
+# Click on "OK."
+# Close the Bookmarks Manager.
+
+'''Be sure''' to put your URL where it says ''YOUR-NAMESPACE-URL-HERE''
+above.
+
+As an example, [[Lion Kimbro]] sets his URL to: {{{http://ln.taoriver.net/redirect?namespace=http://taoriver.net:9000/description?namespace=lion&path=%s}}}
+
+(Geek note: The "%s" at the end is where Firefox is going to stick
+whatever Local Name you look up.)
+
+'''How to Use It'''
+
+# Hold down the Alt-key, and type the letter "d." ({{{Alt-d}}}.) You can release the Alt key now.
+# The URL of the page you are at should now be highlighted, with a dark background.
+# Type {{{ln}}} ''a local name'', and then Enter.
+# You should find yourself at the web page with that name!
+
+So for example, when Lion types {{{ln creole}}}, he's taken to
+{{{http://www.wikicreole.org/wiki/Home}}}, because
+[http://taoriver.net:9000/description?namespace=lion his namespace]
+binds "creole" to that URL.
+
+'''Caveats'''
+
+This is by far the fastest way to get to a web page that you know by
+name.  No browsing through huge lists of bookmarks, and no browsing
+across Google or del.icio.us.  If you know what you want, you can get
+''straight'' to it.
+
+That said, this software is young.  Sometimes, if nobody has used Local
+Names in a while, or if a namespace is freshly appended to, there's a
+noticable slight delay, as the [[query server]] comes to the foreground,
+and as needed namespaces are retrieved & cached.
+
+You'll notice that every lookup after your first will be much quicker.
+
+$name Name Pages
+$name Name a Page
+$name Name Web Pages
+$name Name a Web Page
+$name My LocalNames Bookmarklet
+
+== Firefox: Name Pages ==
+
+'''What It Is'''
+
+You can also ''name'' web pages (assign a [[name]] to a [[URL]]) in
+FireFox!
+
+Basically: You see a page that you like, and you go, "Oh! I'll call this
+page... Pancakes!"  You click a button, type in "Pancakes," and the page
+is named.
+
+'''How to Install It'''
+
+You do this with a [[bookmarklet,]] and an account on [[My Local
+Names.]]
+
+Accounts are totally free, your data is yours, there's zero lock-in.
+
+Type in a name for a namespace. If you want to protect it, put in your
+password.
+
+You'll see a big page, and it'll have a bookmarklet on it.  Drag the
+bookmarklet to your [[FireFox]] bookmarks toolbar, and it's installed!
+
+'''How to Use It'''
+
+Go to a page on the Internet that you like.
+
+Come up with a name for it.
+
+Click on the "Name this Page" bookmarklet.
+
+Type in the name of the page in the box that prompts for the name, and
+hit the "submit" button.
+
+You've named the page!
+
+'''Caveats'''
+
+First, you'll probably want to bind a name "''this''" (as in, the word
+"''this''") to point to your actual [[namespace description]] file.
+
+When you see the "Welcome! You've just created a Local Names namespace!"
+page, you'll see a link to the source code for your namespace,
+immediately following.  Click that, and then hit your "Name this Page"
+bookmarklet.
+
+Type "{{{this}}}" in, for the name, and then hit the submit button.
+
+Now, if you do an "ln this", you can see all the things you've named so
+far!
+
+AND: If you want to back up your namespace description, this is the page
+to copy.  Just save it to a file, and you're done.
+
+== GreaseMonkey ==
+
+'''What It Is'''
+
+[[Jonathan Roes]] has written an excellent [[Greasemonkey]] script: The
+[[Local Names Greasemonkey Script]].
+
+It sits in [[FireFox,]] and waits, while you browse the web.
+
+When you start typing into an XHTML textarea, (such as
+[http://www.htmlref.com/examples/chapter12/textarea.html the one on this page,])
+it intercepts local names, and replaces them with hyperlinks.
+
+'''How to Install It'''
+
+# Install [[Firefox,]] if you haven't already.
+# Install [[GreaseMonkey.]]  -- Don't worry, it's easy.
+# Go to [[Jonathan Roes']] [[Local Names Greasemonkey Script.]]
+# Click "Install," to in the yellow bar with the monkey in it.
+# Click "OK," when it says, "localnameslink.user.js installed."
+# Click on "Tools" in the Firefox menu, and then "Manage User Scripts."
+# Select "Local Names Link" in the list of scripts on the left.
+# Click "Edit."
+# If prompted for an editor, pick one, such as "Notepad."
+# Find the text "namespace_url" in the text, as per your editor.
+# Change the URL to the URL for your namespace.  (For example, you could put: {{{var namespace_url = 'http://ln.taoriver.net/localnames.txt';}}} if you wanted to use [[this]the Local Names namespace.])
+# Close the editor.
+# Go to the [[Textarea Example]] page.
+# Try it!
+
+That is, start typing text like the following:
+
+#CODE
+This is a test of [[Local Names.]]
+I want to see if the [[Local Names Greasemonkey Script]] works.
+#CODE
+
+Though, this particular example will only work if you actually have
+those names defined.
+
+'''How to Use It'''
+
+You type in a [[textarea example]textarea] like normal, but you put two
+brackets around words that you want to link.
+
+#CODE
+Here is some text,
+it has a [[hyperlink]] in it.
+#CODE
+
+The Greasemonkey script then detects this, performs a lookup, and
+replaces the text with:
+
+#CODE
+Here is some text,
+it has a <a href="http://c2.com/cgi/wiki?HyperLinking">hyperlink</a> in it.
+#CODE
+
+Very simple.
+
+'''Caveats'''
+
+The script can take a few moments to kick in: The first request
+generally takes around 5 seconds, and then, thereafter, 1-2 seconds.
+
+Also, it doesn't work on all sites, all textareas.
+
+For example, it works on [[Slashdot,]] but it doesn't work in [[Gmail.]]
+Generally, the more [[S:WP:JavaScript]JavaScript] there is working on
+a page, the less likely it is to work.
+
+== WordPress ==
+
+For the bloggers, there is a [[WordPress]] plugin.
+
+I have written up special instructions for it; See: [[WordPress Plugin]]
+

@@ -1,0 +1,75 @@
+$set title: Local Names WordPress Plugin
+$name WordPress Plugin
+$name WP Plugin
+
+The Local Names WordPress Plugin automatically links [[local names]]
+to [[URL]]s in WordPress posts.
+
+
+== Download! ==
+
+* [[WordPress Plugin Download] Download the Local Names WordPress Plugin!]
+
+Use [[7-zip]] to untar it on Windows, "tar xvzf lnwordpress.tgz" to untar it on Linux.
+
+
+== How To Use It ==
+
+There's actually a ''very'' nice tutorial in the README, but this diagram can serve as a preview:
+
+#LITERAL
+<img src="ln_demonstration.png" alt="depiction of linking names to URLs with the Local Names WordPress Plugin" />
+#LITERAL
+
+In short,
+
+#CODE
+[[your name here]]
+#CODE
+
+...or...
+
+#CODE
+[[your name here | your link text here]]
+#CODE
+
+...the plugin changes the text to remove the brackets, and hyperlink
+the text.
+
+
+== Getting A Namespace ==
+
+A [[namespace]] is ''your'' personal collection of names that link to URLs.
+
+You can make a namespace from scratch on your own, or you can use [[My Local Names]] to make and maintain your namespace.
+
+== Isn't there already a plugin that does automatic linking? ==
+
+There are many great plugins that already do automatic linking.
+
+If you use one, consider telling the authors about [[Local Names
+Website] Local Names.]  If the author adds support for producing
+[[namespace descriptions,]] then you can use the names you define
+there in any other contexts that support Local Names!
+
+What is ''unique'' to Local Names, is that it's based on the idea of
+publishing name-URL binding lists, so that you can reuse them in
+different contexts.
+
+You should be able to use your names in...
+
+* your wiki,
+* your web browser, (to tell it to go to places by name alone,)
+* your mail client,
+* your instant messenger,
+* in IRC,
+* in your web page editor,
+* ...and so on, and so forth.
+
+Any place where you can produced hyperlinks, you should be able to use
+Local Names.  My goal is to make Local Names work in as many places as
+I can write plug-ins for.
+
+Please read [[About Local Names]] for more information, and a
+technical introduction.
+
