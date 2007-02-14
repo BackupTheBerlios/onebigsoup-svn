@@ -172,7 +172,7 @@ This is a DRAFT version only; Feedback welcome! Visit
   * "INTERFACE"
       - MUST return the text: "v1 Local Names Query Interface"
   * "IMPLEMENTATION"
-      - Returns some unique name identifying the coede-base in use.
+      - Returns some unique name identifying the code-base in use.
       - For example, "LION-LNQS-D1-V1", for Lion Kimbros' Local Names
         query server.
       - You can make this name up; Just don't collide with anyone else.
