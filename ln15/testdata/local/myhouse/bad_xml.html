@@ -1,0 +1,62 @@
+<html>
+
+<head>
+<title>Local Test Namespace Description: My Namespace</title>
+</head>
+
+<body>
+
+<h3>Notes</h3>
+
+<p>This is <b>local</b>.  This page is for testing on a computer that is
+   <i>not</i> connected to the Internet.</p>
+
+<p>All pages are relative addressed.</p>
+
+<p>In particular, <b>this paragraph does not terminate.</b>
+
+<h3>Names</h3>
+
+<p>The following links <i>do not</i> have rel="ln-localname" in their listing.</p>
+
+<ul>
+<li><a href="shrub.html">shrub</a> - href="shrub.html"</li>
+<li><a href="bush.html">bush</a> - href="bush.html"</li>
+<li><a href="weed.html">weed</a> - href="weed.html"</li>
+</ul>
+
+<p>The following links <i>do</i> have rel="ln-localname" in their listing.</p>
+
+<ul>
+<li><a rel="ln-localname" href="chair.html">chair</a> - rel="ln-localname" href="chair.html"</li>
+<li><a rel="ln-localname" href="table.html">table</a> - rel="ln-localname" href="table.html"</li>
+<li><a rel="ln-localname" href="../johnshouse/homepage.html">Johns House</a> - rel="ln-localname" href="../johnshouse/homepage.html"</li>
+<li><a rel="ln-localname" href="../janeshouse/homepage.html">Janes House</a> - rel="ln-localname" href="../janeshouse/homepage.html"</li>
+</ul>
+
+<p>A pattern:</p>
+
+<ul>
+<li><a rel="ln-pattern" href="computer/{number}.html">Computer</a> - rel="ln-pattern" href="computer/{number}.html"</li>
+</ul>
+
+<p>Namespaces:</p>
+
+<ul>
+<li><a rel="ln-namespace" href=""><b>this</b></a> - rel="ln-namespace" <b>href=""</b></li>
+<li><a rel="ln-namespace" href="namespace.html"><b>this2</b></a> - rel="ln-namespace" <b>href="namespace.html"</b></li>
+<li><a rel="ln-namespace" href="../johnshouse/namespace.html">Johns House</a> - rel="ln-namespace" href="../johnshouse/namespace.html"</li>
+<li><a rel="ln-namespace" href="../janeshouse/namespace.html">Janes House</a> - rel="ln-namespace" href="../janeshouse/namespace.html"</li>
+</ul>
+
+<p>To be ignored:</p>
+
+<ul>
+<li><a rel="ln-ignore" href="homepage.html">back to homepage</a> - rel="ln-ignore" href="homepage.html"</li>
+</ul>
+
+</body>
+
+</html>
+
+
